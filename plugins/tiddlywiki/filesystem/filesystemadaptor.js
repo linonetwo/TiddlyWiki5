@@ -72,9 +72,10 @@ FileSystemAdaptor.prototype.getTiddlerFileInfo = function(tiddler,callback) {
 };
 
 
-/*
-Save a tiddler and invoke the callback with (err,adaptorInfo,revision)
-*/
+/**
+ * Save a tiddler and invoke the callback with (err,adaptorInfo,revision)
+ * @param options `{ tiddlerInfo; noToFile?: boolean }
+ */
 FileSystemAdaptor.prototype.saveTiddler = function(tiddler,callback,options) {
 	var self = this;
 	var syncerInfo = options.tiddlerInfo || {};
@@ -82,7 +83,9 @@ FileSystemAdaptor.prototype.saveTiddler = function(tiddler,callback,options) {
 		if(err) {
 			return callback(err);
 		}
-		$tw.utils.saveTiddlerToFile(tiddler,fileInfo,function(err,fileInfo) {
+
+		/** callback for `$tw.utils.saveTiddlerToFile` , we pass it to a call of `$tw.utils.saveTiddlerToFile` if we have `options.toFile`, which ask tw to modify file system. Otherwise we call this callback without calling `$tw.utils.saveTiddlerToFile` */
+		const saveTiddlerCallback = (err,fileInfo) => {
 			if(err) {
 				if ((err.code == "EPERM" || err.code == "EACCES") && err.syscall == "open") {
 					fileInfo = fileInfo || self.boot.files[tiddler.fields.title];
@@ -102,13 +105,24 @@ FileSystemAdaptor.prototype.saveTiddler = function(tiddler,callback,options) {
 				bootInfo: fileInfo || {},
 				title: tiddler.fields.title
 			};
-			$tw.utils.cleanupTiddlerFiles(options,function(err,fileInfo) {
+			/** callback for `$tw.utils.cleanupTiddlerFiles` */
+			const cleanupTiddlerCallback = (err,fileInfo) => {
 				if(err) {
 					return callback(err);
 				}
 				return callback(null,fileInfo);
-			});
-		});
+			}
+			if (options.noToFile) {
+				$tw.utils.cleanupTiddlerFiles(options,function,cleanupTiddlerCallback);
+			} else {
+				cleanupTiddlerCallback(null, fileInfo);
+			}
+		}
+		if (options.noToFile) {
+			$tw.utils.saveTiddlerToFile(tiddler,fileInfo,saveTiddlerCallback);
+		} else {
+			saveTiddlerCallback(null, fileInfo);
+		}
 	});
 };
 
@@ -121,15 +135,16 @@ FileSystemAdaptor.prototype.loadTiddler = function(title,callback) {
 	callback(null,null);
 };
 
-/*
-Delete a tiddler and invoke the callback with (err)
-*/
+/**
+ * Delete a tiddler and invoke the callback with (err)
+ * @param options `{ tiddlerInfo; noToFile?: boolean }
+ */
 FileSystemAdaptor.prototype.deleteTiddler = function(title,callback,options) {
 	var self = this,
 		fileInfo = this.boot.files[title];
 	// Only delete the tiddler if we have writable information for the file
 	if(fileInfo) {
-		$tw.utils.deleteTiddlerFile(fileInfo,function(err,fileInfo) {
+		const deleteTiddlerCallback = (err,fileInfo) => {
 			if(err) {
 				if ((err.code == "EPERM" || err.code == "EACCES") && err.syscall == "unlink") {
 					// Error deleting the file on disk, should fail gracefully
@@ -142,7 +157,12 @@ FileSystemAdaptor.prototype.deleteTiddler = function(title,callback,options) {
 			// Remove the tiddler from self.boot.files & return null adaptorInfo
 			delete self.boot.files[title];
 			return callback(null,null);
-		});
+		}
+		if (options.noToFile) {
+			$tw.utils.deleteTiddlerFile(fileInfo,deleteTiddlerCallback);
+		} else {
+			deleteTiddlerCallback(null, fileInfo);
+		}
 	} else {
 		callback(null,null);
 	}
