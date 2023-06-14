@@ -6,22 +6,30 @@ module-type: allfilteroperator
 Filter function for [all[current]]
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter function
-*/
-exports.current = function(source,prefix,options) {
-	var currTiddlerTitle = options.widget && options.widget.getVariable("currentTiddler");
-	if(currTiddlerTitle) {
-		return [currTiddlerTitle];
-	} else {
-		return [];
-	}
-};
-
+	*/
+	exports.current = function(source, prefix, options) {
+		var currTiddlerTitle = options.widget && options.widget.getVariable("currentTiddler");
+		if(currTiddlerTitle) {
+			return [currTiddlerTitle];
+		} else {
+			return [];
+		}
+	};
 })();
+
+
+
+
+
+
+
+
+
+

@@ -6,25 +6,33 @@ module-type: filteroperator
 Filter operator for replacing an empty input list with a constant, passing a non-empty input list straight through
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter function
-*/
-exports.else = function(source,operator,options) {
-	var results = [];
-	source(function(tiddler,title) {
-		results.push(title);
-	});
-	if(results.length === 0) {
-		return [operator.operand];
-	} else {
-		return results;
-	}
-};
-
+	*/
+	exports.else = function(source, operator, options) {
+		var results = [];
+		source(function(tiddler, title) {
+			results.push(title);
+		});
+		if(results.length === 0) {
+			return [operator.operand];
+		} else {
+			return results;
+		}
+	};
 })();
+
+
+
+
+
+
+
+
+
+

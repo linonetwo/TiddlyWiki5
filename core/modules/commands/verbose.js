@@ -6,29 +6,37 @@ module-type: command
 Verbose command
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	exports.info = {
+		name: "verbose",
+		synchronous: true,
+	};
 
-exports.info = {
-	name: "verbose",
-	synchronous: true
-};
+	var Command = function(params, commander) {
+		this.params = params;
+		this.commander = commander;
+	};
 
-var Command = function(params,commander) {
-	this.params = params;
-	this.commander = commander;
-};
+	Command.prototype.execute = function() {
+		this.commander.verbose = true;
+		// Output the boot message log
+		this.commander.streams.output.write("Boot log:\n  " + $tw.boot.logMessages.join("\n  ") + "\n");
+		return null; // No error
+	};
 
-Command.prototype.execute = function() {
-	this.commander.verbose = true;
-	// Output the boot message log
-	this.commander.streams.output.write("Boot log:\n  " + $tw.boot.logMessages.join("\n  ") + "\n");
-	return null; // No error
-};
-
-exports.Command = Command;
-
+	exports.Command = Command;
 })();
+
+
+
+
+
+
+
+
+
+

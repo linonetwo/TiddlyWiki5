@@ -6,28 +6,36 @@ module-type: macro
 Macro to output tiddlers matching a filter to JSON
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Information about this macro
-*/
+	*/
 
-exports.name = "jsontiddlers";
+	exports.name = "jsontiddlers";
 
-exports.params = [
-	{name: "filter"},
-	{name: "spaces"}
-];
+	exports.params = [
+		{name: "filter"},
+		{name: "spaces"},
+	];
 
-/*
+	/*
 Run the macro
-*/
-exports.run = function(filter,spaces) {
-	return this.wiki.getTiddlersAsJson(filter,$tw.utils.parseInt(spaces));
-};
-
+	*/
+	exports.run = function(filter, spaces) {
+		return this.wiki.getTiddlersAsJson(filter, $tw.utils.parseInt(spaces));
+	};
 })();
+
+
+
+
+
+
+
+
+
+

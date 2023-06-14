@@ -4,14 +4,21 @@ type: application/javascript
 module-type: texteditoroperation
 Simply focus the Text editor
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-exports["focus-editor"] = function(event,operation) {
-	operation = null;
-};
-
+	exports["focus-editor"] = function(event, operation) {
+		operation = null;
+	};
 })();
+
+
+
+
+
+
+
+
+

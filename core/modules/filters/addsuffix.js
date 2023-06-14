@@ -8,21 +8,29 @@ especially useful in contexts where only a filter expression is allowed
 and macro substitution isn't available.
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter function
-*/
-exports.addsuffix = function(source,operator,options) {
-	var results = [];
-	source(function(tiddler,title) {
-		results.push(title + operator.operand);
-	});
-	return results;
-};
-
+	*/
+	exports.addsuffix = function(source, operator, options) {
+		var results = [];
+		source(function(tiddler, title) {
+			results.push(title + operator.operand);
+		});
+		return results;
+	};
 })();
+
+
+
+
+
+
+
+
+
+

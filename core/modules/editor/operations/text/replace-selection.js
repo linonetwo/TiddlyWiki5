@@ -6,18 +6,26 @@ module-type: texteditoroperation
 Text editor operation to replace the selection
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-exports["replace-selection"] = function(event,operation) {
-	operation.replacement = event.paramObject.text;
-	operation.cutStart = operation.selStart;
-	operation.cutEnd = operation.selEnd;
-	operation.newSelStart = operation.selStart;
-	operation.newSelEnd = operation.selStart + operation.replacement.length;
-};
-
+	exports["replace-selection"] = function(event, operation) {
+		operation.replacement = event.paramObject.text;
+		operation.cutStart = operation.selStart;
+		operation.cutEnd = operation.selEnd;
+		operation.newSelStart = operation.selStart;
+		operation.newSelEnd = operation.selStart + operation.replacement.length;
+	};
 })();
+
+
+
+
+
+
+
+
+
+

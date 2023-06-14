@@ -6,31 +6,39 @@ module-type: isfilteroperator
 Filter function for [is[binary]]
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter function
-*/
-exports.binary = function(source,prefix,options) {
-	var results = [];
-	if(prefix === "!") {
-		source(function(tiddler,title) {
-			if(!options.wiki.isBinaryTiddler(title)) {
-				results.push(title);
-			}
-		});
-	} else {
-		source(function(tiddler,title) {
-			if(options.wiki.isBinaryTiddler(title)) {
-				results.push(title);
-			}
-		});
-	}
-	return results;
-};
-
+	*/
+	exports.binary = function(source, prefix, options) {
+		var results = [];
+		if(prefix === "!") {
+			source(function(tiddler, title) {
+				if(!options.wiki.isBinaryTiddler(title)) {
+					results.push(title);
+				}
+			});
+		} else {
+			source(function(tiddler, title) {
+				if(options.wiki.isBinaryTiddler(title)) {
+					results.push(title);
+				}
+			});
+		}
+		return results;
+	};
 })();
+
+
+
+
+
+
+
+
+
+

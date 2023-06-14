@@ -6,26 +6,34 @@ module-type: filteroperator
 Filter operator for returning the names of the fields on the selected subtiddlers of the plugin named in the operand
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter function
-*/
-exports.subtiddlerfields = function(source,operator,options) {
-	var results = [];
-	source(function(tiddler,title) {
-		var subtiddler = options.wiki.getSubTiddler(operator.operand,title);
-		if(subtiddler) {
-			for(var fieldName in subtiddler.fields) {
-				$tw.utils.pushTop(results,fieldName);
+	*/
+	exports.subtiddlerfields = function(source, operator, options) {
+		var results = [];
+		source(function(tiddler, title) {
+			var subtiddler = options.wiki.getSubTiddler(operator.operand, title);
+			if(subtiddler) {
+				for(var fieldName in subtiddler.fields) {
+					$tw.utils.pushTop(results, fieldName);
+				}
 			}
-		}
-	});
-	return results;
-};
-
+		});
+		return results;
+	};
 })();
+
+
+
+
+
+
+
+
+
+

@@ -6,25 +6,33 @@ module-type: macro
 Macro to return the TiddlyWiki core version number
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Information about this macro
-*/
+	*/
 
-exports.name = "version";
+	exports.name = "version";
 
-exports.params = [];
+	exports.params = [];
 
-/*
+	/*
 Run the macro
-*/
-exports.run = function() {
-	return $tw.version;
-};
-
+	*/
+	exports.run = function() {
+		return $tw.version;
+	};
 })();
+
+
+
+
+
+
+
+
+
+

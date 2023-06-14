@@ -6,27 +6,35 @@ module-type: macro
 Macro to return a formatted version of the current time
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Information about this macro
-*/
+	*/
 
-exports.name = "now";
+	exports.name = "now";
 
-exports.params = [
-	{name: "format"}
-];
+	exports.params = [
+		{name: "format"},
+	];
 
-/*
+	/*
 Run the macro
-*/
-exports.run = function(format) {
-	return $tw.utils.formatDateString(new Date(),format || "0hh:0mm, DDth MMM YYYY");
-};
-
+	*/
+	exports.run = function(format) {
+		return $tw.utils.formatDateString(new Date(), format || "0hh:0mm, DDth MMM YYYY");
+	};
 })();
+
+
+
+
+
+
+
+
+
+

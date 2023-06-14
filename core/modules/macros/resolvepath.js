@@ -6,24 +6,32 @@ module-type: macro
 Resolves a relative path for an absolute rootpath.
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	exports.name = "resolvepath";
 
-exports.name = "resolvepath";
+	exports.params = [
+		{name: "source"},
+		{name: "root"},
+	];
 
-exports.params = [
-	{name: "source"},
-	{name: "root"}
-];
-
-/*
+	/*
 Run the macro
-*/
-exports.run = function(source, root) {
-	return $tw.utils.resolvePath(source, root);
-};
-
+	*/
+	exports.run = function(source, root) {
+		return $tw.utils.resolvePath(source, root);
+	};
 })();
+
+
+
+
+
+
+
+
+
+

@@ -6,32 +6,31 @@ module-type: startup
 Command processing
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	// Export name and synchronous status
+	exports.name = "commands";
+	exports.platforms = ["node"];
+	exports.after = ["story"];
+	exports.synchronous = false;
 
-// Export name and synchronous status
-exports.name = "commands";
-exports.platforms = ["node"];
-exports.after = ["story"];
-exports.synchronous = false;
-
-exports.startup = function(callback) {
-	// On the server, start a commander with the command line arguments
-	var commander = new $tw.Commander(
-		$tw.boot.argv,
-		function(err) {
-			if(err) {
-				return $tw.utils.error("Error: " + err);
-			}
-			callback();
-		},
-		$tw.wiki,
-		{output: process.stdout, error: process.stderr}
-	);
-	commander.execute();
-};
-
+	exports.startup = function(callback) {
+		// On the server, start a commander with the command line arguments
+		var commander = new $tw.Commander(
+			$tw.boot.argv,
+			function(err) {
+				if(err) {
+					return $tw.utils.error("Error: " + err);
+				}
+				callback();
+			},
+			$tw.wiki,
+			{output: process.stdout, error: process.stderr},
+		);
+		commander.execute();
+	};
 })();
+

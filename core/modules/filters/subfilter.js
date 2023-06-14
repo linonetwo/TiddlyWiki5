@@ -6,28 +6,36 @@ module-type: filteroperator
 Filter operator returning its operand evaluated as a filter
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter function
-*/
-exports.subfilter = function(source,operator,options) {
-	var list = options.wiki.filterTiddlers(operator.operand,options.widget,source);
-	if(operator.prefix === "!") {
-		var results = [];
-		source(function(tiddler,title) {
-			if(list.indexOf(title) === -1) {
-				results.push(title);
-			}
-		});
-		return results;
-	} else {
-		return list;
-	}
-};
-
+	*/
+	exports.subfilter = function(source, operator, options) {
+		var list = options.wiki.filterTiddlers(operator.operand, options.widget, source);
+		if(operator.prefix === "!") {
+			var results = [];
+			source(function(tiddler, title) {
+				if(list.indexOf(title) === -1) {
+					results.push(title);
+				}
+			});
+			return results;
+		} else {
+			return list;
+		}
+	};
 })();
+
+
+
+
+
+
+
+
+
+

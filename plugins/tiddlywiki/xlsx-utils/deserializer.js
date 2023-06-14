@@ -6,25 +6,33 @@ module-type: tiddlerdeserializer
 XLSX file deserializer
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Parse an XLSX file into tiddlers
-*/
-exports["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"] = function(text,fields) {
-	// Collect output tiddlers in an array
-	var results = [],
-		XLSXImporter = require("$:/plugins/tiddlywiki/xlsx-utils/importer.js").XLSXImporter,
-		importer = new XLSXImporter({
-			text: text,
-			wiki: $tw.wiki
-		});
-	// Return the output tiddlers
-	return importer.getResults();
-};
-
+	*/
+	exports["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"] = function(text, fields) {
+		// Collect output tiddlers in an array
+		var results = [],
+			XLSXImporter = require("$:/plugins/tiddlywiki/xlsx-utils/importer.js").XLSXImporter,
+			importer = new XLSXImporter({
+				text: text,
+				wiki: $tw.wiki,
+			});
+		// Return the output tiddlers
+		return importer.getResults();
+	};
 })();
+
+
+
+
+
+
+
+
+
+

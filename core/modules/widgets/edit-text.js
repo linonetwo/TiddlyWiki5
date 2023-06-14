@@ -6,16 +6,24 @@ module-type: widget
 Edit-text widget
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	var editTextWidgetFactory = require("$:/core/modules/editor/factory.js").editTextWidgetFactory,
+		FramedEngine = require("$:/core/modules/editor/engines/framed.js").FramedEngine,
+		SimpleEngine = require("$:/core/modules/editor/engines/simple.js").SimpleEngine;
 
-var editTextWidgetFactory = require("$:/core/modules/editor/factory.js").editTextWidgetFactory,
-	FramedEngine = require("$:/core/modules/editor/engines/framed.js").FramedEngine,
-	SimpleEngine = require("$:/core/modules/editor/engines/simple.js").SimpleEngine;
-
-exports["edit-text"] = editTextWidgetFactory(FramedEngine,SimpleEngine);
-
+	exports["edit-text"] = editTextWidgetFactory(FramedEngine, SimpleEngine);
 })();
+
+
+
+
+
+
+
+
+
+

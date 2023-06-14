@@ -6,15 +6,23 @@ module-type: widget
 Edit-codemirror widget
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	var editTextWidgetFactory = require("$:/core/modules/editor/factory.js").editTextWidgetFactory,
+		CodeMirrorEngine = require("$:/plugins/tiddlywiki/codemirror/engine.js").CodeMirrorEngine;
 
-var editTextWidgetFactory = require("$:/core/modules/editor/factory.js").editTextWidgetFactory,
-	CodeMirrorEngine = require("$:/plugins/tiddlywiki/codemirror/engine.js").CodeMirrorEngine;
-
-exports["edit-codemirror"] = editTextWidgetFactory(CodeMirrorEngine,CodeMirrorEngine);
-
+	exports["edit-codemirror"] = editTextWidgetFactory(CodeMirrorEngine, CodeMirrorEngine);
 })();
+
+
+
+
+
+
+
+
+
+

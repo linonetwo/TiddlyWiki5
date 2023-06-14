@@ -6,17 +6,25 @@ module-type: allfilteroperator
 Filter function for [all[tiddlers]]
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter function
-*/
-exports.tiddlers = function(source,prefix,options) {
-	return options.wiki.allTitles();
-};
-
+	*/
+	exports.tiddlers = function(source, prefix, options) {
+		return options.wiki.allTitles();
+	};
 })();
+
+
+
+
+
+
+
+
+
+

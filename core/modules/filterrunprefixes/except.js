@@ -7,19 +7,27 @@ Difference of sets.
 Equivalent to - filter run prefix.
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter prefix function
-*/
-exports.except = function(operationSubFunction) {
-	return function(results,source,widget) {
-		results.remove(operationSubFunction(source,widget));
+	*/
+	exports.except = function(operationSubFunction) {
+		return function(results, source, widget) {
+			results.remove(operationSubFunction(source, widget));
+		};
 	};
-};
-
 })();
+
+
+
+
+
+
+
+
+
+

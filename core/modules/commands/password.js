@@ -6,31 +6,39 @@ module-type: command
 Save password for crypto operations
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	exports.info = {
+		name: "password",
+		synchronous: true,
+	};
 
-exports.info = {
-	name: "password",
-	synchronous: true
-};
+	var Command = function(params, commander, callback) {
+		this.params = params;
+		this.commander = commander;
+		this.callback = callback;
+	};
 
-var Command = function(params,commander,callback) {
-	this.params = params;
-	this.commander = commander;
-	this.callback = callback;
-};
+	Command.prototype.execute = function() {
+		if(this.params.length < 1) {
+			return "Missing password";
+		}
+		$tw.crypto.setPassword(this.params[0]);
+		return null;
+	};
 
-Command.prototype.execute = function() {
-	if(this.params.length < 1) {
-		return "Missing password";
-	}
-	$tw.crypto.setPassword(this.params[0]);
-	return null;
-};
-
-exports.Command = Command;
-
+	exports.Command = Command;
 })();
+
+
+
+
+
+
+
+
+
+

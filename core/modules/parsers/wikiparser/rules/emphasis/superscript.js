@@ -17,34 +17,41 @@ This wikiparser can be modified using the rules eg:
 ```
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	exports.name = "superscript";
+	exports.types = {inline: true};
 
-exports.name = "superscript";
-exports.types = {inline: true};
+	exports.init = function(parser) {
+		this.parser = parser;
+		// Regexp to match
+		this.matchRegExp = /\^\^/mg;
+	};
 
-exports.init = function(parser) {
-	this.parser = parser;
-	// Regexp to match
-	this.matchRegExp = /\^\^/mg;
-};
+	exports.parse = function() {
+		// Move past the match
+		this.parser.pos = this.matchRegExp.lastIndex;
 
-exports.parse = function() {
-	// Move past the match
-	this.parser.pos = this.matchRegExp.lastIndex;
+		// Parse the run including the terminator
+		var tree = this.parser.parseInlineRun(/\^\^/mg, {eatTerminator: true});
 
-	// Parse the run including the terminator
-	var tree = this.parser.parseInlineRun(/\^\^/mg,{eatTerminator: true});
-
-	// Return the classed span
-	return [{
-		type: "element",
-		tag: "sup",
-		children: tree
-	}];
-};
-
+		// Return the classed span
+		return [{
+			type: "element",
+			tag: "sup",
+			children: tree,
+		}];
+	};
 })();
+
+
+
+
+
+
+
+
+

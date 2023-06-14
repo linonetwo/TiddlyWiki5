@@ -3,14 +3,22 @@
 Do nothing widget
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	var Widget = require("$:/core/modules/widgets/widget.js").widget;
 
-var Widget = require("$:/core/modules/widgets/widget.js").widget;
-
-exports.donothing = Widget;
-
+	exports.donothing = Widget;
 })();
+
+
+
+
+
+
+
+
+
+

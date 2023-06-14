@@ -6,26 +6,34 @@ module-type: filteroperator
 Filter operator for replacing tiddler titles by the value of the field specified in the operand.
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter function
-*/
-exports.get = function(source,operator,options) {
-	var results = [];
-	source(function(tiddler,title) {
-		if(tiddler) {
-			var value = tiddler.getFieldString(operator.operand);
-			if(value) {
-				results.push(value);
+	*/
+	exports.get = function(source, operator, options) {
+		var results = [];
+		source(function(tiddler, title) {
+			if(tiddler) {
+				var value = tiddler.getFieldString(operator.operand);
+				if(value) {
+					results.push(value);
+				}
 			}
-		}
-	});
-	return results;
-};
-
+		});
+		return results;
+	};
 })();
+
+
+
+
+
+
+
+
+
+

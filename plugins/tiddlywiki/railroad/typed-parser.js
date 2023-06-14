@@ -6,23 +6,31 @@ module-type: parser
 This parser wraps unadorned railroad syntax into a railroad widget
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-var RailroadParser = function(type,text,options) {
-	var element = {
+	var RailroadParser = function(type, text, options) {
+		var element = {
 			type: "railroad",
 			tag: "$railroad",
-			text: text
+			text: text,
 		};
-	this.tree = [element];
-console.log(text);
-};
+		this.tree = [element];
+		console.log(text);
+	};
 
-exports["text/vnd.tiddlywiki.railroad"] = RailroadParser;
-
+	exports["text/vnd.tiddlywiki.railroad"] = RailroadParser;
 })();
+
+
+
+
+
+
+
+
+
+
 

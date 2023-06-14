@@ -6,51 +6,59 @@ module-type: saver
 Handles saving changes via HTML5's download APIs
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	// Title of the tiddler containing the download message
+	var downloadInstructionsTitle = "$:/language/Modals/Download";
 
-// Title of the tiddler containing the download message
-var downloadInstructionsTitle = "$:/language/Modals/Download";
-
-/*
+	/*
 Select the appropriate saver module and set it up
-*/
-var ManualDownloadSaver = function(wiki) {
-};
+	*/
+	var ManualDownloadSaver = function(wiki) {
+	};
 
-ManualDownloadSaver.prototype.save = function(text,method,callback) {
-	$tw.modal.display(downloadInstructionsTitle,{
-		downloadLink: "data:text/html," + encodeURIComponent(text)
-	});
-	// Callback that we succeeded
-	callback(null);
-	return true;
-};
+	ManualDownloadSaver.prototype.save = function(text, method, callback) {
+		$tw.modal.display(downloadInstructionsTitle, {
+			downloadLink: "data:text/html," + encodeURIComponent(text),
+		});
+		// Callback that we succeeded
+		callback(null);
+		return true;
+	};
 
-/*
+	/*
 Information about this saver
-*/
-ManualDownloadSaver.prototype.info = {
-	name: "manualdownload",
-	priority: 0,
-	capabilities: ["save", "download"]
-};
+	*/
+	ManualDownloadSaver.prototype.info = {
+		name: "manualdownload",
+		priority: 0,
+		capabilities: ["save", "download"],
+	};
 
-/*
+	/*
 Static method that returns true if this saver is capable of working
-*/
-exports.canSave = function(wiki) {
-	return true;
-};
+	*/
+	exports.canSave = function(wiki) {
+		return true;
+	};
 
-/*
+	/*
 Create an instance of this saver
-*/
-exports.create = function(wiki) {
-	return new ManualDownloadSaver(wiki);
-};
-
+	*/
+	exports.create = function(wiki) {
+		return new ManualDownloadSaver(wiki);
+	};
 })();
+
+
+
+
+
+
+
+
+
+

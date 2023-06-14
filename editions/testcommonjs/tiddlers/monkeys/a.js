@@ -7,6 +7,16 @@ Monkeys test A
 
 \*/
 
-require('./program').monkey = 10;
+require("./program").monkey = 10;
+
+
+
+
+
+
+
+
+
+
 
 

@@ -6,19 +6,27 @@ module-type: filterrunprefix
 Equivalent to a filter run with no prefix.
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter prefix function
-*/
-exports.or = function(operationSubFunction) {
-	return function(results,source,widget) {
-		results.pushTop(operationSubFunction(source,widget));
+	*/
+	exports.or = function(operationSubFunction) {
+		return function(results, source, widget) {
+			results.pushTop(operationSubFunction(source, widget));
+		};
 	};
-};
-
 })();
+
+
+
+
+
+
+
+
+
+

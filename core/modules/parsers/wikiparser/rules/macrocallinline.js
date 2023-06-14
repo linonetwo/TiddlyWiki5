@@ -10,40 +10,48 @@ Wiki rule for macro calls
 ```
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	exports.name = "macrocallinline";
+	exports.types = {inline: true};
 
-exports.name = "macrocallinline";
-exports.types = {inline: true};
+	exports.init = function(parser) {
+		this.parser = parser;
+	};
 
-exports.init = function(parser) {
-	this.parser = parser;
-};
-
-exports.findNextMatch = function(startPos) {
-	var nextStart = startPos;
-	// Try parsing at all possible macrocall openers until we match
-	while((nextStart = this.parser.source.indexOf("<<",nextStart)) >= 0) {
-		this.nextCall = $tw.utils.parseMacroInvocationAsTransclusion(this.parser.source,nextStart);
-		if(this.nextCall) {
-			return nextStart;
+	exports.findNextMatch = function(startPos) {
+		var nextStart = startPos;
+		// Try parsing at all possible macrocall openers until we match
+		while((nextStart = this.parser.source.indexOf("<<", nextStart)) >= 0) {
+			this.nextCall = $tw.utils.parseMacroInvocationAsTransclusion(this.parser.source, nextStart);
+			if(this.nextCall) {
+				return nextStart;
+			}
+			nextStart += 2;
 		}
-		nextStart += 2;
-	}
-	return undefined;
-};
+		return undefined;
+	};
 
-/*
+	/*
 Parse the most recent match
-*/
-exports.parse = function() {
-	var call = this.nextCall;
-	this.nextCall = null;
-	this.parser.pos = call.end;
-	return [call];
-};
-
+	*/
+	exports.parse = function() {
+		var call = this.nextCall;
+		this.nextCall = null;
+		this.parser.pos = call.end;
+		return [call];
+	};
 })();
+
+
+
+
+
+
+
+
+
+

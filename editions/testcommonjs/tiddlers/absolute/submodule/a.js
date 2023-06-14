@@ -8,7 +8,17 @@ Absolute require test
 \*/
 
 
-exports.foo = function () {
-    return require('../b');
+exports.foo = function() {
+	return require("../b");
 };
+
+
+
+
+
+
+
+
+
+
 

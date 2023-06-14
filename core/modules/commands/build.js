@@ -6,47 +6,55 @@ module-type: command
 Command to build a build target
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	exports.info = {
+		name: "build",
+		synchronous: true,
+	};
 
-exports.info = {
-	name: "build",
-	synchronous: true
-};
+	var Command = function(params, commander) {
+		this.params = params;
+		this.commander = commander;
+	};
 
-var Command = function(params,commander) {
-	this.params = params;
-	this.commander = commander;
-};
-
-Command.prototype.execute = function() {
-	// Get the build targets defined in the wiki
-	var buildTargets = $tw.boot.wikiInfo.build;
-	if(!buildTargets) {
-		return "No build targets defined";
-	}
-	// Loop through each of the specified targets
-	var targets;
-	if(this.params.length > 0) {
-		targets = this.params;
-	} else {
-		targets = Object.keys(buildTargets);
-	}
-	for(var targetIndex=0; targetIndex<targets.length; targetIndex++) {
-		var target = targets[targetIndex],
-			commands = buildTargets[target];
-		if(!commands) {
-			return "Build target '" + target + "' not found";
+	Command.prototype.execute = function() {
+		// Get the build targets defined in the wiki
+		var buildTargets = $tw.boot.wikiInfo.build;
+		if(!buildTargets) {
+			return "No build targets defined";
 		}
-		// Add the commands to the queue
-		this.commander.addCommandTokens(commands);
-	}
-	return null;
-};
+		// Loop through each of the specified targets
+		var targets;
+		if(this.params.length > 0) {
+			targets = this.params;
+		} else {
+			targets = Object.keys(buildTargets);
+		}
+		for(var targetIndex = 0; targetIndex < targets.length; targetIndex++) {
+			var target = targets[targetIndex],
+				commands = buildTargets[target];
+			if(!commands) {
+				return "Build target '" + target + "' not found";
+			}
+			// Add the commands to the queue
+			this.commander.addCommandTokens(commands);
+		}
+		return null;
+	};
 
-exports.Command = Command;
-
+	exports.Command = Command;
 })();
+
+
+
+
+
+
+
+
+
+

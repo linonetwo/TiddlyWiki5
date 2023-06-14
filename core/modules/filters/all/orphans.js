@@ -6,17 +6,25 @@ module-type: allfilteroperator
 Filter function for [all[orphans]]
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter function
-*/
-exports.orphans = function(source,prefix,options) {
-	return options.wiki.getOrphanTitles();
-};
-
+	*/
+	exports.orphans = function(source, prefix, options) {
+		return options.wiki.getOrphanTitles();
+	};
 })();
+
+
+
+
+
+
+
+
+
+

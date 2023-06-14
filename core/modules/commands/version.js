@@ -6,27 +6,35 @@ module-type: command
 Version command
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+	exports.info = {
+		name: "version",
+		synchronous: true,
+	};
 
-exports.info = {
-	name: "version",
-	synchronous: true
-};
+	var Command = function(params, commander) {
+		this.params = params;
+		this.commander = commander;
+	};
 
-var Command = function(params,commander) {
-	this.params = params;
-	this.commander = commander;
-};
+	Command.prototype.execute = function() {
+		this.commander.streams.output.write($tw.version + "\n");
+		return null; // No error
+	};
 
-Command.prototype.execute = function() {
-	this.commander.streams.output.write($tw.version + "\n");
-	return null; // No error
-};
-
-exports.Command = Command;
-
+	exports.Command = Command;
 })();
+
+
+
+
+
+
+
+
+
+

@@ -7,8 +7,18 @@ Nested test
 
 \*/
 
-exports.foo = function () {
-    return 1;
+exports.foo = function() {
+	return 1;
 };
+
+
+
+
+
+
+
+
+
+
 
 

@@ -6,22 +6,30 @@ module-type: filterrunprefix
 Equivalent to ~ filter run prefix.
 
 \*/
-(function(){
+(function() {
+	/*jslint node: true, browser: true */
+	/*global $tw: false */
+	"use strict";
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*
+	/*
 Export our filter prefix function
-*/
-exports.else = function(operationSubFunction) {
-	return function(results,source,widget) {
-		if(results.length === 0) {
-			// Main result so far is empty
-			results.pushTop(operationSubFunction(source,widget));
-		}
+	*/
+	exports.else = function(operationSubFunction) {
+		return function(results, source, widget) {
+			if(results.length === 0) {
+				// Main result so far is empty
+				results.pushTop(operationSubFunction(source, widget));
+			}
+		};
 	};
-};
-
 })();
+
+
+
+
+
+
+
+
+
+
