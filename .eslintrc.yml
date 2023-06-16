@@ -7,7 +7,7 @@ extends: 'eslint:recommended'
 globals:
   "$tw": "writable" # temporary
 parserOptions:
-  ecmaVersion: 5
+  ecmaVersion: latest
 rules:
   array-bracket-newline: 'off'
   array-bracket-spacing: 'off'

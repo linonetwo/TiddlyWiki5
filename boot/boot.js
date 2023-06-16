@@ -141,7 +141,12 @@ Iterate through all the own properties of an object or array. Callback is invoke
 $tw.utils.each = function(object,callback) {
 	var next,f,length;
 	if(object) {
-		if(Object.prototype.toString.call(object) == "[object Array]") {
+		if ('then' in object && typeof object.then === 'function') {
+			// It's a promise
+			object.then(function(data) {
+				$tw.utils.each(data,callback);
+			});
+		} else if(Object.prototype.toString.call(object) == "[object Array]") {
 			for (f=0, length=object.length; f<length; f++) {
 				next = callback(object[f],f,object);
 				if(next === false) {
@@ -1873,12 +1878,12 @@ if($tw.node) {
 /*
 Load the tiddlers contained in a particular file (and optionally extract fields from the accompanying .meta file) returned as {filepath:,type:,tiddlers:[],hasMetaFile:}
 */
-$tw.loadTiddlersFromFile = function(filepath,fields) {
+$tw.loadTiddlersFromFile = async function(filepath,fields) {
 	var ext = path.extname(filepath),
 		extensionInfo = $tw.utils.getFileExtensionInfo(ext),
 		type = extensionInfo ? extensionInfo.type : null,
 		typeInfo = type ? $tw.config.contentTypeInfo[type] : null,
-		data = fs.readFileSync(filepath,typeInfo ? typeInfo.encoding : "utf8"),
+		data = await fs.promises.readFile(filepath,typeInfo ? typeInfo.encoding : "utf8"),
 		tiddlers = $tw.wiki.deserializeTiddlers(ext,data,fields),
 		metadata = $tw.loadMetadataForFile(filepath);
 	if(metadata) {
@@ -1893,10 +1898,10 @@ $tw.loadTiddlersFromFile = function(filepath,fields) {
 /*
 Load the metadata fields in the .meta file corresponding to a particular file
 */
-$tw.loadMetadataForFile = function(filepath) {
+$tw.loadMetadataForFile = async function(filepath) {
 	var metafilename = filepath + ".meta";
-	if(fs.existsSync(metafilename)) {
-		return $tw.utils.parseFields(fs.readFileSync(metafilename,"utf8") || "");
+	if(await fs.promises.stat(metafilename)) {
+		return $tw.utils.parseFields(await fs.promises.readFile(metafilename,"utf8") || "");
 	} else {
 		return null;
 	}
@@ -1912,7 +1917,7 @@ $tw.boot.excludeRegExp = /^\.DS_Store$|^.*\.meta$|^\..*\.swp$|^\._.*$|^\.git$|^\
 /*
 Load all the tiddlers recursively from a directory, including honouring `tiddlywiki.files` files for drawing in external files. Returns an array of {filepath:,type:,tiddlers: [{..fields...}],hasMetaFile:}. Note that no file information is returned for externally loaded tiddlers, just the `tiddlers` property.
 */
-$tw.loadTiddlersFromPath = function(filepath,excludeRegExp) {
+$tw.loadTiddlersFromPath = async function(filepath,excludeRegExp) {
 	excludeRegExp = excludeRegExp || $tw.boot.excludeRegExp;
 	var tiddlers = [];
 	if(fs.existsSync(filepath)) {
@@ -1924,14 +1929,14 @@ $tw.loadTiddlersFromPath = function(filepath,excludeRegExp) {
 				Array.prototype.push.apply(tiddlers,$tw.loadTiddlersFromSpecification(filepath,excludeRegExp));
 			} else {
 				// If not, read all the files in the directory
-				$tw.utils.each(files,function(file) {
+				$tw.utils.each(files,async function(file) {
 					if(!excludeRegExp.test(file) && file !== "plugin.info") {
-						tiddlers.push.apply(tiddlers,$tw.loadTiddlersFromPath(filepath + path.sep + file,excludeRegExp));
+						tiddlers.push.apply(tiddlers,await $tw.loadTiddlersFromPath(filepath + path.sep + file,excludeRegExp));
 					}
 				});
 			}
 		} else if(stat.isFile()) {
-			tiddlers.push($tw.loadTiddlersFromFile(filepath,{title: filepath}));
+			tiddlers.push(await $tw.loadTiddlersFromFile(filepath,{title: filepath}));
 		}
 	}
 	return tiddlers;
@@ -2037,12 +2042,12 @@ $tw.loadTiddlersFromSpecification = function(filepath,excludeRegExp) {
 		processFile(tidInfo.file,tidInfo.isTiddlerFile,tidInfo.fields);
 	});
 	// Process any listed directories
-	$tw.utils.each(filesInfo.directories,function(dirSpec) {
+	$tw.utils.each(filesInfo.directories,async function(dirSpec) {
 		// Read literal directories directly
 		if(typeof dirSpec === "string") {
 			var pathname = path.resolve(filepath,dirSpec);
 			if(fs.existsSync(pathname) && fs.statSync(pathname).isDirectory()) {
-				tiddlers.push.apply(tiddlers,$tw.loadTiddlersFromPath(pathname,excludeRegExp));
+				tiddlers.push.apply(tiddlers,await $tw.loadTiddlersFromPath(pathname,excludeRegExp));
 			}
 		} else {
 			// Process directory specifier
@@ -2071,7 +2076,7 @@ $tw.loadTiddlersFromSpecification = function(filepath,excludeRegExp) {
 /*
 Load the tiddlers from a plugin folder, and package them up into a proper JSON plugin tiddler
 */
-$tw.loadPluginFolder = function(filepath,excludeRegExp) {
+$tw.loadPluginFolder = async function(filepath,excludeRegExp) {
 	excludeRegExp = excludeRegExp || $tw.boot.excludeRegExp;
 	var infoPath = filepath + path.sep + "plugin.info";
 	if(fs.existsSync(filepath) && fs.statSync(filepath).isDirectory()) {
@@ -2086,7 +2091,7 @@ $tw.loadPluginFolder = function(filepath,excludeRegExp) {
 			pluginInfo = {};
 		}
 		// Read the plugin files
-		var pluginFiles = $tw.loadTiddlersFromPath(filepath,excludeRegExp);
+		var pluginFiles = await $tw.loadTiddlersFromPath(filepath,excludeRegExp);
 		// Save the plugin tiddlers into the plugin info
 		pluginInfo.tiddlers = pluginInfo.tiddlers || Object.create(null);
 		for(var f=0; f<pluginFiles.length; f++) {
@@ -2193,7 +2198,7 @@ options:
 	parentPaths: array of parent paths that we mustn't recurse into
 	readOnly: true if the tiddler file paths should not be retained
 */
-$tw.loadWikiTiddlers = function(wikiPath,options) {
+$tw.loadWikiTiddlers = async function(wikiPath,options) {
 	options = options || {};
 	var parentPaths = options.parentPaths || [],
 		wikiInfoPath = path.resolve(wikiPath,$tw.config.wikiInfo),
@@ -2218,13 +2223,13 @@ $tw.loadWikiTiddlers = function(wikiPath,options) {
 	if(wikiInfo.includeWikis) {
 		parentPaths = parentPaths.slice(0);
 		parentPaths.push(wikiPath);
-		$tw.utils.each(wikiInfo.includeWikis,function(info) {
+		$tw.utils.each(wikiInfo.includeWikis,async function(info) {
 			if(typeof info === "string") {
 				info = {path: info};
 			}
 			var resolvedIncludedWikiPath = path.resolve(wikiPath,info.path);
 			if(parentPaths.indexOf(resolvedIncludedWikiPath) === -1) {
-				var subWikiInfo = $tw.loadWikiTiddlers(resolvedIncludedWikiPath,{
+				var subWikiInfo = await $tw.loadWikiTiddlers(resolvedIncludedWikiPath,{
 					parentPaths: parentPaths,
 					readOnly: info["read-only"]
 				});
@@ -2241,7 +2246,7 @@ $tw.loadWikiTiddlers = function(wikiPath,options) {
 	$tw.loadPlugins(wikiInfo.languages,$tw.config.languagesPath,$tw.config.languagesEnvVar);
 	// Load the wiki files, registering them as writable
 	var resolvedWikiPath = path.resolve(wikiPath,$tw.config.wikiTiddlersSubDir);
-	$tw.utils.each($tw.loadTiddlersFromPath(resolvedWikiPath),function(tiddlerFile) {
+	$tw.utils.each(await $tw.loadTiddlersFromPath(resolvedWikiPath),function(tiddlerFile) {
 		if(!options.readOnly && tiddlerFile.filepath) {
 			$tw.utils.each(tiddlerFile.tiddlers,function(tiddler) {
 				$tw.boot.files[tiddler.title] = {
@@ -2308,7 +2313,7 @@ $tw.loadWikiTiddlers = function(wikiPath,options) {
 	return wikiInfo;
 };
 
-$tw.loadTiddlersNode = function() {
+$tw.loadTiddlersNode = async function() {
 	// Load the boot tiddlers
 	$tw.utils.each($tw.loadTiddlersFromPath($tw.boot.bootPath),function(tiddlerFile) {
 		$tw.wiki.addTiddlers(tiddlerFile.tiddlers);
@@ -2332,7 +2337,7 @@ $tw.loadTiddlersNode = function() {
 	});
 	// Load the tiddlers from the wiki directory
 	if($tw.boot.wikiPath) {
-		$tw.boot.wikiInfo = $tw.loadWikiTiddlers($tw.boot.wikiPath);
+		$tw.boot.wikiInfo = await $tw.loadWikiTiddlers($tw.boot.wikiPath);
 	}
 };
 
