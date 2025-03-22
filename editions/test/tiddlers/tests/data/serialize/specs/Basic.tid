@@ -9,9 +9,11 @@ This is a <% if [<something>match[one]] %>Elephant<% endif %>, I think.
 +
 title: Output
 
-<$wikify text={{Text}} name=parsetree output=parsetree >
+\whitespace trim
+
+<$wikify text={{Text!!text}} name=parsetree output=parsetree >
   <$let text={{{[<parsetree>serializeparsetree[]]}}}>
-    <<text>>
+    <$text text=<<text>>/>
   </$let>
 </$wikify>
 +

@@ -259,7 +259,7 @@ WikiParser.prototype.parseBlock = function(terminatorRegExpString) {
 	var start = this.pos;
 	var children = this.parseInlineRun(terminatorRegExp);
 	var end = this.pos;
-	return [{type: "element", tag: "p", children: children, start: start, end: end, rule: "parseblock" }];
+	return [{type: "element", tag: "p", rule: "parseblock", children: children, start: start, end: end }];
 };
 
 /*
