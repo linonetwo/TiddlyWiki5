@@ -25,6 +25,9 @@ var {
 var { exampleSetup } = require("prosemirror-example-setup");
 var { keymap } = require("prosemirror-keymap");
 var { inputRules } = require("prosemirror-inputrules");
+var { SlashMenuPlugin } = require("prosemirror-slash-menu");
+var { slashMenuDefaultElements } = require("$:/plugins/tiddlywiki/prosemirror/slash-menu/elements.js");
+var { createSlashMenuUI } = require("$:/plugins/tiddlywiki/prosemirror/slash-menu/ui.js");
 
 var ProsemirrorWidget = function(parseTreeNode,options) {
 	this.initialise(parseTreeNode,options);
@@ -45,6 +48,10 @@ ProsemirrorWidget.prototype.render = function(parent,nextSibling) {
   var container = $tw.utils.domMaker('div', {
     class: 'tc-prosemirror-container',
   });
+  var slashMenuContainer = $tw.utils.domMaker('div', {
+    class: 'tc-prosemirror-slash-menu',
+  });
+  container.appendChild(slashMenuContainer);
   
   var schema = new Schema({
     nodes: basicSchema.spec.nodes.append({ list: createListSpec() }),
@@ -70,6 +77,7 @@ ProsemirrorWidget.prototype.render = function(parent,nextSibling) {
       // doc: schema.node("doc", null, [schema.node("paragraph")]),
       doc: schema.nodeFromJSON(doc),
       plugins: [
+        SlashMenuPlugin(slashMenuDefaultElements),
         listKeymapPlugin,
         listInputRulePlugin,
         ...listPlugins,
@@ -82,6 +90,7 @@ ProsemirrorWidget.prototype.render = function(parent,nextSibling) {
       self.debouncedSaveEditorContent();
     }
   })
+  createSlashMenuUI(this.view);
   
 	parent.insertBefore(container,nextSibling);
 	this.domNodes.push(container);

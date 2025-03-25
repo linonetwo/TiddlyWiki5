@@ -161,6 +161,13 @@
 				"title": "prosemirror-safari-ime-span",
 				"module-type": "library"
 			}
+		},{
+			"file": "prosemirror-slash-menu.cjs",
+			"fields": {
+				"type": "application/javascript",
+				"title": "prosemirror-slash-menu",
+				"module-type": "library"
+			}
 		}
 	]
 }

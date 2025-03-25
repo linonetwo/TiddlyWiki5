@@ -1,0 +1,50 @@
+.pm-slash-menu-root {
+  position: absolute;
+  display: none;
+  z-index: 100;
+}
+.pm-slash-menu-display {
+  display: flex;
+  flex-direction: column;
+  max-height: 150px;
+  width: 200px;
+  overflow: auto;
+  border-radius: 0.3rem;
+  background-color: #fafafa;
+  border: 2px solid #dddddd;
+}
+.pm-slash-menu-element {
+  display: flex;
+  border-radius: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+}
+.pm-slash-menu-element-selected {
+  background-color: #f1f1f1;
+}
+.pm-slash-menu-element-label {
+  color: black;
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+.pm-slash-menu-filter-wrapper {
+  display: flex;
+  background-color: transparent;
+  padding: 0.2rem 0.5rem;
+  position: absolute;
+  top: -1.5rem;
+  width: 200px;
+}
+.pm-slash-menu-filter {
+  color: #aaaaaa;
+  font-style: italic;
+}
+.pm-slash-menu-submenu-label {
+  margin-left: 0.5rem;
+}
+.pm-slash-menu-placeholder {
+  color: #aaaaaa;
+  text-align: center;
+  padding: 0 0.5rem;
+}
