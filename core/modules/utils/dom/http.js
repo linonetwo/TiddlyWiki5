@@ -92,6 +92,7 @@ oncompletion: action string to be invoked on completion
 onprogress: action string to be invoked on progress updates
 bindStatus: optional title of tiddler to which status ("pending", "complete", "error") should be written
 bindProgress: optional title of tiddler to which the progress of the request (0 to 100) should be bound
+stateNonce: optional unique identifier for creating state tiddler as $:/state/http-request/{nonce}
 variables: hashmap of variable name to string value passed to action strings
 headers: hashmap of header name to header value to be sent with the request
 passwordHeaders: hashmap of header name to password store name to be sent with the request
@@ -112,6 +113,7 @@ function HttpClientRequest(options) {
 	this.progressActions = options.onprogress;
 	this.bindStatus = options["bindStatus"];
 	this.bindProgress = options["bindProgress"];
+	this.stateNonce = options.stateNonce;
 	this.method = options.method || "GET";
 	this.body = options.body || "";
 	this.binary = options.binary || "";
@@ -152,6 +154,19 @@ HttpClientRequest.prototype.send = function(callback) {
 	if(this.url) {
 		setBinding(this.bindStatus,"pending");
 		setBinding(this.bindProgress,"0");
+		// Create state tiddler if nonce is provided
+		if(this.stateNonce) {
+			this.stateTiddler = "$:/state/http-request/" + this.stateNonce;
+			this.wiki.addTiddler(new $tw.Tiddler({
+				title: this.stateTiddler,
+				tags: "$:/tags/HttpRequest",
+				status: "pending",
+				progress: "0",
+				url: this.url,
+				method: this.method,
+				text: ""
+			}));
+		}
 		// Set the request tracker tiddler
 		var requestTrackerTitle = this.wiki.generateNewTitle("$:/temp/HttpRequest");
 		this.wiki.addTiddler({
@@ -202,6 +217,18 @@ HttpClientRequest.prototype.send = function(callback) {
 					}
 					resultVariables.data = $tw.utils.base64Encode(binary,true);
 				}
+				// Update state tiddler with results
+				if(self.stateTiddler) {
+					self.wiki.addTiddler(new $tw.Tiddler(self.wiki.getTiddler(self.stateTiddler),{
+						status: completionCode,
+						progress: "100",
+						"http-status": xhr.status.toString(),
+						"status-text": xhr.statusText,
+						error: (err || "").toString(),
+						text: resultVariables.data,
+						headers: JSON.stringify(headers)
+					}));
+				}
 				self.wiki.addTiddler(new $tw.Tiddler(self.wiki.getTiddler(requestTrackerTitle),{
 					status: completionCode,
 				}));
@@ -211,7 +238,14 @@ HttpClientRequest.prototype.send = function(callback) {
 			},
 			progress: function(lengthComputable,loaded,total) {
 				if(lengthComputable) {
-					setBinding(self.bindProgress,"" + Math.floor((loaded/total) * 100))
+					var progressValue = "" + Math.floor((loaded/total) * 100);
+					setBinding(self.bindProgress,progressValue);
+					// Update state tiddler with progress
+					if(self.stateTiddler) {
+						self.wiki.addTiddler(new $tw.Tiddler(self.wiki.getTiddler(self.stateTiddler),{
+							progress: progressValue
+						}));
+					}
 				}
 				self.wiki.invokeActionString(self.progressActions,undefined,$tw.utils.extend({},self.variables,{
 					lengthComputable: lengthComputable ? "yes" : "no",

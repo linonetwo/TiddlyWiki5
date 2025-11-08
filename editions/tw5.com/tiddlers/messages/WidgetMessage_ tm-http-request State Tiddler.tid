@@ -1,0 +1,94 @@
+created: 20251107000000000
+modified: 20251107000000000
+tags: [[WidgetMessage: tm-http-request]]
+title: WidgetMessage: tm-http-request State Tiddler
+type: text/vnd.tiddlywiki
+
+The ''tm-http-request'' message now supports automatic state tracking through state tiddlers.
+
+!! State Nonce Parameter
+
+When making an HTTP request, you can optionally specify a `state-nonce` parameter. The system will automatically create a state tiddler at `$:/state/http-request/{nonce}` to track the request progress and store the response:
+
+```
+<$action-sendmessage
+	$message="tm-http-request"
+	url="http://example.com/api/data"
+	method="GET"
+	state-nonce="my-unique-request"
+/>
+```
+
+The state tiddler will be created at `$:/state/http-request/my-unique-request`.
+
+If `state-nonce` is not provided, no state tiddler will be created (you can still use `bind-status` and `bind-progress` for basic status tracking).
+
+!! State Tiddler Fields
+
+The state tiddler contains the following fields:
+
+|!Field |!Description |
+|status |Current request status: "pending", "complete", or "error" |
+|progress |Progress percentage from "0" to "100" |
+|url |The URL that was requested |
+|method |The HTTP method used (GET, POST, etc.) |
+|http-status |The HTTP status code from the response (e.g., "200", "404") |
+|status-text |The HTTP status text (e.g., "OK", "Not Found") |
+|error |Error message if the request failed |
+|text |The response body (or base64-encoded data for binary responses) |
+|headers |JSON string containing the response headers |
+|tags |Tagged with `$:/tags/HttpRequest` |
+
+!! Example: Monitoring Request Progress
+
+```
+<$action-sendmessage
+	$message="tm-http-request"
+	url="http://example.com/api/data"
+	method="GET"
+	state-nonce="my-request"
+/>
+
+<$list filter="[[$:/state/http-request/my-request]get[status]]">
+	<$text text={{{ [[$:/state/http-request/my-request]get[status]] }}}/>
+	<br/>
+	Progress: <$text text={{{ [[$:/state/http-request/my-request]get[progress]] }}}/>%
+</$list>
+
+<$reveal state="$:/state/http-request/my-request!!status" type="match" text="complete">
+	<h3>Response Data:</h3>
+	<$codeblock code={{$:/state/http-request/my-request}}/>
+</$reveal>
+```
+
+!! Example: Using Response Data
+
+After a request completes, you can access the response data from the `text` field:
+
+```
+<$action-sendmessage
+	$message="tm-http-request"
+	url="/recipes/default/filter"
+	method="POST"
+	body='{"filter":"[tag[Journal]]"}'
+	header-Content-Type="application/json"
+	header-x-requested-with="TiddlyWiki"
+	state-nonce="journal-list"
+/>
+
+<!-- Display results after request completes -->
+<$list filter="[[$:/state/http-request/journal-list]get[status]match[complete]]">
+	<$set name="responseData" tiddler="$:/state/http-request/journal-list" field="text">
+		<$set name="results" value={{{ [<responseData>jsonget[results]] }}}>
+			Found <$text text={{{ [<results>jsonindexes[]count[]] }}}/> journal entries
+		</$set>
+	</$set>
+</$list>
+```
+
+!! Benefits
+
+* ''Progress Tracking'': Monitor long-running requests with the `progress` field
+* ''Error Handling'': Check the `status` and `error` fields to handle failures gracefully
+* ''Response Access'': Store and reuse API responses without repeated requests
+* ''Reactive Updates'': Use the state tiddler in filters and widgets that automatically update when the request completes

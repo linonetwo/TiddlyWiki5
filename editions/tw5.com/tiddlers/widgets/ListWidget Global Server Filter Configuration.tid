@@ -1,0 +1,114 @@
+created: 20251107000000000
+modified: 20251107000000000
+tags: [[ListWidget Server-Side Filtering]]
+title: ListWidget Global Server Filter Configuration
+type: text/vnd.tiddlywiki
+
+!! Global Server-Side Filtering
+
+You can enable server-side filtering for ALL list widgets in your wiki using a global configuration.
+
+!! Configuration Tiddler
+
+Create or edit the following tiddler:
+
+```
+Title: $:/config/ListWidget/UseServerFilter
+Text: yes
+```
+
+When set to `yes`, all list widgets with a `filter` attribute will automatically execute their filters on the server instead of locally.
+
+!! How It Works
+
+# Every list widget checks this configuration on execution
+# If enabled and the widget has a `filter` attribute (but no `server-filter` attribute), the filter is automatically sent to the server
+# The widget initially displays an empty list while waiting for the server response
+# When the server responds, the widget automatically refreshes to display the results
+
+!! Example
+
+With global server filtering enabled:
+
+```wikitext
+<!-- This normal list widget -->
+<$list filter="[tag[Journal]sort[created]]">
+  <$link/>
+</$list>
+
+<!-- Automatically becomes equivalent to -->
+<$list server-filter="[tag[Journal]sort[created]]">
+  <$link/>
+</$list>
+```
+
+!! Benefits
+
+* ''One-click migration'': Enable server-side filtering for your entire wiki without modifying any widget code
+* ''Better performance'': Large wikis with complex filters benefit from server-side computation
+* ''Easy testing'': Toggle the config to compare local vs server performance
+* ''Gradual rollout'': Test on a staging wiki before enabling in production
+
+!! Disabling for Specific Widgets
+
+If you have global server filtering enabled but want specific widgets to use local filtering, explicitly set `server-filter` to empty:
+
+```wikitext
+<$list filter="[tag[Journal]]" server-filter="">
+  <!-- This will always use local filtering -->
+</$list>
+```
+
+!! Performance Considerations
+
+When enabling global server filtering:
+
+* ''Initial load'': All lists will be empty briefly while server requests complete
+* ''Concurrent requests'': Many list widgets may send requests simultaneously
+* ''Network latency'': Each list depends on network round-trip time
+* ''Server load'': Server must handle many filter requests
+
+!! Best Practices
+
+# Start with `no` and enable only on specific high-impact widgets
+# Test with `yes` on a development wiki to measure performance impact
+# Monitor server load and response times
+# Consider using `emptyMessage` attribute to show loading indicators:
+
+```wikitext
+<$list 
+  filter="[tag[Journal]limit[50]]"
+  emptyMessage="Loading..."
+>
+  <$link/>
+</$list>
+```
+
+!! Combining with Explicit server-filter
+
+Priority order:
+# If `server-filter` attribute is present, it is used (even if empty)
+# If global config is `yes` and `filter` exists, use server-side filtering
+# Otherwise, use local filtering
+
+Example:
+
+```wikitext
+<!-- Global config: yes -->
+
+<!-- Uses server-side with this filter -->
+<$list filter="[tag[A]]"/>
+
+<!-- Uses server-side with different filter -->
+<$list filter="[tag[A]]" server-filter="[tag[B]]"/>
+
+<!-- Forces local filtering -->
+<$list filter="[tag[A]]" server-filter=""/>
+```
+
+!! See Also
+
+* [[ListWidget Server-Side Filtering]]
+* [[ListWidget]]
+* [[WebServer API: Post Filter]]
+* [[$:/config/Server/AllowAllExternalFilters]]

@@ -1,0 +1,156 @@
+created: 20251107000000000
+modified: 20251107000000000
+tags: [[WidgetMessage: tm-http-request State Tiddler]]
+title: WidgetMessage: tm-http-request State Tiddler Example
+type: text/vnd.tiddlywiki
+
+!! Example: Calling Server-Side Filter with State Tracking
+
+This example shows how to manually call the server-side filter API and track the response using a state tiddler:
+
+```
+<$button>
+	<$action-sendmessage
+		$message="tm-http-request"
+		url="/recipes/default/filter"
+		method="POST"
+		body='{"filter":"[tag[Journal]sort[created]limit[10]]"}'
+		header-Content-Type="application/json"
+		header-x-requested-with="TiddlyWiki"
+		state-nonce="my-filter-request"
+	/>
+	Load Journal Entries
+</$button>
+
+<!-- Display status -->
+<div>
+	Status: <$text text={{{ [[$:/state/http-request/my-filter-request]get[status]else[not started]] }}}/>
+</div>
+
+<!-- Show progress -->
+<$reveal state="$:/state/http-request/my-filter-request!!status" type="match" text="pending">
+	<div class="tc-notification">
+		Loading... <$text text={{{ [[$:/state/http-request/my-filter-request]get[progress]else[0]] }}}/>%
+	</div>
+</$reveal>
+
+<!-- Display results when complete -->
+<$reveal state="$:/state/http-request/my-filter-request!!status" type="match" text="complete">
+	<h3>Results:</h3>
+	<$set name="responseText" tiddler="$:/state/http-request/my-filter-request" field="text">
+		<$set name="parsedData" value={{{ [<responseText>jsonget[results]] }}}>
+			<$list filter="[<parsedData>jsonindexes[]]">
+				<div>
+					<$text text={{{ [<parsedData>jsonget<currentTiddler>] }}}/>
+				</div>
+			</$list>
+		</$set>
+	</$set>
+	
+	<!-- Display response metadata -->
+	<div class="tc-metadata">
+		<strong>HTTP Status:</strong> <$text text={{{ [[$:/state/http-request/my-filter-request]get[http-status]] }}}/><br/>
+		<strong>Status Text:</strong> <$text text={{{ [[$:/state/http-request/my-filter-request]get[status-text]] }}}/><br/>
+	</div>
+</$reveal>
+
+<!-- Show errors -->
+<$reveal state="$:/state/http-request/my-filter-request!!status" type="match" text="error">
+	<div class="tc-notification tc-notification-error">
+		<strong>Request Failed!</strong><br/>
+		<$text text={{{ [[$:/state/http-request/my-filter-request]get[error]] }}}/>
+	</div>
+</$reveal>
+```
+
+!! Example: Executing Server-Side Actions
+
+This example executes an action tiddler on the server:
+
+```
+<$button>
+	<$action-sendmessage
+		$message="tm-http-request"
+		url="/recipes/default/actions"
+		method="POST"
+		body='{"tag":"$:/tags/Actions","variables":{"currentTiddler":"TestTiddler"}}'
+		header-Content-Type="application/json"
+		header-x-requested-with="TiddlyWiki"
+		state-nonce="server-action"
+	/>
+	Execute Server Action
+</$button>
+
+<$reveal state="$:/state/http-request/server-action!!status" type="match" text="complete">
+	<div class="tc-notification tc-notification-success">
+		Action executed successfully!
+	</div>
+</$reveal>
+```
+
+!! Example: Monitoring Multiple Requests
+
+Track multiple concurrent requests:
+
+```
+<div class="tc-request-monitor">
+	<h3>Active Requests</h3>
+	
+	<!-- List all pending/active HTTP requests -->
+	<$list filter="[tag[$:/tags/HttpRequest]get[status]match[pending]]">
+		<div class="tc-request-item">
+			<strong><$view field="title"/></strong><br/>
+			URL: <$view field="url"/><br/>
+			Progress: <$view field="progress"/>%
+		</div>
+	</$list>
+	
+	<h3>Completed Requests</h3>
+	
+	<!-- List recent completed requests -->
+	<$list filter="[tag[$:/tags/HttpRequest]get[status]match[complete]limit[5]]">
+		<div class="tc-request-item tc-request-complete">
+			<strong><$view field="title"/></strong><br/>
+			URL: <$view field="url"/><br/>
+			Status: <$view field="http-status"/> <$view field="status-text"/>
+		</div>
+	</$list>
+</div>
+```
+
+!! Example: Reusing Response Data
+
+Store and reuse API responses across your wiki:
+
+```
+<!-- First, fetch data and store it -->
+<$button>
+	<$action-sendmessage
+		$message="tm-http-request"
+		url="/recipes/default/filter"
+		method="POST"
+		body='{"filter":"[all[tiddlers]count[]]"}'
+		header-Content-Type="application/json"
+		header-x-requested-with="TiddlyWiki"
+		state-nonce="tiddler-count"
+	/>
+	Count All Tiddlers
+</$button>
+
+<!-- Later, anywhere in your wiki, reference the cached result -->
+<div>
+	Total tiddlers in wiki: 
+	<$reveal state="$:/state/http-request/tiddler-count!!status" type="match" text="complete">
+		<$set name="response" tiddler="$:/state/http-request/tiddler-count" field="text">
+			<$text text={{{ [<response>jsonget[results],[0]] }}}/>
+		</$set>
+	</$reveal>
+</div>
+```
+
+!! See Also
+
+* [[WidgetMessage: tm-http-request State Tiddler]]
+* [[WidgetMessage: tm-http-request]]
+* [[WebServer API: Post Filter]]
+* [[WebServer API: Post Actions]]

@@ -33,6 +33,7 @@ The following parameters are used:
 |var-* |Variables to be passed to the completion and progress handlers (without the "var-" prefix) |
 |bind-status |Title of tiddler to which the status of the request ("pending", "complete", "error") should be bound |
 |bind-progress |Title of tiddler to which the progress of the request (0 to 100) should be bound |
+|state-nonce |<<.from-version "5.4.0">> Optional unique identifier for creating state tiddler at `$:/state/http-request/{nonce}` to store request state and results. See [[WidgetMessage: tm-http-request State Tiddler]] for details |
 |oncompletion |Action strings to be executed when the request completes |
 |onprogress |Action strings to be executed when progress is reported |
 
@@ -60,3 +61,4 @@ Note that the state tiddler $:/state/http-requests contains a number representin
 * [[Zotero's|https://www.zotero.org/]] API for retrieving reference items: [[WidgetMessage: tm-http-request Example - Zotero]]
 * [[Random Dog's|https://random.dog/]] API for retrieving random pictures of dogs showing how to retrieve binary data: [[WidgetMessage: tm-http-request Example - Random Dog]]
 * Example of using HTTP Basic Authentication: [[WidgetMessage: tm-http-request Example - Basic Authentication]]
+* Using state tiddlers to track requests: [[WidgetMessage: tm-http-request State Tiddler Example]]

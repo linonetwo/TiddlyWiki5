@@ -77,6 +77,25 @@ ListWidget.prototype.execute = function(changedAttributes) {
 	this.counterName = this.getAttribute("counter");
 	this.storyViewName = this.getAttribute("storyview");
 	this.historyTitle = this.getAttribute("history");
+	this.filter = this.getAttribute("filter");
+	
+	// Check global config to enable server-side filtering for all list widgets
+	var useServerFilterGlobally = this.wiki.getTiddlerText("$:/config/ListWidget/UseServerFilter","no") === "yes";
+	
+	// If server-side filtering is enabled globally and we have a filter
+	if(useServerFilterGlobally && this.filter) {
+		if(!this.serverFilterNonce) {
+			// Generate a unique nonce for this widget instance
+			this.serverFilterNonce = Math.random().toString(36).slice(2);
+		}
+		// Construct the state tiddler title using the nonce
+		this.serverFilterStateTiddler = "$:/state/http-request/" + this.serverFilterNonce;
+		// Check if request needs to be made
+		var stateTiddler = this.wiki.getTiddler(this.serverFilterStateTiddler);
+		if(!stateTiddler || stateTiddler.fields.status !== "pending") {
+			this.requestServerFilter(this.filter);
+		}
+	}
 	// Create join template only if needed
 	if(this.join === undefined || (changedAttributes && changedAttributes.join)) {
 		this.join = this.makeJoinTemplate();
@@ -97,6 +116,36 @@ ListWidget.prototype.execute = function(changedAttributes) {
 	this.makeChildWidgets(members);
 	// Clear the last history
 	this.history = [];
+};
+
+/*
+Request server-side filter execution
+*/
+ListWidget.prototype.requestServerFilter = function(filterExpression) {
+	var self = this;
+	// Prepare the request body with filter and current widget variables
+	var requestBody = {
+		filter: filterExpression,
+		variables: {}
+	};
+	// Collect all variables from the widget's context
+	for(var varName in this.variables) {
+		if(Object.prototype.hasOwnProperty.call(this.variables, varName)) {
+			requestBody.variables[varName] = this.getVariable(varName);
+		}
+	}
+	// Make the HTTP request with the nonce for state tracking
+	this.dispatchEvent({
+		type: "tm-http-request",
+		paramObject: {
+			url: "/recipes/default/filter",
+			method: "POST",
+			body: JSON.stringify(requestBody),
+			"state-nonce": this.serverFilterNonce,
+			"header-Content-Type": "application/json",
+			"header-x-requested-with": "TiddlyWiki"
+		}
+	});
 };
 
 ListWidget.prototype.findExplicitTemplates = function() {
@@ -128,8 +177,28 @@ ListWidget.prototype.findExplicitTemplates = function() {
 
 ListWidget.prototype.getTiddlerList = function() {
 	var limit = $tw.utils.getInt(this.getAttribute("limit",""),undefined);
-	var defaultFilter = "[!is[system]sort[title]]";
-	var results = this.wiki.filterTiddlers(this.getAttribute("filter",defaultFilter),this);
+	var results;
+	var useServerFilter = this.wiki.getTiddlerText("$:/config/ListWidget/UseServerFilter","no") === "yes";
+	// If server-side filtering is enabled, use results from state tiddler
+	if(useServerFilter && this.serverFilterStateTiddler) {
+		var stateTiddler = this.wiki.getTiddler(this.serverFilterStateTiddler);
+		if(stateTiddler && stateTiddler.fields.status === "complete" && stateTiddler.fields.text) {
+			try {
+				var responseData = JSON.parse(stateTiddler.fields.text);
+				results = responseData.results || [];
+			} catch(e) {
+				console.error("Error parsing server filter response:", e);
+				results = [];
+			}
+		} else {
+			// Still pending or error, return empty list for now
+			results = [];
+		}
+	} else {
+		// Use local filter
+		var defaultFilter = "[!is[system]sort[title]]";
+		results = this.wiki.filterTiddlers(this.getAttribute("filter",defaultFilter),this);
+	}
 	if(limit !== undefined) {
 		if(limit >= 0) {
 			results = results.slice(0,limit);
@@ -231,8 +300,10 @@ ListWidget.prototype.refresh = function(changedTiddlers) {
 	if(this.storyview && this.storyview.refreshStart) {
 		this.storyview.refreshStart(changedTiddlers,changedAttributes);
 	}
+	// Check if the server filter state tiddler has changed
+	var serverFilterStateChanged = this.serverFilterStateTiddler && changedTiddlers[this.serverFilterStateTiddler];
 	// Completely refresh if any of our attributes have changed
-	if(changedAttributes.filter || changedAttributes.variable || changedAttributes.counter || changedAttributes.template || changedAttributes.editTemplate || changedAttributes.join || changedAttributes.emptyMessage || changedAttributes.storyview || changedAttributes.history) {
+	if(changedAttributes.filter || changedAttributes.variable || changedAttributes.counter || changedAttributes.template || changedAttributes.editTemplate || changedAttributes.join || changedAttributes.emptyMessage || changedAttributes.storyview || changedAttributes.history || serverFilterStateChanged) {
 		this.refreshSelf();
 		result = true;
 	} else {

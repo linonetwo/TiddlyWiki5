@@ -81,6 +81,8 @@ The action of the list widget depends on the results of the filter combined with
 
 |!Attribute |!Description |
 |filter |The [[tiddler filter|Filters]] to display |
+|server-filter |<<.from-version "5.4.0">> The filter expression to execute on the server. When specified, overrides the local `filter` attribute. See [[ListWidget Server-Side Filtering]] for details |
+|server-url |<<.from-version "5.4.0">> Optional server endpoint URL for server-side filtering (defaults to `/recipes/default/filter`) |
 |limit |<<.from-version "5.3.2">> Optional numeric limit for the number of results that are returned. Negative values will return the results from the end of the list |
 |template |The title of a template tiddler for transcluding each tiddler in the list. When no template is specified, the body of the ListWidget serves as the item template. With no body, a simple link to the tiddler is returned. |
 |editTemplate |An alternative template to use for [[DraftTiddlers|DraftMechanism]] in edit mode |
@@ -165,5 +167,15 @@ The optional `history` attribute specifies the name of a tiddler that is used to
 !! Additional Notes and Edge Cases
 
 * If the `filter` attribute is not present then a default of `[!is[system]sort[title]]` is used
-* If the list widget is completely empty (ie only whitespace between the opening and closing tags), then it behaves as if the content were a `DIV` or a `SPAN` containing a link to the current tiddler (it’s a `DIV` if the list widget is in block mode, or a SPAN if it is in inline mode)
+* If both `filter` and `server-filter` are present, `server-filter` takes precedence
+* If the list widget is completely empty (ie only whitespace between the opening and closing tags), then it behaves as if the content were a `DIV` or a `SPAN` containing a link to the current tiddler (it's a `DIV` if the list widget is in block mode, or a SPAN if it is in inline mode)
 * If the `template` attribute is not present then the content of the list widget will be used as the template, unless the widget is completely empty in which case a default template is used
+
+!! Server-Side Filtering
+
+<<.from-version "5.4.0">> The ListWidget supports executing filters on the server for improved performance with large wikis. See:
+
+* [[ListWidget Server-Side Filtering]]
+* [[ListWidget Global Server Filter Configuration]] - Enable server-side filtering for all list widgets
+* [[ListWidget Server-Side Filtering Examples]]
+* [[Server-Side Filter Integration Example]]

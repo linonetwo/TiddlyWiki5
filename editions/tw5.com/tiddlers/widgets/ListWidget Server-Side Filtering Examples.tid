@@ -1,0 +1,160 @@
+created: 20251107000000000
+modified: 20251107000000000
+tags: [[ListWidget Server-Side Filtering]]
+title: ListWidget Server-Side Filtering Examples
+type: text/vnd.tiddlywiki
+
+!! Example 1: Simple Server-Side List
+
+This example displays all journal entries, with the filtering performed on the server:
+
+```
+<$list server-filter="[tag[Journal]sort[created]reverse[]]">
+	<div class="tc-menu-list-item">
+		<$link><$text text=<<currentTiddler>>/></$link>
+	</div>
+</$list>
+```
+
+!! Example 2: Server-Side Search
+
+Create a search interface that uses server-side filtering:
+
+```
+Search: <$edit-text tiddler="$:/temp/search" tag="input" default=""/>
+
+<$list server-filter="[search{$:/temp/search}limit[20]]">
+	<div>
+		<$link><$view field="title"/></$link> - 
+		<$view field="modified" format="date" template="DDth MMM YYYY"/>
+	</div>
+</$list>
+```
+
+!! Example 3: Loading Indicator
+
+Show a loading message while waiting for server results:
+
+```
+<$set name="stateTiddler" value={{$:/temp/server-filter-state}}>
+	<!-- Trigger the server request -->
+	<$list server-filter="[tag[Journal]limit[50]]">
+		<$text text=<<currentTiddler>>/>
+	</$list>
+	
+	<!-- Show loading state -->
+	<$list filter="[<stateTiddler>get[status]match[pending]]">
+		<div class="tc-alert tc-alert-highlight">
+			Loading... (<$text text={{{ [<stateTiddler>get[progress]] }}}/>%)
+		</div>
+	</$list>
+</$set>
+```
+
+!! Example 4: Error Handling
+
+Handle potential errors gracefully:
+
+```
+<$vars stateTiddler={{!!server-filter-state}}>
+	<$list server-filter="[tag[NonExistentTag]]">
+		<div><$link/></div>
+	</$list>
+	
+	<$list filter="[<stateTiddler>get[status]match[error]]">
+		<div class="tc-alert tc-alert-warning">
+			<strong>Error loading data:</strong><br/>
+			<$text text={{{ [<stateTiddler>get[error]] }}}/>
+		</div>
+	</$list>
+</$vars>
+```
+
+!! Example 5: Comparing Server vs Local Filtering
+
+This example shows both filtering methods side by side:
+
+```
+!!! Local Filtering (Traditional)
+<div class="tc-tab-buttons">
+<$button>
+<$action-setfield $tiddler="$:/temp/filter-mode" text="local"/>
+Local
+</$button>
+<$button>
+<$action-setfield $tiddler="$:/temp/filter-mode" text="server"/>
+Server
+</$button>
+</div>
+
+<$reveal state="$:/temp/filter-mode" type="match" text="local">
+Time: <$text text={{{ [[local-start]now[]] }}}/>
+<$list filter="[tag[Journal]sort[created]limit[100]]">
+	<div><$link/></div>
+</$list>
+Time: <$text text={{{ [[local-end]now[]] }}}/>
+</$reveal>
+
+<$reveal state="$:/temp/filter-mode" type="match" text="server">
+Time: <$text text={{{ [[server-start]now[]] }}}/>
+<$list server-filter="[tag[Journal]sort[created]limit[100]]">
+	<div><$link/></div>
+</$list>
+Time: <$text text={{{ [[server-end]now[]] }}}/>
+</$reveal>
+```
+
+!! Example 6: Paginated Results
+
+Implement pagination with server-side filtering:
+
+```
+\define pageNum() $:/temp/page-number
+\define pageSize() 10
+
+<$vars 
+	skip={{{ [<pageNum>get[text]else[0]] }}}
+	limit={{{ [<pageSize>] }}}
+>
+	<$list server-filter="[tag[Journal]sort[created]skip<skip>limit<limit>]">
+		<div><$link/></div>
+	</$list>
+	
+	<div class="tc-pagination">
+		<$button>
+		<$action-setfield $tiddler=<<pageNum>> text={{{ [<skip>subtract<pageSize>max[0]] }}}/>
+		Previous
+		</$button>
+		
+		Page: <$text text={{{ [<skip>divide<pageSize>add[1]trunc[]] }}}/>
+		
+		<$button>
+		<$action-setfield $tiddler=<<pageNum>> text={{{ [<skip>add<pageSize>] }}}/>
+		Next
+		</$button>
+	</div>
+</$vars>
+```
+
+!! Example 7: Cached Results
+
+Reuse server filter results across multiple widgets:
+
+```
+<!-- First widget triggers the request -->
+<h2>Recent Changes</h2>
+<$list server-filter="[!is[system]sort[modified]limit[10]]">
+	<div><$link/> - <$view field="modified" format="relativedate"/></div>
+</$list>
+
+<!-- Other parts of the page can reference the same state tiddler -->
+<div class="tc-sidebar">
+	Total recent items: <$count filter="[<stateTiddler>get[text]jsonget[results]jsonindexes[]]"/>
+</div>
+```
+
+!! See Also
+
+* [[ListWidget Server-Side Filtering]]
+* [[ListWidget]]
+* [[WebServer API: Post Filter]]

@@ -41,6 +41,7 @@ exports.startup = function() {
 			onprogress: params.onprogress,
 			bindStatus: params["bind-status"],
 			bindProgress: params["bind-progress"],
+			stateNonce: params["state-nonce"],
 			variables: getPropertiesWithPrefix(params,"var-"),
 			headers: getPropertiesWithPrefix(params,"header-"),
 			passwordHeaders: getPropertiesWithPrefix(params,"password-header-"),

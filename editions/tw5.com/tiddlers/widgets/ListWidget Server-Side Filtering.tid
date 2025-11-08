@@ -1,0 +1,118 @@
+created: 20251107000000000
+modified: 20251107000000000
+tags: Widgets ListWidget
+title: ListWidget Server-Side Filtering
+type: text/vnd.tiddlywiki
+
+The List Widget now supports server-side filter execution, which can significantly improve performance for large wikis by offloading filter computation to the server.
+
+!! Enabling Server-Side Filtering
+
+Server-side filtering is controlled by a global configuration tiddler:
+
+```
+Title: $:/config/ListWidget/UseServerFilter
+Text: yes
+```
+
+When set to `yes`, all list widgets with a `filter` attribute will automatically execute their filters on the server instead of locally.
+
+See [[ListWidget Global Server Filter Configuration]] for detailed information.
+
+!! How It Works
+
+When server-side filtering is enabled, the List Widget:
+
+# Creates a state tiddler to track the server request
+# Sends a POST request to `/recipes/default/filter` with the filter expression and widget variables
+# Initially displays an empty list (or `emptyMessage`) while waiting for the response
+# Automatically updates to show the filtered results when the server responds
+
+The widget uses TiddlyWiki's normal refresh cycle, so it integrates seamlessly with existing features like history tracking and story views.
+
+!! Example: Basic Server-Side Filtering
+
+```
+<$list server-filter="[tag[Journal]sort[created]]">
+	<$link><$text text=<<currentTiddler>>/></$link>
+</$list>
+```
+
+!! Example: With Variables
+
+The server-side filter receives the widget's `currentTiddler` variable automatically:
+
+```
+<$set name="currentTiddler" value="MyTiddler">
+	<$list server-filter="[tag<currentTag>]">
+		<$text text=<<currentTiddler>>/>
+	</$list>
+</$set>
+```
+
+!! Example: Custom Server URL
+
+```
+<$list 
+	server-filter="[tag[Journal]limit[10]]"
+	server-url="/api/custom-filter"
+>
+	<$link><$text text=<<currentTiddler>>/></$link>
+</$list>
+```
+
+!! Combining with Local Filters
+
+You can use both `filter` (local) and `server-filter` attributes, but only one will be active:
+
+* If `server-filter` is present, it takes precedence
+* If `server-filter` is absent or empty, the local `filter` is used
+
+```
+<$list 
+	filter="[tag[Journal]]"
+	server-filter="[tag[Journal]sort[created]]"
+>
+	<!-- Uses server-filter when available -->
+</$list>
+```
+
+!! Server Configuration
+
+For server-side filtering to work, the server must:
+
+# Have the POST /recipes/default/filter route enabled (included in TiddlyWiki 5.4.0+)
+# Allow the filter expression via `$:/config/Server/AllowAllExternalFilters` set to "yes", or
+# Allow specific filters via `$:/config/Server/ExternalFilters/<filter>` set to "yes"
+
+Example configuration tiddler:
+
+```
+title: $:/config/Server/AllowAllExternalFilters
+text: yes
+```
+
+!! Performance Considerations
+
+Server-side filtering is beneficial when:
+
+* The wiki contains thousands of tiddlers
+* Complex filter expressions require extensive computation
+* The initial page load time is critical
+* Multiple widgets use the same or similar filters
+
+Server-side filtering may add latency due to network round-trips, so for small wikis or simple filters, local filtering may be faster.
+
+!! Use Cases
+
+# ''Large Wikis'': Speed up startup by computing filters on the server
+# ''Shared Databases'': Execute filters against a SQL database or search index
+# ''API Integration'': Filter results from external data sources
+# ''Progressive Loading'': Display the page quickly and load list contents asynchronously
+
+!! See Also
+
+* [[ListWidget]]
+* [[WebServer API: Post Filter]]
+* [[WidgetMessage: tm-http-request State Tiddler]]
+* [[Filters]]

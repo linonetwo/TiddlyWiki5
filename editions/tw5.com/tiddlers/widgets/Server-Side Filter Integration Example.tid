@@ -1,0 +1,116 @@
+created: 20251107000000000
+modified: 20251107000000000
+tags: [[ListWidget Server-Side Filtering]] [[WidgetMessage: tm-http-request State Tiddler]]
+title: Server-Side Filter Integration Example
+type: text/vnd.tiddlywiki
+
+This example demonstrates how the new `tm-http-request` state tiddler feature integrates with the `ListWidget` server-side filtering to create a responsive, efficient user interface.
+
+!! Complete Example: Server-Side Search Dashboard
+
+```
+\define state-tiddler() $:/state/dashboard-search
+
+<!-- Search Input -->
+<div class="tc-search">
+	<$edit-text 
+		tiddler="$:/temp/dashboard-search" 
+		tag="input" 
+		default="" 
+		placeholder="Search tiddlers..."
+		class="tc-edit-texteditor"
+	/>
+</div>
+
+<!-- Status Indicator -->
+<$reveal state=<<state-tiddler>> stateField="status" type="match" text="pending">
+	<div class="tc-notification tc-notification-info">
+		<$text text="Searching..."/>
+		Progress: <$text text={{{ [<state-tiddler>get[progress]else[0]] }}}/>%
+	</div>
+</$reveal>
+
+<!-- Error Display -->
+<$reveal state=<<state-tiddler>> stateField="status" type="match" text="error">
+	<div class="tc-notification tc-notification-error">
+		<strong>Error:</strong> <$text text={{{ [<state-tiddler>get[error]] }}}/>
+	</div>
+</$reveal>
+
+<!-- Results List -->
+<$reveal state=<<state-tiddler>> stateField="status" type="match" text="complete">
+	<div class="tc-search-results">
+		<$list server-filter="[search{$:/temp/dashboard-search}limit[20]]">
+			<div class="tc-search-result">
+				<$link to=<<currentTiddler>>>
+					<$view field="title"/>
+				</$link>
+				<div class="tc-search-result-excerpt">
+					<$view field="text" format="plaintext"/>
+				</div>
+			</div>
+		</$list>
+	</div>
+</$reveal>
+
+<!-- Result Count -->
+<$reveal state=<<state-tiddler>> stateField="status" type="match" text="complete">
+	<div class="tc-search-count">
+		<$text text={{{ [<state-tiddler>get[text]jsonget[results]jsonindexes[]count[]] }}}/>
+		results found
+	</div>
+</$reveal>
+```
+
+!! How It Works
+
+# ''User Input'': The search query is stored in `$:/temp/dashboard-search`
+# ''Server Request'': The `ListWidget` with `server-filter` attribute sends a POST request to `/recipes/default/filter`
+# ''State Tracking'': The request status is tracked in the state tiddler referenced by the widget
+# ''Reactive UI'': The `$reveal` widgets show/hide based on the state tiddler's `status` field
+# ''Results Display'': When complete, the list widget displays the filtered results
+
+!! Benefits
+
+* ''User Feedback'': Users see loading indicators and progress updates
+* ''Error Handling'': Network errors are displayed gracefully
+* ''Performance'': Large wikis benefit from server-side computation
+* ''Reactivity'': UI updates automatically as the request progresses
+
+!! Advanced: Multiple Concurrent Requests
+
+You can have multiple list widgets making server requests simultaneously:
+
+```
+<div class="tc-dashboard">
+	<div class="tc-dashboard-section">
+		<h3>Recent Changes</h3>
+		<$list server-filter="[!is[system]sort[modified]limit[5]]">
+			<div><$link/></div>
+		</$list>
+	</div>
+	
+	<div class="tc-dashboard-section">
+		<h3>Popular Tags</h3>
+		<$list server-filter="[tags[]sort[]]">
+			<$macrocall $name="tag" tag=<<currentTiddler>>/>
+		</$list>
+	</div>
+	
+	<div class="tc-dashboard-section">
+		<h3>System Tiddlers</h3>
+		<$list server-filter="[is[system]limit[10]]">
+			<div><$link/></div>
+		</$list>
+	</div>
+</div>
+```
+
+Each list widget maintains its own state tiddler and updates independently.
+
+!! See Also
+
+* [[ListWidget Server-Side Filtering]]
+* [[ListWidget Server-Side Filtering Examples]]
+* [[WidgetMessage: tm-http-request State Tiddler]]
+* [[WebServer API: Post Filter]]
