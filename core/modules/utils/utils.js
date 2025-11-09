@@ -9,6 +9,7 @@ Various static utility functions.
 
 "use strict";
 
+// Test comment for change note validation
 /*
 Display a message, in colour if we're on a terminal
 */
