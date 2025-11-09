@@ -1,8 +1,8 @@
 title: $:/changenotes/5.4.0/#9407
 description: Automated change note validation system
 tags: $:/tags/ChangeNote
-change-type: enhancement
-change-category: internal
+change-type: wrongtype
+change-category: wrongcategory
 links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/9407
 github-contributors: linonetwo
 
