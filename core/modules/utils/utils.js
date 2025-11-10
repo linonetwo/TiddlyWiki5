@@ -16,7 +16,6 @@ exports.log = function(text,colour) {
 	console.log($tw.node ? exports.terminalColour(colour) + text + exports.terminalColour() : text);
 };
 
-// trigger change detection
 exports.terminalColour = function(colour) {
 	if(!$tw.browser && $tw.node && process.stdout.isTTY) {
 		if(colour) {
