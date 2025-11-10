@@ -1,10 +1,11 @@
 title: $:/changenotes/5.4.0/#9407
 description: Automated change note validation system
 tags: $:/tags/ChangeNote
-change-type: feature
+change-type: performance
 change-category: developer
-links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/9407
+github-links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/9407
 github-contributors: linonetwo
+release: 5.4.0
 
 This PR implements an automated validation system for change notes to address the manual checking burden mentioned in issue #9406.
 
