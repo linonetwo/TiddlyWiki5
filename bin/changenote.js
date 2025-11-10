@@ -145,16 +145,12 @@ const CONFIG = {
 	releasesInfoPatterns: {
 		changeType: {
 			caption: /^change-types\/([^/]+)\/caption:/,
-			colour: /^change-types\/([^/]+)\/colour:\s*(.+)/,
 		},
 		category: {
 			caption: /^categories\/([^/]+)\/caption:/,
-			colour: /^categories\/([^/]+)\/colour:\s*(.+)/,
 		},
 		impactType: {
 			caption: /^impact-types\/([^/]+)\/caption:/,
-			colourBg: /^impact-types\/([^/]+)\/colour\/background:\s*(.+)/,
-			colourFg: /^impact-types\/([^/]+)\/colour\/foreground:\s*(.+)/,
 		},
 	},
 };
@@ -177,12 +173,6 @@ function loadReleasesInfo() {
 	const changeTypes = new Set();
 	const changeCategories = new Set();
 	const impactTypes = new Set();
-	const typeCaptions = {};
-	const typeColors = {};
-	const categoryCaptions = {};
-	const categoryColors = {};
-	const impactCaptions = {};
-	const impactColors = {};
 	
 	const patterns = CONFIG.releasesInfoPatterns;
 	
@@ -192,50 +182,19 @@ function loadReleasesInfo() {
 		// Parse change-types
 		match = line.match(patterns.changeType.caption);
 		if(match) {
-			const typeKey = match[1];
-			changeTypes.add(typeKey);
-			const caption = line.split(":")[1].trim();
-			typeCaptions[typeKey] = caption;
-		}
-		
-		match = line.match(patterns.changeType.colour);
-		if(match) {
-			typeColors[match[1]] = match[2].trim();
+			changeTypes.add(match[1]);
 		}
 		
 		// Parse categories
 		match = line.match(patterns.category.caption);
 		if(match) {
-			const categoryKey = match[1];
-			changeCategories.add(categoryKey);
-			const caption = line.split(":")[1].trim();
-			categoryCaptions[categoryKey] = caption;
-		}
-		
-		match = line.match(patterns.category.colour);
-		if(match) {
-			categoryColors[match[1]] = match[2].trim();
+			changeCategories.add(match[1]);
 		}
 		
 		// Parse impact-types
 		match = line.match(patterns.impactType.caption);
 		if(match) {
-			const impactKey = match[1];
-			impactTypes.add(impactKey);
-			const caption = line.split(":")[1].trim();
-			impactCaptions[impactKey] = caption;
-		}
-		
-		match = line.match(patterns.impactType.colourBg);
-		if(match) {
-			if(!impactColors[match[1]]) impactColors[match[1]] = {};
-			impactColors[match[1]].bg = match[2].trim();
-		}
-		
-		match = line.match(patterns.impactType.colourFg);
-		if(match) {
-			if(!impactColors[match[1]]) impactColors[match[1]] = {};
-			impactColors[match[1]].fg = match[2].trim();
+			impactTypes.add(match[1]);
 		}
 	}
 	
@@ -243,12 +202,6 @@ function loadReleasesInfo() {
 		changeTypes: Array.from(changeTypes),
 		changeCategories: Array.from(changeCategories),
 		impactTypes: Array.from(impactTypes),
-		typeCaptions,
-		typeColors,
-		categoryCaptions,
-		categoryColors,
-		impactCaptions,
-		impactColors,
 	};
 }
 
@@ -527,31 +480,12 @@ function formatChangeNote(fields) {
 	const{ title, "change-type": changeType, "change-category": changeCategory, 
 		description, release, "github-links": githubLinks, "github-contributors": githubContributors } = fields;
 	
-	const typeColor = RELEASES_INFO.typeColors[changeType];
-	const categoryColor = RELEASES_INFO.categoryColors[changeCategory];
-	
 	let output = `### 📝 ${title || "Untitled"}\n\n`;
 	
-	// Type with color if available
-	output += "Type: ";
-	if(typeColor) {
-		output += `<span style="background-color: ${typeColor}; padding: 2px 6px; border-radius: 3px;">${changeType}</span>`;
-	} else {
-		output += changeType;
-	}
-	
-	output += " | ";
-	
-	// Category with color if available
-	output += "Category: ";
-	if(categoryColor) {
-		output += `<span style="background-color: ${categoryColor}; padding: 2px 6px; border-radius: 3px;">${changeCategory}</span>\n`;
-	} else {
-		output += `${changeCategory}\n`;
-	}
+	output += `Type: **${changeType}** | Category: **${changeCategory}**\n`;
 	
 	if(release) {
-		output += `**Release:** ${release}\n`;
+		output += `Release: **${release}**\n`;
 	}
 	
 	output += "\n";
@@ -565,7 +499,7 @@ function formatChangeNote(fields) {
 	}
 	
 	if(githubContributors) {
-		output += `👥 **Contributors:** ${githubContributors}\n\n`;
+		output += `👥 Contributors: **${githubContributors}**\n\n`;
 	}
 	
 	output += "---\n";
@@ -575,20 +509,12 @@ function formatChangeNote(fields) {
 function formatImpactNote(fields) {
 	const{ title, "impact-type": impactType, changenote, description } = fields;
 	
-	const colors = RELEASES_INFO.impactColors[impactType];
+	let output = `### ⚠️ Impact: **${title || "Untitled"}**\n\n`;
 	
-	let output = `### ⚠️ **Impact:** ${title || "Untitled"}\n\n`;
-	
-	// Only use color span if colors are defined
-	output += "Impact Type: ";
-	if(colors && colors.bg && colors.fg) {
-		output += `<span style="background-color: ${colors.bg}; color: ${colors.fg}; padding: 2px 6px; border-radius: 3px;">${impactType}</span>\n`;
-	} else {
-		output += `${impactType}\n`;
-	}
+	output += `Impact Type: **${impactType}**\n`;
 	
 	if(changenote) {
-		output += `**Related Change:** ${changenote}\n`;
+		output += `Related Change: **${changenote}**\n`;
 	}
 	
 	output += "\n";
