@@ -9,10 +9,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Validate PR
-      uses: TiddlyWiki/cerebrus@v4
+    # Step 1: Validate PR paths
+    - name: Validate PR Paths
+      uses: linonetwo/Cerebrus@feat/check-release-note
       with:
         pr_number: ${{ github.event.pull_request.number }}
         repo: ${{ github.repository }}
         base_ref: ${{ github.base_ref }}
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        mode: rules
+      continue-on-error: true
+    
+    # Step 2: Validate change notes
+    - name: Validate Change Notes
+      uses: linonetwo/Cerebrus@feat/check-release-note
+      with:
+        pr_number: ${{ github.event.pull_request.number }}
+        repo: ${{ github.repository }}
+        base_ref: ${{ github.base_ref }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        mode: changenotes
+      continue-on-error: true
+
