@@ -14,6 +14,12 @@ Display a message, in colour if we're on a terminal
 */
 exports.log = function(text,colour) {
 	console.log($tw.node ? exports.terminalColour(colour) + text + exports.terminalColour() : text);
+	// TEST
+	console.log($tw.node ? exports.terminalColour(colour) + text + exports.terminalColour() : text);
+	console.log($tw.node ? exports.terminalColour(colour) + text + exports.terminalColour() : text);
+	console.log($tw.node ? exports.terminalColour(colour) + text + exports.terminalColour() : text);
+	console.log($tw.node ? exports.terminalColour(colour) + text + exports.terminalColour() : text);
+	console.log($tw.node ? exports.terminalColour(colour) + text + exports.terminalColour() : text);
 };
 
 exports.terminalColour = function(colour) {
