@@ -25,3 +25,5 @@ This PR implements an automated validation system for change notes to address th
 * Integration with `peter-evans/create-or-update-comment` for clean PR comments
 
 This automation saves maintainers time and helps contributors follow the correct format from the start.
+
+Test test
