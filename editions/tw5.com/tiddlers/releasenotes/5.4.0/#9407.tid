@@ -1,7 +1,7 @@
 title: $:/changenotes/5.4.0/#9407
 description: Automated change note validation system
 tags: $:/tags/ChangeNote
-change-type: performanceeee
+change-type: performance
 change-category: developer
 github-links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/9407
 github-contributors: linonetwo
