@@ -9,6 +9,8 @@ Adds tiddler filtering methods to the $tw.Wiki object.
 
 "use strict";
 
+// test test
+
 var widgetClass = require("$:/core/modules/widgets/widget.js").widget;
 
 /* Maximum permitted filter recursion depth */
