@@ -6,7 +6,7 @@ change-type: enhancement
 change-category: nodejs
 github-links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/9078
 github-contributors: linonetwo
-released: 5.4.0
+release: 5.4.0
 
 The web server's `get-file` route now supports HTTP Range requests and file streaming, enabling better loading and playback of large media files.
 
