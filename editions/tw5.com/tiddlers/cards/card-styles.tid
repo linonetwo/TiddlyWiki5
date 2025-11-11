@@ -16,6 +16,8 @@ type: text/vnd.tiddlywiki
 	gap: 1em;
 }
 
+.test {}
+
 .tc-cards.tc-small {
 	text-align: center;
 	font-size: 0.7em;
