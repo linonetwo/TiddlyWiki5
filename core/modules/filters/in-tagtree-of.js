@@ -3,31 +3,21 @@ title: $:/core/modules/filters/in-tagtree-of.js
 type: application/javascript
 module-type: filteroperator
 
-Filter operator for checking if tiddlers are in a tag tree with a specified root
+Filter operator for checking if tiddlers are in a tag tree with a specified root.
 
-Finds out where a tiddler originates from, is it in a tag tree with xxx as root?
-
-Based on:
-- https://github.com/bimlas/tw5-kin-filter/blob/master/plugins/kin-filter/kin.js
-- https://talk.tiddlywiki.org/t/recursive-filter-operators-to-show-all-tiddlers-beneath-a-tag-and-all-tags-above-a-tiddler/3814
+By default, checks whether each input tiddler is a descendant (direct or indirect) of the
+operand tag in the tag hierarchy. The optional `:inclusive` suffix also matches the root tiddler itself.
+Prefixing with `!` inverts the result, returning only those tiddlers NOT in the tag tree.
 
 \*/
 
 "use strict";
 
-/*
-Export our filter function
-*/
 exports["in-tagtree-of"] = function(source,operator,options) {
 	const rootTiddler = operator.operand;
-	/*
-	 * By default we check tiddler passed-in is tagged with the operand (or is its child), we output the tiddler passed-in, otherwise output empty.
-	 * But if `isInclusive` is true, if tiddler operand itself is passed-in, we output it, even if the operand itself is not tagged with itself.
-	 */
+	// With the `:inclusive` suffix, the root tiddler itself is included in the results if it appears in the input
 	const isInclusive = operator.suffix === "inclusive";
-	/*
-	 * If add `!` prefix, means output the input if input is not in rootTiddlerChildren
-	 */
+	// With the `!` prefix, output tiddlers that are NOT in the tag tree instead
 	const isNotInTagTreeOf = operator.prefix === "!";
 	const sourceTiddlers = new Set();
 	let firstTiddler;
@@ -55,17 +45,15 @@ exports["in-tagtree-of"] = function(source,operator,options) {
 	});
 	
 	if(isNotInTagTreeOf) {
-		const sourceTiddlerCheckedToNotBeChildrenOfRootTiddler = Array.from(sourceTiddlers).filter(function(title) {
-			// Check if title is in the tag tree, or if it's the root itself when inclusive
+		const outsideTree = Array.from(sourceTiddlers).filter(function(title) {
 			const isInTree = rootTiddlerChildren.has(title) || (isInclusive && title === rootTiddler);
 			return !isInTree;
 		});
-		return sourceTiddlerCheckedToNotBeChildrenOfRootTiddler;
+		return outsideTree;
 	}
-	
-	const sourceTiddlerCheckedToBeChildrenOfRootTiddler = Array.from(sourceTiddlers).filter(function(title) {
-		// Check if title is in the tag tree, or if it's the root itself when inclusive
+
+	const insideTree = Array.from(sourceTiddlers).filter(function(title) {
 		return rootTiddlerChildren.has(title) || (isInclusive && title === rootTiddler);
 	});
-	return sourceTiddlerCheckedToBeChildrenOfRootTiddler;
+	return insideTree;
 };
