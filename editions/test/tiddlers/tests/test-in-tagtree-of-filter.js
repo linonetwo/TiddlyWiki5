@@ -42,26 +42,15 @@ describe("in-tagtree-of filter operator tests", function() {
 			tiddlers: {
 				"$:/TiddlerFive": {
 					title: "$:/TiddlerFive",
-					text: "Everything in federation",
 					tags: ["two"]
-				},
-				"TiddlerSix": {
-					title: "TiddlerSix",
-					text: "Missing inaction from [[TiddlerOne]]",
-					filter: "[[one]] [[a a]] [subfilter{hasList!!list}]",
-					tags: []
 				},
 				"TiddlerSeventh": {
 					title: "TiddlerSeventh",
-					text: "",
-					list: "[[TiddlerOne]] [[Tiddler Three]] [[a fourth tiddler]] [[MissingTiddler]]",
 					tags: ["one"]
 				},
 				"Tiddler8": {
 					title: "Tiddler8",
-					text: "Tidd",
-					tags: ["one"],
-					"test-field": "JoeBloggs"
+					tags: ["one"]
 				}
 			}
 		};
@@ -72,61 +61,23 @@ describe("in-tagtree-of filter operator tests", function() {
 			type: "application/json"
 		},{
 			title: "TiddlerOne",
-			text: "The quick brown fox in $:/TiddlerTwo",
-			tags: ["one"],
-			cost: "123",
-			value: "120",
-			slug: "tiddler-one",
-			authors: "Joe Bloggs",
-			modifier: "JoeBloggs",
-			modified: "201304152222"
+			tags: ["one"]
+		},{
+			// ChildOfTiddlerOne is tagged with TiddlerOne (not directly with "one"),
+			// making it an indirect (level-2) descendant of "one"
+			title: "ChildOfTiddlerOne",
+			tags: ["TiddlerOne"]
 		},{
 			title: "$:/TiddlerTwo",
-			text: "The rain in Spain\nfalls mainly on the plain and [[a fourth tiddler]]",
-			tags: ["two"],
-			cost: "42",
-			value: "190",
-			slug: "tiddler-two",
-			authors: "[[John Doe]]",
-			modifier: "John",
-			modified: "201304152211"
+			tags: ["two"]
 		},{
 			title: "Tiddler Three",
-			text: "The speed of sound in light\n\nThere is no [[TiddlerZero]] but [[TiddlerSix]]",
-			tags: ["one","two"],
-			cost: "56",
-			value: "80",
-			modifier: "John",
-			modified: "201304162202"
+			tags: ["one","two"]
 		},{
 			title: "a fourth tiddler",
-			text: "The quality of mercy is not drained by [[Tiddler Three]]",
-			tags: [],
-			cost: "82",
-			value: "72",
-			empty: "not",
-			modifier: "John"
+			tags: []
 		},{
-			title: "one",
-			text: "This is the text of tiddler [[one]]",
-			list: "[[Tiddler Three]] [[TiddlerOne]]",
-			empty: "",
-			modifier: "John"
-		},{
-			title: "hasList",
-			text: "This is the text of tiddler [[hasList]]",
-			list: "[[Tiddler Three]] [[TiddlerOne]]",
-			modifier: "PMario"
-		},{
-			title: "has filter",
-			text: "This is the text of tiddler [[has filter]]",
-			filter: "[[Tiddler Three]] [[TiddlerOne]] [subfilter{hasList!!list}]",
-			modifier: "PMario"
-		},{
-			title: "filter regexp test",
-			text: "Those strings have been used to create the `regexp = /[+|\-|~]?([[](?:[^\]])*\]+)|([+|-|~|\S]\S*)/;`",
-			filter: "+aaa -bbb ~ccc aaaaaabbbbbbbbaa \"bb'b\" 'cc\"c' [[abc]] [[tiddler with spaces]] [is[test]] [is[te st]] a s df [enlist<hugo>] +[enlist:raw{test with spaces}] [enlist:raw{test with spaces}] [[a a]] [[ ] [ ]] [[ [hugo]] [subfilter{Story/Tower of Hanoi/A-C Sequence}]",
-			modifier: "PMario"
+			title: "one"
 		}];
 		// Load the tiddlers in the required order
 		var fnCompare;
@@ -205,18 +156,52 @@ describe("in-tagtree-of filter operator tests", function() {
 		});
 
 		it("should work correctly with non-shadow tiddlers only", function() {
-			// "Tiddler8" and "TiddlerSeventh" are shadow tiddlers
-			expect(wiki.filterTiddlers("[!is[shadow]in-tagtree-of[one]sort[title]]").join(",")).toBe("Tiddler Three,TiddlerOne");
-			expect(wiki.filterTiddlers("[!is[shadow]!in-tagtree-of[one]sort[title]]").join(",")).toBe("$:/ShadowPlugin,$:/TiddlerTwo,a fourth tiddler,filter regexp test,has filter,hasList,one");
+			// "Tiddler8" and "TiddlerSeventh" are shadow tiddlers; ChildOfTiddlerOne is a non-shadow indirect descendant
+			expect(wiki.filterTiddlers("[!is[shadow]in-tagtree-of[one]sort[title]]").join(",")).toBe("ChildOfTiddlerOne,Tiddler Three,TiddlerOne");
+			expect(wiki.filterTiddlers("[!is[shadow]!in-tagtree-of[one]sort[title]]").join(",")).toBe("$:/ShadowPlugin,$:/TiddlerTwo,a fourth tiddler,one");
 		});
 
 		it("should return empty for non-existent root tags", function() {
 			expect(wiki.filterTiddlers("[[TiddlerOne]in-tagtree-of[NonExistentTag]]").join(",")).toBe("");
 		});
 
-		it("should optimize single tiddler input", function() {
-			// This tests the optimization for single-tiddler inputs used in cascades
-			expect(wiki.filterTiddlers("[[TiddlerOne]in-tagtree-of[one]]").join(",")).toBe("TiddlerOne");
+		it("should handle multi-level (indirect) descendants", function() {
+			// Tag hierarchy has 3 levels:
+			//   Level 1 (root): "one"
+			//   Level 2 (direct children): TiddlerOne, Tiddler Three, Tiddler8 (shadow), TiddlerSeventh (shadow)
+			//   Level 3 (indirect grandchildren): ChildOfTiddlerOne (tagged with TiddlerOne)
+
+			// Single indirect input: the single-tiddler optimisation fast path does not fire
+			// (ChildOfTiddlerOne.tags = ["TiddlerOne"], not ["one"]), so it falls through to getTagDescendants
+			expect(wiki.filterTiddlers("[[ChildOfTiddlerOne]in-tagtree-of[one]]").join(",")).toBe("ChildOfTiddlerOne");
+
+			// Multiple inputs including an indirect descendant
+			expect(wiki.filterTiddlers("[[TiddlerOne]] [[ChildOfTiddlerOne]] [[$:/TiddlerTwo]] +[in-tagtree-of[one]sort[title]]").join(",")).toBe("ChildOfTiddlerOne,TiddlerOne");
+
+			// Default input (all non-shadow tiddlers): only non-shadow descendants appear
+			expect(wiki.filterTiddlers("[in-tagtree-of[one]sort[title]]").join(",")).toBe("ChildOfTiddlerOne,Tiddler Three,TiddlerOne");
+
+			// Including shadow tiddlers in input: all 5 descendants (levels 2 and 3) are returned
+			expect(wiki.filterTiddlers("[all[shadows+tiddlers]in-tagtree-of[one]sort[title]]").join(",")).toBe("ChildOfTiddlerOne,Tiddler Three,Tiddler8,TiddlerOne,TiddlerSeventh");
+		});
+
+		it("should handle a non-existent single input tiddler", function() {
+			// firstTiddler will be undefined; the optimisation fast path is skipped entirely
+			expect(wiki.filterTiddlers("[[NonExistentTiddler]in-tagtree-of[one]]").join(",")).toBe("");
+			expect(wiki.filterTiddlers("[[NonExistentTiddler]!in-tagtree-of[one]]").join(",")).toBe("NonExistentTiddler");
+		});
+
+		it("should handle circular tag references without infinite loops", function() {
+			// TagA is tagged with TagB, TagB is tagged with TagA — a direct cycle
+			var circularWiki = new $tw.Wiki();
+			circularWiki.addTiddlers([
+				{title: "TagA", tags: ["TagB"]},
+				{title: "TagB", tags: ["TagA"]}
+			]);
+			// getTagDescendants cycle detection must prevent infinite recursion
+			// Both TagA and TagB end up as descendants of each root
+			expect(circularWiki.filterTiddlers("[in-tagtree-of[TagA]sort[title]]").join(",")).toBe("TagA,TagB");
+			expect(circularWiki.filterTiddlers("[in-tagtree-of[TagB]sort[title]]").join(",")).toBe("TagA,TagB");
 		});
 	}
 
