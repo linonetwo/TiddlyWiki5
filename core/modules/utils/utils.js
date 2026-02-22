@@ -970,6 +970,8 @@ exports.parseECMAScriptDate = function(input) {
 	} else {
 		return false;
 	}
+};
+
 /*
 Split text into parts (lines or words) for diff operations
 Adapted from https://github.com/google/diff-match-patch/wiki/Line-or-Word-Diffs
