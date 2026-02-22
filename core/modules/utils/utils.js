@@ -883,27 +883,38 @@ exports.makeDataUri = function(text,type,_canonical_uri) {
 };
 
 /*
-Return a Set of all tiddler titles that are descendants in the tag tree rooted at the given tag.
-The input tag itself is not included in the returned Set.
+Return a cached Set of all tiddler titles that are descendants in a tree rooted at the given node.
+The root node itself is not included in the returned Set.
+Results are cached via wiki.getGlobalCache and automatically invalidated when the wiki changes.
+	wiki: wiki object
+	root: title of the root node
+	fieldName: optional field name whose value is parsed as a title list to obtain children.
+	           When omitted the tag hierarchy (getTiddlersWithTag) is used.
 */
-exports.getTagDescendants = function(wiki,rootTag) {
+exports.getTreeDescendants = function(wiki,root,fieldName) {
 	wiki = wiki || $tw.wiki;
-	var results = new Set();
-	if(!rootTag) {
-		return results;
+	if(!root) {
+		return new Set();
 	}
-	function collect(title) {
-		var tagged = wiki.getTiddlersWithTag(title) || [];
-		for(var index = 0; index < tagged.length; index++) {
-			var childTitle = tagged[index];
-			if(!results.has(childTitle)) {
-				results.add(childTitle);
-				collect(childTitle);
+	var cacheKey = "tree-descendants:" + (fieldName || "tags") + ":" + root;
+	return wiki.getGlobalCache(cacheKey,function() {
+		var results = new Set();
+		var getChildren = fieldName
+			? function(title) { return wiki.getTiddlerList(title,fieldName); }
+			: function(title) { return wiki.getTiddlersWithTag(title) || []; };
+		function collect(title) {
+			var children = getChildren(title) || [];
+			for(var index = 0; index < children.length; index++) {
+				var childTitle = children[index];
+				if(!results.has(childTitle)) {
+					results.add(childTitle);
+					collect(childTitle);
+				}
 			}
 		}
-	}
-	collect(rootTag);
-	return results;
+		collect(root);
+		return results;
+	});
 };
 
 /*
