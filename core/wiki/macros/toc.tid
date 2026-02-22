@@ -219,10 +219,10 @@ tags: $:/tags/Macro
 \whitespace trim
 <!-- body for linked items in the auto-expand variant -->
 <!-- "open" if focusedTiddler is this node or any descendant in the tag tree.
-     in-tagtree-of:inclusive is a built-in filter operator that traverses the tag
+     in-tree-of:inclusive is a built-in filter operator that traverses the tag
      hierarchy internally — it is not a recursive call of our own macros -->
 <$qualify name="toc-state" title={{{ [[$:/state/toc]addsuffix<__path__>addsuffix[-]addsuffix<currentTiddler>] }}}>
-  <$let toc-auto-open={{{ [<__focusedTiddler__>in-tagtree-of:inclusive<currentTiddler>then[open]else[]] }}}>
+  <$let toc-auto-open={{{ [<__focusedTiddler__>in-tree-of:inclusive<currentTiddler>then[open]else[]] }}}>
     <$set name="toc-item-class" filter=<<__itemClassFilter__>> emptyValue="toc-item-selected" value="toc-item">
       <li class={{{ [<toc-item-class>] [<currentTiddler>match<__focusedTiddler__>then[tc-toc-item-focused]] +[join[ ]] }}}>
         <$link to={{{ [<currentTiddler>get[target]else<currentTiddler>] }}}>
@@ -261,7 +261,7 @@ tags: $:/tags/Macro
 \whitespace trim
 <!-- body for unlinked items in the auto-expand variant -->
 <$qualify name="toc-state" title={{{ [[$:/state/toc]addsuffix<__path__>addsuffix[-]addsuffix<currentTiddler>] }}}>
-  <$let toc-auto-open={{{ [<__focusedTiddler__>in-tagtree-of:inclusive<currentTiddler>then[open]else[]] }}}>
+  <$let toc-auto-open={{{ [<__focusedTiddler__>in-tree-of:inclusive<currentTiddler>then[open]else[]] }}}>
     <$set name="toc-item-class" filter=<<__itemClassFilter__>> emptyValue="toc-item-selected" value="toc-item">
       <li class={{{ [<toc-item-class>] [<currentTiddler>match<__focusedTiddler__>then[tc-toc-item-focused]] +[join[ ]] }}}>
         <$list filter="[all[current]tagging[]$sort$] -[subfilter<__exclude__>] +[limit[1]]" variable="ignore" emptyMessage="""<$button class="tc-btn-invisible">{{$:/core/images/blank}}</$button><span class="toc-item-muted"><<toc-caption>></span>""">

@@ -80,6 +80,10 @@ exports.startup = function() {
 	}
 
 	updateTopOffset();
+	// initialize focused tiddler after the initial render completes
+	setTimeout(function() {
+		check();
+	},0);
 
 	// Debounced scroll handler (captures scroll on any scrolling element)
 	var scrollTimer;
@@ -112,6 +116,7 @@ exports.startup = function() {
 	$tw.wiki.addEventListener("change",function(changes) {
 		if(changes[TOP_OFFSET_CONFIG]) {
 			updateTopOffset();
+			check();
 		}
 		if(changes["$:/HistoryList"] || changes["$:/StoryList"]) {
 			setTimeout(function() {

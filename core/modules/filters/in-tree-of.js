@@ -34,11 +34,13 @@ exports["in-tree-of"] = function(source,operator,options) {
 	// With the `!` prefix, output tiddlers that are NOT in the tree instead
 	var isNotInTree = operator.prefix === "!";
 
-	var sourceTiddlers = new Set();
+	// Collect input titles as an array to preserve duplicates and original order.
+	// (A Set would silently deduplicate, changing filter semantics.)
+	var sourceTitles = [];
 	var firstTiddler;
 
 	source(function(tiddler,title) {
-		sourceTiddlers.add(title);
+		sourceTitles.push(title);
 		if(firstTiddler === undefined) {
 			firstTiddler = tiddler;
 		}
@@ -47,8 +49,8 @@ exports["in-tree-of"] = function(source,operator,options) {
 	// Single-input fast path (optimised for cascade / fileSystemPath usage):
 	// When there is exactly one input and we are not inverting, check membership
 	// directly without building the full descendant Set.
-	if(sourceTiddlers.size === 1 && !isNotInTree) {
-		var theOnlyTiddlerTitle = Array.from(sourceTiddlers)[0];
+	if(sourceTitles.length === 1 && !isNotInTree) {
+		var theOnlyTiddlerTitle = sourceTitles[0];
 		if(fieldName) {
 			// Field-tree fast path: check whether the root tiddler's field directly lists the input
 			var rootTiddlerObj = options.wiki.getTiddler(rootTiddler);
@@ -75,13 +77,13 @@ exports["in-tree-of"] = function(source,operator,options) {
 	var descendants = $tw.utils.getTreeDescendants(options.wiki,rootTiddler,fieldName || undefined);
 
 	if(isNotInTree) {
-		return Array.from(sourceTiddlers).filter(function(title) {
+		return sourceTitles.filter(function(title) {
 			var isInTree = descendants.has(title) || (isInclusive && title === rootTiddler);
 			return !isInTree;
 		});
 	}
 
-	return Array.from(sourceTiddlers).filter(function(title) {
+	return sourceTitles.filter(function(title) {
 		return descendants.has(title) || (isInclusive && title === rootTiddler);
 	});
 };
