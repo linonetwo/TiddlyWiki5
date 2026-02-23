@@ -34,13 +34,13 @@ For example this link, <a href=<<qualify "##Bottom_of_tiddler">>>Bottom</a>, sho
 
 There are only 2 steps to making anchor links.
 
-* First, create the target point (called an 'blockId') where you want it.
+* First, create the target point (called an 'anchor') where you want it.
 * Second, add a link to it where the reader might need it.
 
 That's it. 
 
 
-''Step 1: Create an 'blockId' (link target)''
+''Step 1: Create an 'anchor' (link target)''
 
 ```
 <a id="#Bottom_of_tiddler"></a>
