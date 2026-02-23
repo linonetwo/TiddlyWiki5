@@ -1,0 +1,8 @@
+caption: contains
+created: 20180815124349784
+modified: 20180815124607101
+tags: [[Filter Operators]] [[Field Operators]] [[Negatable Operators]]
+title: contains Operator
+type: text/vnd.tiddlywiki
+
+<<.operator-examples "contains">>

@@ -13,9 +13,7 @@ The ''action-navigate'' widget is an [[action widget|ActionWidgets]] that sends 
 
 The ''action-navigate'' widget is invisible. Any content within it is ignored.
 
-|!Attribute |!Description |
-|$to |The title of the target tiddler for the navigation (if not provided defaults to the [[current tiddler|Current Tiddler]] |
-|$scroll |Optional parameter determining whether the navigation will also cause a scroll to the target tiddler (see below) |
+<$macrocall $name=".widget-attributes" widget="ActionNavigateWidget"/>
 
 !! Scroll handling
 

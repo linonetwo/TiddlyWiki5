@@ -1,11 +1,6 @@
 caption: get
 created: 20140426183123179
 modified: 20230309163844434
-op-input: a [[selection of titles|Title Selection]]
-op-output: the values of field <<.place F>> in each of the input titles
-op-parameter: the name of a [[field|TiddlerFields]]
-op-parameter-name: F
-op-purpose: select all values of a field in the input titles
 tags: [[Filter Operators]] [[Field Operators]]
 title: get Operator
 type: text/vnd.tiddlywiki

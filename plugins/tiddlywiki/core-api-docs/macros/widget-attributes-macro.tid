@@ -1,0 +1,27 @@
+title: $:/plugins/tiddlywiki/core-api-docs/widget-attributes-macro
+tags: $:/tags/Macro
+code-body: yes
+type: text/vnd.tiddlywiki
+
+\procedure .widget-attributes(widget)
+<$let attrPrefix={{{ [[$:/docs/widgets/]addsuffix<widget>addsuffix[/attributes/]] }}}>
+<table>
+<tr>
+<th align="left">Attribute</th>
+<th align="left">Description</th>
+</tr>
+<$list filter="[all[shadows+tiddlers]prefix<attrPrefix>sort[]]">
+<$let attrName={{{ [all[current]removeprefix<attrPrefix>] }}}>
+<tr>
+<td>`<<attrName>>`
+<%if [{!!deprecated}match[yes]] %>
+ //deprecated//
+<%endif%>
+</td>
+<td><$transclude/></td>
+</tr>
+</$let>
+</$list>
+</table>
+</$let>
+\end

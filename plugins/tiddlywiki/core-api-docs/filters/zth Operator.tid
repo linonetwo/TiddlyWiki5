@@ -1,11 +1,6 @@
 caption: zth
 created: 20211029023242012
 modified: 20211029023711450
-op-input: a [[selection of titles|Title Selection]]
-op-output: the <<.place Z>>th input title
-op-parameter: an integer, defaulting to 0
-op-parameter-name: Z
-op-purpose: select the <<.place Z>>th input title
 tags: [[Filter Operators]] [[Order Operators]]
 title: zth Operator
 type: text/vnd.tiddlywiki
