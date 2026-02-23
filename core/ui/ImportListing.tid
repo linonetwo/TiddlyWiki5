@@ -82,6 +82,7 @@ title: $:/core/ui/ImportListing
 		</$let>
 	</$reveal>
 <%endif%>
+
 <div class="tc-table-wrapper">
 <table class="tc-import-table">
 <tbody>
