@@ -92,7 +92,7 @@ ElementWidget.prototype.refresh = function(changedTiddlers) {
 	if(hasChangedAttributes) {
 		if(!this.isReplaced) {
 			// Update our attributes
-				this.assignAttributes(this.domNodes[0],{excludeEventAttributes: true, excludeBlockIdAttribute: true});
+			this.assignAttributes(this.domNodes[0],{excludeEventAttributes: true, excludeBlockIdAttribute: true});
 			// Reapply block ID
 			this.applyBlockId(this.domNodes[0]);
 		} else {

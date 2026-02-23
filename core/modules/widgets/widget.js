@@ -523,7 +523,7 @@ Widget.prototype.assignAttributes = function(domNode,options) {
 		if(options.excludeEventAttributes && name.substr(0,2).toLowerCase() === EVENT_ATTRIBUTE_PREFIX) {
 			value = undefined;
 		}
-			if(options.excludeBlockIdAttribute && name === "blockId") {
+		if(options.excludeBlockIdAttribute && name === "blockId") {
 			value = undefined;
 		}
 		if(value !== undefined) {

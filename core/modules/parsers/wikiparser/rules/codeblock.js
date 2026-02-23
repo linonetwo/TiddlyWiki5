@@ -54,7 +54,7 @@ exports.parse = function() {
 		attributes.blockId = {type: "string", value: blockId};
 	}
 	return [{
-			type: "codeblock",
-			attributes: attributes
+		type: "codeblock",
+		attributes: attributes
 	}];
 };

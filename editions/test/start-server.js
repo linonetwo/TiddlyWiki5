@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /*\
 title: editions/test/start-server.js
 type: application/javascript
