@@ -15,6 +15,7 @@ The body should contain the raw file content (binary or text).
 Parameters:
 
 * ''pathname'' - URI encoded path to the file
+* ''meta'' (optional query parameter) - if set to `true`, also write a sibling `.meta` file with `title` and inferred `type`
 
 Headers:
 
@@ -26,6 +27,7 @@ Response:
 * 204 No Content
 *> `Content-Type: text/plain`
 * 403 Forbidden - if the file path attempts to access directories outside the files folder
+* 413 Payload Too Large - if upload exceeds `MAX_UPLOAD_SIZE` bytes (defaults to `1000000000`)
 * 500 Internal Server Error - if there was an error creating directories or writing the file
 
 Notes:
