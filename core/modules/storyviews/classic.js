@@ -22,12 +22,21 @@ ClassicStoryView.prototype.navigateTo = function(historyInfo) {
 	}
 	var listItemWidget = this.listWidget.children[listElementIndex],
 		targetElement = listItemWidget.findFirstDomNode();
+	// If block ID is provided, find the marked element via DOM query
+	var foundBlockId = false;
+	if(targetElement && historyInfo.blockId) {
+		var blockIdElement = targetElement.parentNode.querySelector("[data-tw-block-id=\"" + historyInfo.blockId + "\"]");
+		if(blockIdElement) {
+			targetElement = blockIdElement;
+			foundBlockId = true;
+		}
+	}
 	// Abandon if the list entry isn't a DOM element (it might be a text node)
 	if(!targetElement || targetElement.nodeType === Node.TEXT_NODE) {
 		return;
 	}
 	// Scroll the node into view
-	this.listWidget.dispatchEvent({type: "tm-scroll", target: targetElement});
+	this.listWidget.dispatchEvent({type: "tm-scroll", target: targetElement, highlight: foundBlockId});
 };
 
 ClassicStoryView.prototype.insert = function(widget) {

@@ -19,6 +19,13 @@ exports.serialize = function(tree,serialize) {
 		if(transcludeNode.attributes.$index) {
 			result += "##" + transcludeNode.attributes.$index.value;
 		}
+		// Check for block ID attribute (single or range)
+		if(transcludeNode.attributes.$blockId) {
+			result += "^" + transcludeNode.attributes.$blockId.value;
+			if(transcludeNode.attributes.$blockIdEnd) {
+				result += "..^" + transcludeNode.attributes.$blockIdEnd.value;
+			}
+		}
 		// Handle template
 		var tiddlerTitle = tree.attributes.tiddler ? tree.attributes.tiddler.value : undefined;
 		if(transcludeNode.attributes.$tiddler && transcludeNode.attributes.$tiddler.value !== tiddlerTitle) {
@@ -26,7 +33,7 @@ exports.serialize = function(tree,serialize) {
 		}
 		// Check for parameters
 		var params = [];
-		var excludedAttributes = ["tiddler", "$tiddler", "$field", "$index", "$template"];
+		var excludedAttributes = ["tiddler", "$tiddler", "$field", "$index", "$blockId", "$blockIdEnd", "$template"];
 		for(var key in transcludeNode.attributes) {
 			if(excludedAttributes.indexOf(key) === -1) {
 				params.push(transcludeNode.attributes[key].value);

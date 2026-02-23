@@ -88,6 +88,8 @@ var WikiParser = function(type,text,options) {
 	} else {
 		topBranch.push.apply(topBranch,this.parseBlocks());
 	}
+	// Post-process: absorb blockid nodes into parent block ID attributes
+	this.tree = this.postProcessBlockIds(this.tree);
 	// Build rules' name map
 	this.usingRuleMap = {};
 	$tw.utils.each(this.pragmaRules, function (ruleInfo) { self.usingRuleMap[ruleInfo.rule.name] = Object.getPrototypeOf(ruleInfo.rule); });
@@ -257,6 +259,33 @@ WikiParser.prototype.parseBlock = function(terminatorRegExpString) {
 	var children = this.parseInlineRun(terminatorRegExp);
 	var end = this.pos;
 	return [{type: "element", tag: "p", children: children, start: start, end: end, rule: "parseblock" }];
+};
+
+/*
+Post-process the parse tree to absorb blockid nodes into their parent block's block ID attribute.
+A blockid node at the end of a block's children array is removed and its id is set as the
+parent's "blockId" attribute. This means blockid nodes never appear in the final widget tree.
+*/
+WikiParser.prototype.postProcessBlockIds = function(tree) {
+	for(var i = 0; i < tree.length; i++) {
+		var node = tree[i];
+		// Recurse into children first
+		if(node.children && node.children.length > 0) {
+			this.postProcessBlockIds(node.children);
+			// Check if the last child is a blockid
+			var lastChild = node.children[node.children.length - 1];
+			if(lastChild.type === "blockid" && lastChild.attributes && lastChild.attributes.id) {
+				// Absorb the blockid's id into the parent node's block ID attribute
+				if(!node.attributes) {
+					node.attributes = {};
+				}
+				node.attributes.blockId = {type: "string", value: lastChild.attributes.id.value};
+				// Remove the blockid node from children
+				node.children.pop();
+			}
+		}
+	}
+	return tree;
 };
 
 /*

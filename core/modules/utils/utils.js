@@ -724,6 +724,26 @@ Returns an object with the following fields, all optional:
 * index: JSON property index
 */
 exports.parseTextReference = function(textRef) {
+	// Check for ^blockId suffix before processing !! and ## separators
+	// ^blockId is only valid for wikitext text content and is mutually exclusive with !!field and ##index
+	// Supports range syntax: Title^start..^end (both block IDs required for range)
+	var blockId, blockIdEnd, caretPos = textRef.indexOf("^");
+	if(caretPos !== -1) {
+		// Only treat as block ID if there's no !! or ## before the ^
+		var beforeCaret = textRef.substring(0,caretPos);
+		if(beforeCaret.indexOf("!!") === -1 && beforeCaret.indexOf("##") === -1) {
+			var blockIdPart = textRef.substring(caretPos + 1);
+			// Check for range syntax: blockIdStart..^blockIdEnd
+			var rangeMatch = /^(\S+?)\.\.\^(\S+)$/.exec(blockIdPart);
+			if(rangeMatch) {
+				blockId = rangeMatch[1];
+				blockIdEnd = rangeMatch[2];
+			} else {
+				blockId = blockIdPart;
+			}
+			textRef = beforeCaret;
+		}
+	}
 	// Separate out the title, field name and/or JSON indices
 	var reTextRef = /(?:(.*?)!!(.+))|(?:(.*?)##(.+))|(.*)/mg,
 		match = reTextRef.exec(textRef),
@@ -748,6 +768,12 @@ exports.parseTextReference = function(textRef) {
 	} else {
 		// If we couldn't parse it
 		result.title = textRef;
+	}
+	if(blockId) {
+		result.blockId = blockId;
+	}
+	if(blockIdEnd) {
+		result.blockIdEnd = blockIdEnd;
 	}
 	return result;
 };

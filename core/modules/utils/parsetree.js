@@ -101,6 +101,84 @@ exports.findParseTreeNode = function(nodeArray,search) {
 };
 
 /*
+Recursively search for a parse tree node with a matching block ID attribute.
+Returns the matching node or null.
+*/
+exports.findNodeWithBlockId = function(tree,blockId) {
+	for(var i = 0; i < tree.length; i++) {
+		var node = tree[i];
+		if(node.attributes && node.attributes.blockId && node.attributes.blockId.value === blockId) {
+			return node;
+		}
+		if(node.children) {
+			var found = exports.findNodeWithBlockId(node.children,blockId);
+			if(found) {
+				return found;
+			}
+		}
+	}
+	return null;
+};
+
+/*
+Extract a single block (or range of blocks) from a parse tree by block ID(s).
+If blockIdEnd is provided, extracts all top-level nodes from blockId to blockIdEnd (inclusive).
+Returns an array of parse tree nodes, or null if block ID not found.
+*/
+exports.extractBlockIdNodes = function(tree,blockId,blockIdEnd) {
+	if(!blockIdEnd) {
+		// Single block extraction
+		var node = exports.findNodeWithBlockId(tree,blockId);
+		if(node) {
+			return [node];
+		}
+		return null;
+	}
+	// Range extraction: find both block IDs in the flat top-level list
+	// First, try to find both block IDs at the same level of nesting
+	var result = exports.extractBlockIdRange(tree,blockId,blockIdEnd);
+	if(result) {
+		return result;
+	}
+	return null;
+};
+
+/*
+Extract a range of nodes between two block IDs at the same level of a tree.
+Returns the matching nodes array, or null if not found at this level.
+Searches recursively into children if not found at the current level.
+*/
+exports.extractBlockIdRange = function(tree,blockIdStart,blockIdEnd) {
+	var startIndex = -1, endIndex = -1;
+	// Search at this level
+	for(var i = 0; i < tree.length; i++) {
+		var node = tree[i];
+		if(node.attributes && node.attributes.blockId) {
+			if(node.attributes.blockId.value === blockIdStart) {
+				startIndex = i;
+			}
+			if(node.attributes.blockId.value === blockIdEnd) {
+				endIndex = i;
+			}
+		}
+	}
+	// Both found at this level
+	if(startIndex !== -1 && endIndex !== -1 && startIndex <= endIndex) {
+		return tree.slice(startIndex,endIndex + 1);
+	}
+	// Not found at this level - search in children
+	for(var j = 0; j < tree.length; j++) {
+		if(tree[j].children) {
+			var found = exports.extractBlockIdRange(tree[j].children,blockIdStart,blockIdEnd);
+			if(found) {
+				return found;
+			}
+		}
+	}
+	return null;
+};
+
+/*
 Helper to get the text of a parse tree node or array of nodes
 */
 exports.getParseTreeText = function getParseTreeText(tree) {

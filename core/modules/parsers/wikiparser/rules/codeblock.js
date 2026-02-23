@@ -20,14 +20,15 @@ exports.types = {block: true};
 
 exports.init = function(parser) {
 	this.parser = parser;
-	// Regexp to match and get language if defined
-	this.matchRegExp = /```([\w-]*)\r?\n/mg;
+	// Regexp to match and get language if defined, with optional ^blockId
+	this.matchRegExp = /```([\w-]*)(?:\s+\^(\S+))?\r?\n/mg;
 };
 
 exports.parse = function() {
 	var reEnd = /(\r?\n```$)/mg;
 	var languageStart = this.parser.pos + 3,
 		languageEnd = languageStart + this.match[1].length;
+	var blockId = this.match[2] || "";
 	// Move past the match
 	this.parser.pos = this.matchRegExp.lastIndex;
 
@@ -45,11 +46,15 @@ exports.parse = function() {
 		this.parser.pos = this.parser.sourceLength;
 	}
 	// Return the $codeblock widget
+	var attributes = {
+		code: {type: "string", value: text, start: codeStart, end: this.parser.pos},
+		language: {type: "string", value: this.match[1], start: languageStart, end: languageEnd}
+	};
+	if(blockId) {
+		attributes.blockId = {type: "string", value: blockId};
+	}
 	return [{
-		type: "codeblock",
-		attributes: {
-			code: {type: "string", value: text, start: codeStart, end: this.parser.pos},
-			language: {type: "string", value: this.match[1], start: languageStart, end: languageEnd}
-		}
+			type: "codeblock",
+			attributes: attributes
 	}];
 };

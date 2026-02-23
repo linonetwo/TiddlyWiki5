@@ -1,0 +1,10 @@
+title: BlockId/Transclusion
+tags: $:/tags/wikitext-serialize-test-spec
+
+Single block transclusion:
+
+{{BlockId/Marks^BlockLevelLinksID1}}
+
+Range transclusion:
+
+{{BlockId/Marks^BlockLevelLinksID1..^AddingIDforTitle}}
