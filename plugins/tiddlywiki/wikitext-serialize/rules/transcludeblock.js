@@ -23,7 +23,7 @@ exports.serialize = function(tree,serialize) {
 		if(transcludeNode.attributes.$anchor) {
 			result += "^" + transcludeNode.attributes.$anchor.value;
 			if(transcludeNode.attributes.$anchorEnd) {
-				result += "..^" + transcludeNode.attributes.$anchorEnd.value;
+				result += "^" + transcludeNode.attributes.$anchorEnd.value;
 			}
 		}
 		// Handle template

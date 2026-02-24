@@ -19,9 +19,9 @@ This renders only the block with anchor `linkSection`, not the entire tiddler.
 
 ! Range Transclusion
 
-You can transclude a range of consecutive blocks using `{{Title^startAnchor..^endAnchor}}`.
+You can transclude a range of consecutive blocks using `{{Title^startAnchor^endAnchor}}`.
 
-Note the `..^` separator — the first `^` is part of the tiddler reference syntax and introduces the start anchor; `..^` then introduces the end anchor.
+Anchor ids cannot contain `^`, so the second `^` unambiguously introduces the end anchor.
 
 For example, given a tiddler "MyNotes" with content:
 
@@ -36,7 +36,7 @@ Third paragraph. ^conclusion
 Transclude from `^intro` to `^details` inclusive:
 
 ```
-{{MyNotes^intro..^details}}
+{{MyNotes^intro^details}}
 ```
 
 This renders the first and second paragraphs, but not the third.
@@ -50,5 +50,5 @@ If the referenced anchor does not exist in the target tiddler, the full tiddler 
 ! Important Notes
 
 * Do ''not'' transclude a tiddler's own anchored blocks from within that same tiddler (e.g., `{{MyTiddler^block}}` inside `MyTiddler`) — this causes a recursive transclusion error.
-* Range syntax uses `..^` (not `^^`) as the separator because `^` alone already introduces the start anchor.
+* Note: the qualified DOM `id` attribute uses `TiddlerTitle^^anchorId` (double caret) as a namespace separator — this is an HTML attribute value, not wikitext syntax, and does not conflict with the single `^` used in wikitext references.
 * See [[Block Level Links in WikiText]] for how to add anchors to blocks.

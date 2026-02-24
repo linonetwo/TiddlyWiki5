@@ -105,21 +105,21 @@ describe("WikiText tests", function() {
 		// Add a tiddler with multiple anchored blocks
 		wiki.addTiddler({title: "RangeBlocks", text: "Block A. ^blockA\n\nBlock B. ^blockB\n\nBlock C. ^blockC\n\nBlock D. ^blockD"});
 		// Transclude range from blockB to blockC
-		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{RangeBlocks^blockB..^blockC}}")).toBe('<p data-tw-anchor="blockB" id="RangeBlocks^^blockB" tabindex="-1">Block B.</p><p data-tw-anchor="blockC" id="RangeBlocks^^blockC" tabindex="-1">Block C.</p>');
+		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{RangeBlocks^blockB^blockC}}")).toBe('<p data-tw-anchor="blockB" id="RangeBlocks^^blockB" tabindex="-1">Block B.</p><p data-tw-anchor="blockC" id="RangeBlocks^^blockC" tabindex="-1">Block C.</p>');
 		// Transclude range from blockA to blockC (3 blocks)
-		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{RangeBlocks^blockA..^blockC}}")).toBe('<p data-tw-anchor="blockA" id="RangeBlocks^^blockA" tabindex="-1">Block A.</p><p data-tw-anchor="blockB" id="RangeBlocks^^blockB" tabindex="-1">Block B.</p><p data-tw-anchor="blockC" id="RangeBlocks^^blockC" tabindex="-1">Block C.</p>');
+		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{RangeBlocks^blockA^blockC}}")).toBe('<p data-tw-anchor="blockA" id="RangeBlocks^^blockA" tabindex="-1">Block A.</p><p data-tw-anchor="blockB" id="RangeBlocks^^blockB" tabindex="-1">Block B.</p><p data-tw-anchor="blockC" id="RangeBlocks^^blockC" tabindex="-1">Block C.</p>');
 		// Transclude full range from blockA to blockD
-		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{RangeBlocks^blockA..^blockD}}")).toBe('<p data-tw-anchor="blockA" id="RangeBlocks^^blockA" tabindex="-1">Block A.</p><p data-tw-anchor="blockB" id="RangeBlocks^^blockB" tabindex="-1">Block B.</p><p data-tw-anchor="blockC" id="RangeBlocks^^blockC" tabindex="-1">Block C.</p><p data-tw-anchor="blockD" id="RangeBlocks^^blockD" tabindex="-1">Block D.</p>');
+		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{RangeBlocks^blockA^blockD}}")).toBe('<p data-tw-anchor="blockA" id="RangeBlocks^^blockA" tabindex="-1">Block A.</p><p data-tw-anchor="blockB" id="RangeBlocks^^blockB" tabindex="-1">Block B.</p><p data-tw-anchor="blockC" id="RangeBlocks^^blockC" tabindex="-1">Block C.</p><p data-tw-anchor="blockD" id="RangeBlocks^^blockD" tabindex="-1">Block D.</p>');
 		// Single anchor in range format (same start and end)
-		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{RangeBlocks^blockB..^blockB}}")).toBe('<p data-tw-anchor="blockB" id="RangeBlocks^^blockB" tabindex="-1">Block B.</p>');
+		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{RangeBlocks^blockB^blockB}}")).toBe('<p data-tw-anchor="blockB" id="RangeBlocks^^blockB" tabindex="-1">Block B.</p>');
 	});
 	it("handles range transclusion with mixed block types", function() {
 		// Add a tiddler with headings and paragraphs
 		wiki.addTiddler({title: "MixedBlocks", text: "!! Heading One ^h1\n\nParagraph under heading. ^p1\n\n!! Heading Two ^h2\n\nAnother paragraph. ^p2"});
 		// Transclude range from heading to paragraph
-		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{MixedBlocks^h1..^p1}}")).toBe('<h2 class="" data-tw-anchor="h1" id="MixedBlocks^^h1" tabindex="-1">Heading One</h2><p data-tw-anchor="p1" id="MixedBlocks^^p1" tabindex="-1">Paragraph under heading.</p>');
+		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{MixedBlocks^h1^p1}}")).toBe('<h2 class="" data-tw-anchor="h1" id="MixedBlocks^^h1" tabindex="-1">Heading One</h2><p data-tw-anchor="p1" id="MixedBlocks^^p1" tabindex="-1">Paragraph under heading.</p>');
 		// Transclude across heading boundary
-		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{MixedBlocks^p1..^h2}}")).toBe('<p data-tw-anchor="p1" id="MixedBlocks^^p1" tabindex="-1">Paragraph under heading.</p><h2 class="" data-tw-anchor="h2" id="MixedBlocks^^h2" tabindex="-1">Heading Two</h2>');
+		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{MixedBlocks^p1^h2}}")).toBe('<p data-tw-anchor="p1" id="MixedBlocks^^p1" tabindex="-1">Paragraph under heading.</p><h2 class="" data-tw-anchor="h2" id="MixedBlocks^^h2" tabindex="-1">Heading Two</h2>');
 	});
 	it("handles transclusion with non-existent anchor gracefully", function() {
 		wiki.addTiddler({title: "SomeBlocks", text: "Paragraph. ^exists"});
@@ -161,7 +161,7 @@ describe("WikiText tests", function() {
 	});
 	it("handles range transclusion including code block with anchor", function() {
 		wiki.addTiddler({title: "MixedCodeBlocks", text: "Intro. ^intro\n\n```js ^codeBlock\nvar x = 1;\n```\n\nOutro. ^outro"});
-		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{MixedCodeBlocks^intro..^codeBlock}}");
+		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{MixedCodeBlocks^intro^codeBlock}}");
 		expect(result).toContain('Intro.');
 		expect(result).toContain('<code>var x = 1;</code>');
 	});

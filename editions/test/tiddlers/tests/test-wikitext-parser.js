@@ -534,7 +534,7 @@ describe("WikiText parser tests", function() {
 	});
 
 	it("should parse transclusion with anchor range", function () {
-		var result = parse("{{SomeTitle^startId..^endId}}");
+		var result = parse("{{SomeTitle^startId^endId}}");
 		expect(result.length).toBe(1);
 		var tiddlerNode = result[0];
 		expect(tiddlerNode.type).toBe("tiddler");
@@ -546,7 +546,7 @@ describe("WikiText parser tests", function() {
 	});
 
 	it("should parse text reference with anchor range", function () {
-		var result = $tw.utils.parseTextReference("MyTitle^blockA..^blockZ");
+		var result = $tw.utils.parseTextReference("MyTitle^blockA^blockZ");
 		expect(result.title).toBe("MyTitle");
 		expect(result.anchor).toBe("blockA");
 		expect(result.anchorEnd).toBe("blockZ");

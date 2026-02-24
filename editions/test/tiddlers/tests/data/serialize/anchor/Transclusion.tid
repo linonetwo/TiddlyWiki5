@@ -7,4 +7,4 @@ Single block transclusion:
 
 Range transclusion:
 
-{{Serialize/Anchor/Heading^h1Id..^h2Id}}
+{{Serialize/Anchor/Heading^h1Id^h2Id}}
