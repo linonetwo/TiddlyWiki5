@@ -19,8 +19,8 @@ exports.types = {block: true};
 
 exports.init = function(parser) {
 	this.parser = parser;
-	// Regexp to match — optionally capture ^anchor after }}
-	this.matchRegExp = /\{\{([^\{\}\|]*)(?:\|\|([^\|\{\}]+))?(?:\|([^\{\}]+))?\}\}(?:\s+\^(\S+))?(?:\r?\n|$)/mg;
+	// Regexp to match
+	this.matchRegExp = /\{\{([^\{\}\|]*)(?:\|\|([^\|\{\}]+))?(?:\|([^\{\}]+))?\}\}(?:\r?\n|$)/mg;
 };
 
 exports.parse = function() {
@@ -29,8 +29,7 @@ exports.parse = function() {
 	// Get the match details
 	var template = $tw.utils.trim(this.match[2]),
 		textRef = $tw.utils.trim(this.match[1]),
-		params = this.match[3] ? this.match[3].split("|") : [],
-		anchor = this.match[4] || "";
+		params = this.match[3] ? this.match[3].split("|") : [];
 	// Prepare the transclude widget
 	var transcludeNode = {
 		type: "transclude",
@@ -66,10 +65,8 @@ exports.parse = function() {
 	if(template) {
 		transcludeNode.attributes["$tiddler"] = {name: "$tiddler", type: "string", value: template};
 		if(textRef) {
-			if(anchor) tiddlerNode.anchorId = anchor;
 			return [tiddlerNode];
 		} else {
-			if(anchor) transcludeNode.anchorId = anchor;
 			return [transcludeNode];
 		}
 	} else {
@@ -87,10 +84,8 @@ exports.parse = function() {
 			if(targetAnchorEnd) {
 				transcludeNode.attributes["$anchorEnd"] = {name: "$anchorEnd", type: "string", value: targetAnchorEnd};
 			}
-			if(anchor) tiddlerNode.anchorId = anchor;
 			return [tiddlerNode];
 		} else {
-			if(anchor) transcludeNode.anchorId = anchor;
 			return [transcludeNode];
 		}
 	}

@@ -127,9 +127,9 @@ describe("WikiText tests", function() {
 		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{SomeBlocks^nonexistent}}");
 		expect(result).toBe('<p data-tw-anchor="exists" id="SomeBlocks^^exists" tabindex="-1">Paragraph.</p>');
 	});
-	it("handles code anchor in transclusion", function() {
-		wiki.addTiddler({title: "CodeBlocks", text: "```js ^codeBlock\nconsole.log('hello');\n```\n\nParagraph. ^afterCode"});
-		// Transclude just the code block (note: no trailing \n in code content)
+	it("handles code anchor in transclusion (anchorblock syntax)", function() {
+		wiki.addTiddler({title: "CodeBlocks", text: "^codeBlock\n```js\nconsole.log('hello');\n```\n\nParagraph. ^afterCode"});
+		// Transclude just the code block
 		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{CodeBlocks^codeBlock}}")).toBe("<pre data-tw-anchor=\"codeBlock\" id=\"CodeBlocks^^codeBlock\" tabindex=\"-1\"><code>console.log('hello');</code></pre>");
 	});
 	it("handles anchor in nested list items", function() {
@@ -139,9 +139,9 @@ describe("WikiText tests", function() {
 			'<ul><li data-tw-anchor="outerA" id="outerA" tabindex="-1">outer<ul><li data-tw-anchor="innerB" id="innerB" tabindex="-1">inner</li></ul></li><li>outer2</li></ul>'
 		);
 	});
-	it("handles quoteblock with anchor", function() {
+	it("handles quoteblock with anchor (anchorblock syntax)", function() {
 		var result = wiki.renderText("text/html","text/vnd-tiddlywiki",
-			"<<< ^quoteId\nQuote body.\n<<<");
+			"^quoteId\n<<<\nQuote body.\n<<<");
 		expect(result).toContain('data-tw-anchor="quoteId"');
 		expect(result).toContain('<blockquote');
 	});

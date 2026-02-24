@@ -8,21 +8,20 @@ module-type: wikiruleserializer
 
 exports.name = "anchor";
 
+/*
+Generic anchor serializer for inline-originated anchors (paragraph, heading,
+list items, etc.). Inserts " ^id" before the trailing newlines of the child
+block's serialized text.
+
+Note: this serializer is NOT called for anchors that wrap list items inside a
+<ul>/<ol> — the list serializer handles those directly via unwrapAnchor.
+*/
 exports.serialize = function(tree,serialize) {
 	var anchorId = tree.attributes && tree.attributes.id ? tree.attributes.id.value : "";
 	if(!tree.children || tree.children.length === 0) {
 		return "";
 	}
-	var child = tree.children[0];
-	// For nodes that declare anchorStyle:"opening", the child's own serializer
-	// handles placing ^id on its opening delimiter line via child._anchorId.
-	// (wrapAnchors has already set child._anchorId = anchorId for these nodes.)
-	if(child.anchorStyle === "opening") {
-		return serialize(child);
-	}
-	// Default: insert ^id before the trailing newlines.
-	// Works uniformly for paragraphs, headings, list items, transclusions, etc.
-	var childText = serialize(child);
+	var childText = serialize(tree.children[0]);
 	if(anchorId) {
 		var match = childText.match(/(\n+)$/);
 		var trailing = match ? match[0] : "\n\n";

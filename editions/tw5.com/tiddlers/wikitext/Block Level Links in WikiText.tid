@@ -25,13 +25,14 @@ The anchor becomes an attribute of the enclosing block element. The DOM will hav
 
 !! Adding anchor to code blocks
 
-Code blocks use a special syntax — add `^anchor` after the closing fence:
+For blocks that don't support inline content (code blocks, typed blocks, quotes), put `^anchor` on its own line before the block:
 
-<<wikitext-example src:"```css
+<<wikitext-example src:"^codeAnchor
+```css
 .main {
   display: none;
 }
-``` ^codeAnchor
+```
 ">>
 
 ! Link to Anchors ^linkSection

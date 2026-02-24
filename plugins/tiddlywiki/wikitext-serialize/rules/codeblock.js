@@ -9,7 +9,5 @@ module-type: wikiruleserializer
 exports.name = "codeblock";
 
 exports.serialize = function(tree,serialize) {
-	var language = tree.attributes.language.value;
-	var anchor = tree._anchorId ? " ^" + tree._anchorId : "";
-	return "```" + language + anchor + "\n" + tree.attributes.code.value + "\n```\n\n";
+	return "```" + tree.attributes.language.value + "\n" + tree.attributes.code.value + "\n```\n\n";
 };
