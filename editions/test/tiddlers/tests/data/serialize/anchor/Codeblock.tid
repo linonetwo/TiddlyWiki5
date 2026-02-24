@@ -1,15 +1,13 @@
 title: Serialize/Anchor/Codeblock
 tags: $:/tags/wikitext-serialize-test-spec
 
-^codeId
-```css
+```css ^codeId
 .main {
   display: none;
 }
 ```
 
-^plainId
-```
+``` ^plainId
 plain code block
 ```
 

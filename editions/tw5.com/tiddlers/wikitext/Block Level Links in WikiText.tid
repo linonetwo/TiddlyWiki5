@@ -1,6 +1,6 @@
 caption: Block Level Links
 created: 20230916061138153
-modified: 20260223150740619
+modified: 20260225120000000
 tags: WikiText
 title: Block Level Links in WikiText
 type: text/vnd.tiddlywiki
@@ -25,14 +25,29 @@ The anchor becomes an attribute of the enclosing block element. The DOM will hav
 
 !! Adding anchor to code blocks
 
-For blocks that don't support inline content (code blocks, typed blocks, quotes), put `^anchor` on its own line before the block:
+Put `^anchor` at the end of the opening fence line:
 
-<<wikitext-example src:"^codeAnchor
-```css
+<<wikitext-example src:"```css ^codeAnchor
 .main {
   display: none;
 }
 ```
+">>
+
+!! Adding anchor to quote blocks
+
+Put `^anchor` after the `<<<` marker:
+
+<<wikitext-example src:"<<< ^quoteAnchor
+A quoted paragraph.
+<<<
+">>
+
+!! Adding anchor to list items
+
+<<wikitext-example src:"* first item ^listA
+* second item ^listB
+* third item
 ">>
 
 ! Link to Anchors ^linkSection
@@ -47,13 +62,9 @@ Add `^anchor` after the title in a link to navigate to and highlight that block:
 
 <<wikitext-example-without-html  src:"[[Link to Non-existing anchor|Block Level Links in WikiText^😂❎]]">>
 
-! Single Block Transclusion
+! Single Block Transclusion and Range Transclusion
 
-You can transclude a single block from another tiddler using `{{Title^anchor}}`:
-
-<<wikitext-example-without-html src:"{{Block Level Links in WikiText^BlockLevelLinksID1}}">>
-
-This will render only the block with that anchor, not the entire tiddler.
+See [[Block Level Transclusion in WikiText]] for details on transcluding individual blocks or ranges of blocks using anchors.
 
 ! Block-Level Backlinks
 

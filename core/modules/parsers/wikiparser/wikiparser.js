@@ -251,41 +251,13 @@ WikiParser.prototype.parseBlock = function(terminatorRegExpString) {
 			if(result[result.length - 1].end === undefined) result[result.length - 1].end = this.pos;
 		}
 		$tw.utils.each(result, function(node) { node.rule = nextMatch.rule.name; });
-		// For heading elements, check their inline content for a trailing ^id.
-		// (List items are handled inside the list rule; other blocks use anchorblock.)
-		if(result.length === 1 && result[0].type === "element" && /^h[1-6]$/.test(result[0].tag)) {
-			var headingAnchorId = $tw.utils.extractInlineAnchor(result[0].children);
-			if(headingAnchorId) {
-				return [{
-					type: "anchor",
-					attributes: {id: {type: "string", value: headingAnchorId}},
-					children: result,
-					start: start,
-					end: this.pos,
-					rule: "anchor",
-					isBlock: true
-				}];
-			}
-		}
 	} else {
 		// Treat it as a paragraph if we didn't find a block rule
 		var children = this.parseInlineRun(terminatorRegExp);
-		var paraAnchorId = $tw.utils.extractInlineAnchor(children);
-		var pNode = {type: "element", tag: "p", children: children, start: start, end: this.pos, rule: "parseblock"};
-		if(paraAnchorId) {
-			return [{
-				type: "anchor",
-				attributes: {id: {type: "string", value: paraAnchorId}},
-				children: [pNode],
-				start: start,
-				end: this.pos,
-				rule: "anchor",
-				isBlock: true
-			}];
-		}
-		return [pNode];
+		result = [{type: "element", tag: "p", children: children, start: start, end: this.pos, rule: "parseblock"}];
 	}
-	return result;
+	// Wrap any blocks containing name anchors in target anchor containers
+	return $tw.utils.wrapAnchorsInTree(result, this.source);
 };
 
 /*

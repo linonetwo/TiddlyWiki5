@@ -33,25 +33,17 @@ exports.serialize = function (tree,serialize) {
 		return ""; // Return empty string if no matching marker is found
 	}
 
-	// Helper to transparently unwrap an anchor container around a list item
-	function unwrapAnchor(node) {
-		if(node && node.type === "anchor" &&
-				node.attributes && node.attributes.id &&
-				node.children && node.children.length === 1) {
-			return {inner: node.children[0], anchorId: node.attributes.id.value};
-		}
-		return {inner: node, anchorId: null};
-	}
-
 	// Recursive function to serialize list nodes, handling nested lists and formatting output
 	function serializeList(node, markerPrefix) {
 		var result = [];
 		if(node.type === "element" && isListNode(node)) {
 			node.children.forEach(function (child) {
-				// Unwrap anchor containers: * item ^id → anchor{li} in parse tree
-				var unwrapped = unwrapAnchor(child);
-				var anchorSuffix = unwrapped.anchorId ? " ^" + unwrapped.anchorId : "";
-				child = unwrapped.inner;
+				// Unwrap target anchor containers around list items — the name
+				// anchor inside the <li> children handles ^id serialization
+				if(child.type === "anchor" && child.attributes && child.attributes.target &&
+						child.children && child.children.length === 1) {
+					child = child.children[0];
+				}
 				if(itemTags.includes(child.tag)) {
 					var currentMarker = findMarker(node.tag, child.tag);
 					// Handle class attributes
@@ -64,11 +56,10 @@ exports.serialize = function (tree,serialize) {
 					$tw.utils.each(child.children,function (subNode) {
 						if(isListNode(subNode)) {
 							// Recursive call for nested lists.
-							// Flush content with anchor suffix before entering nested list.
-							if(content.length > 0 || anchorSuffix) {
-								result.push(markerPrefix + currentMarker + classAttr + " " + content.join("").trim() + anchorSuffix);
+							// Flush content before entering nested list.
+							if(content.length > 0) {
+								result.push(markerPrefix + currentMarker + classAttr + " " + content.join("").trim());
 								content = [];
-								anchorSuffix = ""; // consumed
 							}
 							result.push(serializeList(subNode, markerPrefix + currentMarker).trim());
 						} else {
@@ -78,7 +69,7 @@ exports.serialize = function (tree,serialize) {
 					});
 					// prepend `#` mark to a new line, if it has content (and has or hasn't nested list), or if it has no content and also no nested list
 					if(content.length > 0 || child.children.length === 0) {
-						result.push(markerPrefix + currentMarker + classAttr + " " + content.join("").trim() + anchorSuffix);
+						result.push(markerPrefix + currentMarker + classAttr + " " + content.join("").trim());
 						content = [];
 					}
 				}

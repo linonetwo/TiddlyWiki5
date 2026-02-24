@@ -31,6 +31,10 @@ AnchorWidget.prototype.render = function(parent,nextSibling) {
 	this.parentDomNode = parent;
 	this.computeAttributes();
 	this.execute();
+	// Name anchors render nothing — they are invisible placeholders for serialization
+	if(this.isNameAnchor) {
+		return;
+	}
 	this.renderChildren(parent,nextSibling);
 	this.applyAnchorAttributes();
 };
@@ -40,6 +44,8 @@ Compute the internal state of the widget
 */
 AnchorWidget.prototype.execute = function() {
 	this.anchorId = this.getAttribute("id","");
+	this.isNameAnchor = this.getAttribute("name","") === "true";
+	this.isTargetAnchor = this.getAttribute("target","") === "true";
 	this.makeChildWidgets();
 };
 
@@ -68,9 +74,13 @@ Selectively refreshes the widget if needed. Returns true if the widget or any of
 */
 AnchorWidget.prototype.refresh = function(changedTiddlers) {
 	var changedAttributes = this.computeAttributes();
-	if(changedAttributes.id) {
+	if(changedAttributes.id || changedAttributes.name || changedAttributes.target) {
 		this.refreshSelf();
 		return true;
+	}
+	// Name anchors have no DOM — nothing to refresh
+	if(this.isNameAnchor) {
+		return false;
 	}
 	var result = this.refreshChildren(changedTiddlers);
 	// Re-apply after children refresh in case DOM nodes changed

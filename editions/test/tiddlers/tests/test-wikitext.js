@@ -127,8 +127,8 @@ describe("WikiText tests", function() {
 		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{SomeBlocks^nonexistent}}");
 		expect(result).toBe('<p data-tw-anchor="exists" id="SomeBlocks^^exists" tabindex="-1">Paragraph.</p>');
 	});
-	it("handles code anchor in transclusion (anchorblock syntax)", function() {
-		wiki.addTiddler({title: "CodeBlocks", text: "^codeBlock\n```js\nconsole.log('hello');\n```\n\nParagraph. ^afterCode"});
+	it("handles code anchor in transclusion (inline syntax)", function() {
+		wiki.addTiddler({title: "CodeBlocks", text: "```js ^codeBlock\nconsole.log('hello');\n```\n\nParagraph. ^afterCode"});
 		// Transclude just the code block
 		expect(wiki.renderText("text/html","text/vnd-tiddlywiki","{{CodeBlocks^codeBlock}}")).toBe("<pre data-tw-anchor=\"codeBlock\" id=\"CodeBlocks^^codeBlock\" tabindex=\"-1\"><code>console.log('hello');</code></pre>");
 	});
@@ -139,11 +139,31 @@ describe("WikiText tests", function() {
 			'<ul><li data-tw-anchor="outerA" id="outerA" tabindex="-1">outer<ul><li data-tw-anchor="innerB" id="innerB" tabindex="-1">inner</li></ul></li><li>outer2</li></ul>'
 		);
 	});
-	it("handles quoteblock with anchor (anchorblock syntax)", function() {
+	it("handles quoteblock with anchor (inline syntax)", function() {
 		var result = wiki.renderText("text/html","text/vnd-tiddlywiki",
-			"^quoteId\n<<<\nQuote body.\n<<<");
+			"<<< ^quoteId\nQuote body.\n<<<");
 		expect(result).toContain('data-tw-anchor="quoteId"');
 		expect(result).toContain('<blockquote');
+	});
+	it("handles transclusion of quoteblock with anchor", function() {
+		wiki.addTiddler({title: "QuoteAnchorTiddler", text: "<<< ^myQuote\nQuoted text.\n<<<\n\nParagraph. ^afterQuote"});
+		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{QuoteAnchorTiddler^myQuote}}");
+		expect(result).toContain('data-tw-anchor="myQuote"');
+		expect(result).toContain('<blockquote');
+		expect(result).toContain('Quoted text.');
+		// Should NOT contain the paragraph
+		expect(result).not.toContain('afterQuote');
+	});
+	it("handles transclusion of typedblock with anchor", function() {
+		wiki.addTiddler({title: "TypedAnchorTiddler", text: "$$$text/plain ^myTyped\nHello typed.\n$$$\n\nParagraph. ^afterTyped"});
+		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{TypedAnchorTiddler^myTyped}}");
+		expect(result).toContain('Hello typed.');
+	});
+	it("handles range transclusion including code block with anchor", function() {
+		wiki.addTiddler({title: "MixedCodeBlocks", text: "Intro. ^intro\n\n```js ^codeBlock\nvar x = 1;\n```\n\nOutro. ^outro"});
+		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{MixedCodeBlocks^intro..^codeBlock}}");
+		expect(result).toContain('Intro.');
+		expect(result).toContain('<code>var x = 1;</code>');
 	});
 });
 
