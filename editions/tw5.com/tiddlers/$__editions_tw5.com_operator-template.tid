@@ -1,9 +1,10 @@
 created: 20150203173506000
-modified: 20250223000000000
+modified: 20260224000000000
 list-before: $:/core/ui/ViewTemplate/body
 tags: $:/tags/ViewTemplate
 code-body: yes
 title: $:/editions/tw5.com/operator-template
+type: text/vnd.tiddlywiki
 
 \whitespace trim
 

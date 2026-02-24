@@ -1,6 +1,6 @@
 title: $:/schemas/WidgetDocs
 tags: $:/tags/Schema
-fields: widget-purpose widget-tag-name from-version
+fields: widget-purpose widget-tag-name from-version any-attributes-not-starting-with-$
 type: text/vnd.tiddlywiki
 
 Schema for widget documentation tiddlers under `$:/docs/widgets/`.

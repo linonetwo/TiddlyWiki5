@@ -1,8 +1,4 @@
-caption: get
-created: 20140426183123179
-modified: 20230309163844434
-tags: [[Filter Operators]] [[Field Operators]]
-title: get Operator
+title: $:/plugins/tiddlywiki/core-api-docs/filters/get Operator
 type: text/vnd.tiddlywiki
 
 Each input title is processed in turn. If the corresponding tiddler contains field <<.place F>>, and the value of this field is not empty, then its value is appended to the output.

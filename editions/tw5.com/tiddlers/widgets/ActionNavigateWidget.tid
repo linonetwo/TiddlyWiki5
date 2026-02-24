@@ -1,0 +1,8 @@
+caption: action-navigate
+created: 20141008163514491
+modified: 20260224000000000
+tags: Widgets ActionWidgets
+title: ActionNavigateWidget
+type: text/vnd.tiddlywiki
+
+{{||$:/plugins/tiddlywiki/core-api-docs/widgets/ActionNavigateWidget}}

@@ -29,6 +29,60 @@ function parseStringArray(value) {
 	return results;
 }
 
+function isBlankValue(value) {
+	return !value || (typeof value === "string" && value.trim() === "");
+}
+
+function isNumberValue(value) {
+	if(typeof value !== "string") {
+		return false;
+	}
+	return /^[-+]?\d+(\.\d+)?$/.test(value.trim());
+}
+
+function isBooleanValue(value) {
+	if(typeof value !== "string") {
+		return false;
+	}
+	var normalized = value.trim().toLowerCase();
+	return normalized === "true" || normalized === "false" || normalized === "yes" || normalized === "no";
+}
+
+function isYesNoValue(value) {
+	if(typeof value !== "string") {
+		return false;
+	}
+	var normalized = value.trim().toLowerCase();
+	return normalized === "yes" || normalized === "no";
+}
+
+function isValidByFieldType(fieldType,fieldValue) {
+	switch(fieldType) {
+		case "string":
+		case "filter":
+		case "actionstring":
+		case "textref":
+		case "tiddler-title":
+			return typeof fieldValue === "string";
+		case "number":
+			return isNumberValue(fieldValue);
+		case "boolean":
+			return isBooleanValue(fieldValue);
+		case "yes-no":
+			return isYesNoValue(fieldValue);
+		case "list":
+			// Any string is valid list syntax; parsing must not throw
+			parseStringArray(fieldValue);
+			return true;
+		case "enum":
+			// Enum is validated separately with enum-values
+			return true;
+		default:
+			// Unknown field-type in schema is itself an error
+			return null;
+	}
+}
+
 /**
  * Validate a single tiddler against its declared schema.
  *
@@ -38,7 +92,7 @@ function parseStringArray(value) {
  */
 exports.validateTiddlerSchema = function(wiki, tiddlerTitle) {
 	var tiddler = wiki.getTiddler(tiddlerTitle);
-	var result = { valid: true, errors: [], schemaTitle: null };
+	var result = { valid: true, errors: [], schemaTitle: null, tiddlerTitle: tiddlerTitle };
 	if(!tiddler) {
 		result.valid = false;
 		result.errors.push("Tiddler not found: " + tiddlerTitle);
@@ -89,13 +143,25 @@ exports.validateTiddlerSchema = function(wiki, tiddlerTitle) {
 		var fieldType = fieldSchemaTiddler.fields["field-type"] || "string";
 		var enumValues = fieldSchemaTiddler.fields["enum-values"];
 		// Check required
-		if(isRequired && (!fieldValue || (typeof fieldValue === "string" && fieldValue.trim() === ""))) {
+		if(isRequired && isBlankValue(fieldValue)) {
 			result.valid = false;
 			result.errors.push("Required field '" + fieldName + "' is missing or empty in " + tiddlerTitle);
 			continue;
 		}
 		// Skip further checks if field is absent and not required
-		if(!fieldValue || (typeof fieldValue === "string" && fieldValue.trim() === "")) {
+		if(isBlankValue(fieldValue)) {
+			continue;
+		}
+		// Check field-type constraint
+		var typeValid = isValidByFieldType(fieldType,fieldValue);
+		if(typeValid === null) {
+			result.valid = false;
+			result.errors.push("Schema field definition '" + fieldSchemaTitle + "' has unknown field-type '" + fieldType + "'");
+			continue;
+		}
+		if(typeValid === false) {
+			result.valid = false;
+			result.errors.push("Field '" + fieldName + "' has value '" + fieldValue + "' which is not a valid '" + fieldType + "' in " + tiddlerTitle);
 			continue;
 		}
 		// Check enum constraint

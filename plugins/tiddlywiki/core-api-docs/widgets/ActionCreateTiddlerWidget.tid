@@ -1,8 +1,4 @@
-caption: action-createtiddler
-created: 20161020152745942
-modified: 20240602153213986
-tags: Widgets ActionWidgets
-title: ActionCreateTiddlerWidget
+title: $:/plugins/tiddlywiki/core-api-docs/widgets/ActionCreateTiddlerWidget
 type: text/vnd.tiddlywiki
 
 ! Introduction
@@ -17,10 +13,6 @@ There are several //differences// from the [[tm-new-tiddler message|WidgetMessag
 ! Content and Attributes
 
 The ''action-createtiddler'' widget is invisible.
-
-<$macrocall $name=".widget-attributes" widget="ActionCreateTiddlerWidget"/>
-
-|//{any attributes not starting with $}// |Each attribute name specifies a field to be created in the new tiddler  |
 
 ! Variables
 

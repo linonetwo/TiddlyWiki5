@@ -1,8 +1,4 @@
-caption: action-navigate
-created: 20141008163514491
-modified: 20150220162057000
-tags: Widgets ActionWidgets
-title: ActionNavigateWidget
+title: $:/plugins/tiddlywiki/core-api-docs/widgets/ActionNavigateWidget
 type: text/vnd.tiddlywiki
 
 ! Introduction
@@ -12,8 +8,6 @@ The ''action-navigate'' widget is an [[action widget|ActionWidgets]] that sends 
 ! Content and Attributes
 
 The ''action-navigate'' widget is invisible. Any content within it is ignored.
-
-<$macrocall $name=".widget-attributes" widget="ActionNavigateWidget"/>
 
 !! Scroll handling
 

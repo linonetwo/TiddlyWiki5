@@ -1,8 +1,4 @@
-caption: zth
-created: 20211029023242012
-modified: 20211029023711450
-tags: [[Filter Operators]] [[Order Operators]]
-title: zth Operator
+title: $:/plugins/tiddlywiki/core-api-docs/filters/zth Operator
 type: text/vnd.tiddlywiki
 
 <<.from-version 5.2.1>>
