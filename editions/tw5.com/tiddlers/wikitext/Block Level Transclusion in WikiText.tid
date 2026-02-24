@@ -9,11 +9,9 @@ type: text/vnd.tiddlywiki
 
 You can transclude a single anchored block from another tiddler using `{{Title^anchor}}`.
 
-For example, the [[Block Level Links in WikiText]] tiddler has a section marked `^linkSection`. You can transclude only that section:
+For example, the [[Block Level Links in WikiText^linkSection]] tiddler has a section marked `^linkSection`.
 
-```
-{{Block Level Links in WikiText^linkSection}}
-```
+<<wikitext-example-without-html src:"{{Block Level Links in WikiText^linkSection}}">>
 
 This renders only the block with anchor `linkSection`, not the entire tiddler.
 
@@ -23,23 +21,11 @@ You can transclude a range of consecutive blocks using `{{Title^startAnchor^endA
 
 Anchor ids cannot contain `^`, so the second `^` unambiguously introduces the end anchor.
 
-For example, given a tiddler "MyNotes" with content:
+The [[Block Level Links in WikiText^backlinksSection]] tiddler also has `^backlinksSection`.
 
-```
-First paragraph. ^intro
+<<wikitext-example-without-html src:"{{Block Level Links in WikiText^linkSection^backlinksSection}}">>
 
-Second paragraph. ^details
-
-Third paragraph. ^conclusion
-```
-
-Transclude from `^intro` to `^details` inclusive:
-
-```
-{{MyNotes^intro^details}}
-```
-
-This renders the first and second paragraphs, but not the third.
+This renders all top-level blocks from `^linkSection` to `^backlinksSection`, inclusive.
 
 ! Transclusion of Different Block Types
 

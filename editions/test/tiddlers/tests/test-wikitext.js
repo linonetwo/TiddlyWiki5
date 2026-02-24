@@ -142,28 +142,28 @@ describe("WikiText tests", function() {
 	it("handles quoteblock with anchor (inline syntax)", function() {
 		var result = wiki.renderText("text/html","text/vnd-tiddlywiki",
 			"<<< ^quoteId\nQuote body.\n<<<");
-		expect(result).toContain('data-tw-anchor="quoteId"');
-		expect(result).toContain('<blockquote');
+		expect(result).toContain("data-tw-anchor=\"quoteId\"");
+		expect(result).toContain("<blockquote");
 	});
 	it("handles transclusion of quoteblock with anchor", function() {
 		wiki.addTiddler({title: "QuoteAnchorTiddler", text: "<<< ^myQuote\nQuoted text.\n<<<\n\nParagraph. ^afterQuote"});
 		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{QuoteAnchorTiddler^myQuote}}");
-		expect(result).toContain('data-tw-anchor="myQuote"');
-		expect(result).toContain('<blockquote');
-		expect(result).toContain('Quoted text.');
+		expect(result).toContain("data-tw-anchor=\"myQuote\"");
+		expect(result).toContain("<blockquote");
+		expect(result).toContain("Quoted text.");
 		// Should NOT contain the paragraph
-		expect(result).not.toContain('afterQuote');
+		expect(result).not.toContain("afterQuote");
 	});
 	it("handles transclusion of typedblock with anchor", function() {
 		wiki.addTiddler({title: "TypedAnchorTiddler", text: "$$$text/plain ^myTyped\nHello typed.\n$$$\n\nParagraph. ^afterTyped"});
 		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{TypedAnchorTiddler^myTyped}}");
-		expect(result).toContain('Hello typed.');
+		expect(result).toContain("Hello typed.");
 	});
 	it("handles range transclusion including code block with anchor", function() {
 		wiki.addTiddler({title: "MixedCodeBlocks", text: "Intro. ^intro\n\n```js ^codeBlock\nvar x = 1;\n```\n\nOutro. ^outro"});
 		var result = wiki.renderText("text/html","text/vnd-tiddlywiki","{{MixedCodeBlocks^intro^codeBlock}}");
-		expect(result).toContain('Intro.');
-		expect(result).toContain('<code>var x = 1;</code>');
+		expect(result).toContain("Intro.");
+		expect(result).toContain("<code>var x = 1;</code>");
 	});
 });
 
