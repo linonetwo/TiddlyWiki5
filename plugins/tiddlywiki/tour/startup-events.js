@@ -25,10 +25,6 @@ function makeProgressTitle(tourTitle,suffix) {
 	return "$:/state/tour/progress/" + $tw.utils.encodeURIComponentExtended(tourTitle) + "/" + suffix;
 }
 
-function parseCompletion(value) {
-	var result = parseInt(value,10);
-	return isNaN(result) ? 0 : result;
-}
 
 function getTourInfo(tourTitle) {
 	var info = {
