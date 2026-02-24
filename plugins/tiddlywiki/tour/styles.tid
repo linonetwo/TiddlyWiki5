@@ -193,7 +193,7 @@ tags: $:/tags/Stylesheet
 .tc-tour-panel-controls .tc-tour-panel-list-button {
 	padding: 2px 8px;
 	border-radius: 1em;
-	color: <<color tour-chooser-button-foreground>>;
+	color: <<colour tour-chooser-button-foreground>>;
 	text-align: left;
 }
 
