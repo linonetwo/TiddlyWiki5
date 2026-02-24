@@ -523,9 +523,6 @@ Widget.prototype.assignAttributes = function(domNode,options) {
 		if(options.excludeEventAttributes && name.substr(0,2).toLowerCase() === EVENT_ATTRIBUTE_PREFIX) {
 			value = undefined;
 		}
-		if(options.excludeBlockIdAttribute && name === "blockId") {
-			value = undefined;
-		}
 		if(value !== undefined) {
 			// Handle the xlink: namespace
 			var namespace = null;
@@ -552,25 +549,6 @@ Widget.prototype.assignAttributes = function(domNode,options) {
 		$tw.utils.each(changedAttributes,function(value,name) {
 			assignAttribute(name,self.getAttribute(name));
 		});	
-	}
-};
-
-/*
-Apply a block ID attribute to a DOM node. Any widget can call this to make itself a block ID target.
-Sets data-tw-block-id and id attributes on the DOM node for navigation and static site linking.
-The "blockId" attribute is excluded from normal assignAttributes processing.
-*/
-Widget.prototype.applyBlockId = function(domNode) {
-	var blockId = this.getAttribute("blockId");
-	if(blockId) {
-		var tiddlerTitle = this.getVariable("currentTiddler","");
-		var qualifiedId = tiddlerTitle ? (tiddlerTitle + "^^" + blockId) : blockId;
-		domNode.setAttribute("data-tw-block-id",blockId);
-		domNode.setAttribute("id",qualifiedId);
-		// Make the element focusable for highlight animation
-		if(!domNode.getAttribute("tabindex")) {
-			domNode.setAttribute("tabindex","-1");
-		}
 	}
 };
 

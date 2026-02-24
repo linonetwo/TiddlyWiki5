@@ -1,5 +1,5 @@
 title: $:/changenotes/5.5.0/#7744
-description: Support block-level linking with block IDs
+description: Support block-level linking with anchors
 release: 5.5.0
 tags: $:/tags/ChangeNote
 change-type: feature
@@ -7,4 +7,4 @@ change-category: hackability
 github-links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/7744
 github-contributors: linonetwo
 
-Add `^blockId` syntax for block IDs. Supports linking to blocks with `[[link text|tiddler title^blockId]]`, single block transclusion with `{{Title^blockId}}`, range transclusion with `{{Title^start..^end}}`, block-level backlinks with `[backlinks:blockid[blockId]]`, and code block IDs with the ` ```lang ^blockId` fence syntax. The block ID becomes an attribute on the enclosing block element, enabling plugin developers to build advanced deep reference features.
+Add `^anchor` syntax for anchors. Supports linking to blocks with `[[link text|tiddler title^anchor]]`, single block transclusion with `{{Title^anchor}}`, range transclusion with `{{Title^start..^end}}`, block-level backlinks with `[backlinks:anchor[anchor]]`, and code anchors with closing fence syntax ` ``` ^anchor`. The anchor becomes a container widget wrapping the target block, enabling plugin developers to build advanced deep reference features.

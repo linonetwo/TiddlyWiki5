@@ -42,8 +42,7 @@ exports.serializeWikitextParseTree = function serializeWikitextParseTree(tree,op
 			if(serializeOneRule) {
 				output.push(serializeOneRule(tree,serializeWikitextParseTree));
 			} else if(tree.rule === "parseblock") {
-				var blockIdSuffix = (tree.attributes && tree.attributes.blockId) ? " ^" + tree.attributes.blockId.value : "";
-				output.push(serializeWikitextParseTree(tree.children,options),blockIdSuffix,"\n\n");
+				output.push(serializeWikitextParseTree(tree.children,options),"\n\n");
 			} else {
 				// when no rule is found, just serialize the children, for example the void nodes
 				output.push(serializeWikitextParseTree(tree.children,options));

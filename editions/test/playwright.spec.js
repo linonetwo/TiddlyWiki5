@@ -61,57 +61,57 @@ test("Jasmine unit tests pass", async ({ page }) => {
 	]);
 });
 
-test("Block ID links navigate and highlight correctly", async ({ page }) => {
+test("Anchor links navigate and highlight correctly", async ({ page }) => {
 	const timeout = 30 * 1000;
 	test.setTimeout(60 * 1000);
 
 	await loadTestWiki(page);
-	await openTiddler(page, "BlockId/Links");
+	await openTiddler(page, "Anchor/Links");
 
-	// ── Test 1: link → paragraph block ID ──────────────────────────────────────
-	const firstLink = page.locator('a[href="#BlockId%2FMarks%5E%5EBlockLevelLinksID1"]');
-	await expect(firstLink, "Paragraph block ID link is visible").toBeVisible({ timeout });
-	await expect(firstLink, "Paragraph block ID link text").toHaveText("Block Level Links in WikiText");
+	// ── Test 1: link → paragraph anchor ──────────────────────────────────────
+	const firstLink = page.locator('a[href="#Anchor%2FMarks%5E%5EBlockLevelLinksID1"]');
+	await expect(firstLink, "Paragraph anchor link is visible").toBeVisible({ timeout });
+	await expect(firstLink, "Paragraph anchor link text").toHaveText("Block Level Links in WikiText");
 	await firstLink.click();
 
-	const markedPara = page.locator('p[data-tw-block-id="BlockLevelLinksID1"]');
+	const markedPara = page.locator('p[data-tw-anchor="BlockLevelLinksID1"]');
 	await expect(markedPara, "Marked paragraph is visible").toBeVisible({ timeout });
 	await expect(markedPara, "Paragraph receives focus highlight").toHaveClass(/tc-focus-highlight/);
-	await expect(markedPara).toHaveAttribute("data-tw-block-id", "BlockLevelLinksID1");
-	// id = tiddlerTitle^^blockId
+	await expect(markedPara).toHaveAttribute("data-tw-anchor", "BlockLevelLinksID1");
+	// id = tiddlerTitle^^anchor
 	const paraId = await markedPara.evaluate((e) => e.id);
-	expect(paraId, "Paragraph id uses ^^ separator").toBe("BlockId/Marks^^BlockLevelLinksID1");
+	expect(paraId, "Paragraph id uses ^^ separator").toBe("Anchor/Marks^^BlockLevelLinksID1");
 
-	// ── Test 2: link → heading block ID ────────────────────────────────────────
-	await openTiddler(page, "BlockId/Links");
+	// ── Test 2: link → heading anchor ────────────────────────────────────────
+	await openTiddler(page, "Anchor/Links");
 
-	const secondLink = page.locator('a[href="#BlockId%2FMarks%5E%5EAddingIDforTitle"]');
-	await expect(secondLink, "Heading block ID link is visible").toBeVisible({ timeout });
-	await expect(secondLink, "Heading block ID link text").toHaveText("Title Level 2");
+	const secondLink = page.locator('a[href="#Anchor%2FMarks%5E%5EAddingIDforTitle"]');
+	await expect(secondLink, "Heading anchor link is visible").toBeVisible({ timeout });
+	await expect(secondLink, "Heading anchor link text").toHaveText("Title Level 2");
 	await secondLink.click({ force: true });
 
-	const markedHeading = page.locator('h2[data-tw-block-id="AddingIDforTitle"]');
+	const markedHeading = page.locator('h2[data-tw-anchor="AddingIDforTitle"]');
 	await expect(markedHeading, "Marked heading is visible").toBeVisible({ timeout });
 	await expect(
 		page.locator(".tc-focus-highlight").first(),
 		"Some element receives highlight after heading navigation"
 	).toBeVisible({ timeout: 10 * 1000 });
 	const headingId = await markedHeading.evaluate((e) => e.id);
-	expect(headingId, "Heading id uses ^^ separator").toBe("BlockId/Marks^^AddingIDforTitle");
+	expect(headingId, "Heading id uses ^^ separator").toBe("Anchor/Marks^^AddingIDforTitle");
 
-	// ── Test 3: link → code block ID ─────────────────────────────────────
-	await openTiddler(page, "BlockId/Links");
+	// ── Test 3: link → code anchor ─────────────────────────────────────
+	await openTiddler(page, "Anchor/Links");
 
-	const thirdLink = page.locator('a[href="#BlockId%2FMarks%5E%5EcodeAnchor"]');
-	await expect(thirdLink, "Code block ID link is visible").toBeVisible({ timeout });
-	await expect(thirdLink, "Code block ID link text").toHaveText("Code Block ID", { timeout: 10 * 1000 });
+	const thirdLink = page.locator('a[href="#Anchor%2FMarks%5E%5EcodeAnchor"]');
+	await expect(thirdLink, "Code anchor link is visible").toBeVisible({ timeout });
+	await expect(thirdLink, "Code anchor link text").toHaveText("Code Anchor", { timeout: 10 * 1000 });
 	await thirdLink.click();
 
-	const markedCode = page.locator('pre[data-tw-block-id="codeAnchor"]');
+	const markedCode = page.locator('pre[data-tw-anchor="codeAnchor"]');
 	await expect(markedCode, "Marked code block is visible").toBeVisible({ timeout });
-	await expect(markedCode).toHaveAttribute("data-tw-block-id", "codeAnchor");
+	await expect(markedCode).toHaveAttribute("data-tw-anchor", "codeAnchor");
 	const codeId = await markedCode.evaluate((e) => e.id);
-	expect(codeId, "Code block id uses ^^ separator").toBe("BlockId/Marks^^codeAnchor");
+	expect(codeId, "Code anchor id uses ^^ separator").toBe("Anchor/Marks^^codeAnchor");
 	await expect(
 		page.locator(".tc-focus-highlight").first(),
 		"Some element receives highlight after code block navigation"
@@ -123,20 +123,20 @@ test("Single block transclusion renders only the marked block", async ({ page })
 	test.setTimeout(60 * 1000);
 
 	await loadTestWiki(page);
-	await openTiddler(page, "BlockId/Transclusion");
+	await openTiddler(page, "Anchor/Transclusion");
 
-	const tiddlerBody = page.locator('[data-tiddler-title="BlockId/Transclusion"] .tc-tiddler-body');
+	const tiddlerBody = page.locator('[data-tiddler-title="Anchor/Transclusion"] .tc-tiddler-body');
 	await expect(tiddlerBody, "Transclusion tiddler body is visible").toBeVisible({ timeout });
 
-	// Single block transclusion: {{BlockId/Marks^BlockLevelLinksID1}}
+	// Single block transclusion: {{Anchor/Marks^BlockLevelLinksID1}}
 	// Renders only the "A block level mark in WikiText." paragraph
-	const singleBlock = tiddlerBody.locator('p[data-tw-block-id="BlockLevelLinksID1"]').first();
+	const singleBlock = tiddlerBody.locator('p[data-tw-anchor="BlockLevelLinksID1"]').first();
 	await expect(singleBlock, "Single transcluded block is present").toBeVisible({ timeout });
-	await expect(singleBlock).toHaveAttribute("data-tw-block-id", "BlockLevelLinksID1");
-	const singleBlockId = await singleBlock.evaluate((e) => e.id);
-	expect(singleBlockId, "Single block id contains source tiddler title").toBe("BlockId/Marks^^BlockLevelLinksID1");
+	await expect(singleBlock).toHaveAttribute("data-tw-anchor", "BlockLevelLinksID1");
+	const singleAnchor = await singleBlock.evaluate((e) => e.id);
+	expect(singleAnchor, "Single anchor id contains source tiddler title").toBe("Anchor/Marks^^BlockLevelLinksID1");
 
-	// The first paragraph of BlockId/Marks ("First normal paragraph.") must NOT appear —
+	// The first paragraph of Anchor/Marks ("First normal paragraph.") must NOT appear —
 	// only the specific anchored block was requested
 	const firstPara = tiddlerBody.locator('p:has-text("First normal paragraph")');
 	await expect(firstPara, "Non-targeted paragraphs are not transcluded").not.toBeVisible();
@@ -147,22 +147,22 @@ test("Range transclusion renders all blocks between two anchors", async ({ page 
 	test.setTimeout(60 * 1000);
 
 	await loadTestWiki(page);
-	await openTiddler(page, "BlockId/Transclusion");
+	await openTiddler(page, "Anchor/Transclusion");
 
-	const tiddlerBody = page.locator('[data-tiddler-title="BlockId/Transclusion"] .tc-tiddler-body');
+	const tiddlerBody = page.locator('[data-tiddler-title="Anchor/Transclusion"] .tc-tiddler-body');
 	await expect(tiddlerBody, "Transclusion tiddler body is visible").toBeVisible({ timeout });
 
-	// Range transclusion: {{BlockId/Marks^BlockLevelLinksID1..^AddingIDforTitle}}
+	// Range transclusion: {{Anchor/Marks^BlockLevelLinksID1..^AddingIDforTitle}}
 	// Should render: paragraph (BlockLevelLinksID1) + heading (AddingIDforTitle)
 
 	// The heading at the range end must be present
-	const rangeHeading = tiddlerBody.locator('h2[data-tw-block-id="AddingIDforTitle"]');
+	const rangeHeading = tiddlerBody.locator('h2[data-tw-anchor="AddingIDforTitle"]');
 	await expect(rangeHeading, "Heading at range end is present").toBeVisible({ timeout });
 	const rangeHeadingId = await rangeHeading.evaluate((e) => e.id);
-	expect(rangeHeadingId, "Range heading id correct").toBe("BlockId/Marks^^AddingIDforTitle");
+	expect(rangeHeadingId, "Range heading id correct").toBe("Anchor/Marks^^AddingIDforTitle");
 
 	// The paragraph at the range start appears twice: once from single block, once from range
-	const rangeParagraphs = tiddlerBody.locator('p[data-tw-block-id="BlockLevelLinksID1"]');
+	const rangeParagraphs = tiddlerBody.locator('p[data-tw-anchor="BlockLevelLinksID1"]');
 	const count = await rangeParagraphs.count();
 	expect(count, "Range start paragraph present in both single and range transclusions").toBeGreaterThanOrEqual(2);
 
@@ -171,7 +171,7 @@ test("Range transclusion renders all blocks between two anchors", async ({ page 
 	await expect(afterRange, "Paragraphs after range end are not included").not.toBeVisible();
 
 	// The code block (after AddingIDforTitle, outside the range) must also be absent
-	const outOfRangeCode = tiddlerBody.locator('pre[data-tw-block-id="codeAnchor"]');
+	const outOfRangeCode = tiddlerBody.locator('pre[data-tw-anchor="codeAnchor"]');
 	await expect(outOfRangeCode, "Code block after range end is not included").not.toBeVisible();
 });
 

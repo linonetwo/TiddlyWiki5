@@ -67,7 +67,7 @@ Handle a scroll event hitting the page document
 
 options:
 - animationDuration: total time of scroll animation
-- highlight: highlight the element after scrolling, to make it evident. Usually to focus a block ID in the middle of the tiddler.
+- highlight: highlight the element after scrolling, to make it evident. Usually to focus an anchor in the middle of the tiddler.
 */
 PageScroller.prototype.scrollIntoView = function(element,callback,options) {
 	var self = this,

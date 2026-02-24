@@ -30,15 +30,16 @@ exports.types = {block: true};
 
 exports.init = function(parser) {
 	this.parser = parser;
-	// Regexp to match
-	this.matchRegExp = /\$\$\$([^ >\r\n]*)(?: *> *([^ \r\n]+))?\r?\n/mg;
+	// Regexp to match — optionally capture ^anchor on the opening fence line
+	this.matchRegExp = /\$\$\$([^ >\r\n]*)(?: *> *([^ \r\n]+))?(?: *\^(\S+))?\r?\n/mg;
 };
 
 exports.parse = function() {
 	var reEnd = /\r?\n\$\$\$\r?(?:\n|$)/mg;
-	// Save the type
+	// Save the type and optional anchor (from opening fence)
 	var parseType = this.match[1],
 		renderType = this.match[2];
+	var anchor = this.match[3] || "";
 	// Move past the match
 	this.parser.pos = this.matchRegExp.lastIndex;
 	var start = this.parser.pos;
@@ -46,6 +47,7 @@ exports.parse = function() {
 	reEnd.lastIndex = this.parser.pos;
 	var match = reEnd.exec(this.parser.source),
 		text;
+	// anchor is already captured from the opening fence (this.match[3])
 	// Process the block
 	if(match) {
 		text = this.parser.source.substring(this.parser.pos,match.index);
@@ -58,15 +60,20 @@ exports.parse = function() {
 	var parser = this.parser.wiki.parseText(parseType,text,{defaultType: "text/plain"});
 	// If there's no render type, just return the parse tree
 	if(!renderType) {
-		return  [{
+		var result = [{
 			type: "void",
 			children: $tw.utils.isArray(parser.tree) ? parser.tree : [parser.tree],
 			parseType: parseType,
 			renderType: renderType,
 			text: text,
 			start: start,
-			end: this.parser.pos
+			end: this.parser.pos,
+			anchorStyle: "opening"
 		}];
+		if(anchor) {
+			result[0].anchorId = anchor;
+		}
+		return result;
 	} else {
 		// Otherwise, render to the rendertype and return in a <PRE> tag
 		var widgetNode = this.parser.wiki.makeWidget(parser),
@@ -74,7 +81,7 @@ exports.parse = function() {
 		widgetNode.render(container,null);
 		var renderResult = renderType === "text/html" ? container.innerHTML : container.textContent;
 		// Use void node to carry important info for typedblock
-		return [{
+		var result = [{
 			type: "void",
 			children: [{
 				type: "element",
@@ -88,7 +95,12 @@ exports.parse = function() {
 			renderType: renderType,
 			text: text,
 			start: start,
-			end: this.parser.pos
+			end: this.parser.pos,
+			anchorStyle: "opening"
 		}];
+		if(anchor) {
+			result[0].anchorId = anchor;
+		}
+		return result;
 	}
 };

@@ -124,8 +124,8 @@ In TiddlyWiki anchor links can help us link to target points and distinct sectio
 
 See [[Anchor Links using HTML]] for more information.
 
-! Linking within tiddlers - Link to block ID
+! Linking within tiddlers - Link to anchor
 
-You can link to a specific block within a tiddler using `^blockId` syntax. You will also get block level backlinks with this technique.
+You can link to a specific block within a tiddler using `^anchor` syntax. You will also get block level backlinks with this technique.
 
 See [[Block Level Links in WikiText^linkSection]] for more information.

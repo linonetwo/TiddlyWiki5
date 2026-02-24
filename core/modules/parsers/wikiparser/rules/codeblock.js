@@ -20,7 +20,7 @@ exports.types = {block: true};
 
 exports.init = function(parser) {
 	this.parser = parser;
-	// Regexp to match and get language if defined, with optional ^blockId
+	// Regexp to match language and optional ^anchor on the opening fence line
 	this.matchRegExp = /```([\w-]*)(?:\s+\^(\S+))?\r?\n/mg;
 };
 
@@ -28,7 +28,7 @@ exports.parse = function() {
 	var reEnd = /(\r?\n```$)/mg;
 	var languageStart = this.parser.pos + 3,
 		languageEnd = languageStart + this.match[1].length;
-	var blockId = this.match[2] || "";
+	var anchor = this.match[2] || "";
 	// Move past the match
 	this.parser.pos = this.matchRegExp.lastIndex;
 
@@ -46,15 +46,18 @@ exports.parse = function() {
 		this.parser.pos = this.parser.sourceLength;
 	}
 	// Return the $codeblock widget
-	var attributes = {
-		code: {type: "string", value: text, start: codeStart, end: this.parser.pos},
-		language: {type: "string", value: this.match[1], start: languageStart, end: languageEnd}
-	};
-	if(blockId) {
-		attributes.blockId = {type: "string", value: blockId};
-	}
-	return [{
+	// anchorStyle:"opening" tells wrapAnchors/serializer that ^id appears on the
+	// opening fence line, not appended after the closing fence.
+	var result = [{
 		type: "codeblock",
-		attributes: attributes
+		attributes: {
+			code: {type: "string", value: text, start: codeStart, end: this.parser.pos},
+			language: {type: "string", value: this.match[1], start: languageStart, end: languageEnd}
+		},
+		anchorStyle: "opening"
 	}];
+	if(anchor) {
+		result[0].anchorId = anchor;
+	}
+	return result;
 };

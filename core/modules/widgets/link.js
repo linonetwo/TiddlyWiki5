@@ -93,7 +93,7 @@ LinkWidget.prototype.renderLink = function(parent,nextSibling) {
 	}
 	// Set an href
 	var wikilinkTransformFilter = this.getVariable("tv-filter-export-link"),
-		to = this.blockId ? this.to + "^^" + this.blockId : this.to,
+		to = this.anchor ? this.to + "^^" + this.anchor : this.to,
 		wikiLinkText;
 	if(wikilinkTransformFilter) {
 		// Use the filter to construct the href
@@ -170,7 +170,7 @@ LinkWidget.prototype.handleClickEvent = function(event) {
 	this.dispatchEvent({
 		type: "tm-navigate",
 		navigateTo: this.to,
-		blockId: this.blockId,
+		anchor: this.anchor,
 		navigateFromTitle: this.getVariable("storyTiddler"),
 		navigateFromNode: this,
 		navigateFromClientRect: { top: bounds.top, left: bounds.left, width: bounds.width, right: bounds.right, bottom: bounds.bottom, height: bounds.height
@@ -201,7 +201,7 @@ Compute the internal state of the widget
 LinkWidget.prototype.execute = function() {
 	// Pick up our attributes
 	this.to = this.getAttribute("to",this.getVariable("currentTiddler"));
-	this.blockId = this.getAttribute("blockId");
+	this.anchor = this.getAttribute("anchor");
 	this.tooltip = this.getAttribute("tooltip");
 	this.role = this.getAttribute("role");
 	this.linkClasses = this.getAttribute("class");

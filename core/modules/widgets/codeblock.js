@@ -33,8 +33,6 @@ CodeBlockWidget.prototype.render = function(parent,nextSibling) {
 	domNode.appendChild(codeNode);
 	parent.insertBefore(domNode,nextSibling);
 	this.domNodes.push(domNode);
-	// Apply block ID if present
-	this.applyBlockId(domNode);
 	if(this.postRender) {
 		this.postRender();
 	}
@@ -52,7 +50,7 @@ Selectively refreshes the widget if needed. Returns true if the widget or any of
 */
 CodeBlockWidget.prototype.refresh = function(changedTiddlers) {
 	var changedAttributes = this.computeAttributes();
-	if(changedAttributes.code || changedAttributes.language || changedAttributes.blockId) {
+	if(changedAttributes.code || changedAttributes.language) {
 		this.refreshSelf();
 		return true;
 	} else {

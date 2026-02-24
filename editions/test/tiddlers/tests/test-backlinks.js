@@ -46,7 +46,7 @@ describe("Backlinks tests", function() {
 			expect(wiki.filterTiddlers("TestIncoming +[backlinks[]]").join(",")).toBe("TestOutgoing");
 		});
 
-		it("should have a backlink to block ID", function() {
+		it("should have a backlink to anchor", function() {
 			wiki.addTiddler({
 				title: "TestIncoming",
 				text: "With a mark. ^ToThisBlock",
@@ -58,7 +58,7 @@ describe("Backlinks tests", function() {
 			expect(wiki.filterTiddlers("TestIncoming +[backlinks[]]").join(",")).toBe("TestOutgoing");
 		});
 
-		it("should have a backlink with block ID filter", function() {
+		it("should have a backlink with anchor filter", function() {
 			wiki.addTiddler({
 				title: "TestIncoming",
 				text: "With a mark. ^ToThisBlock",
@@ -67,12 +67,12 @@ describe("Backlinks tests", function() {
 				title: "TestOutgoing",
 				text: "A link to [[TestIncoming^ToThisBlock]]",
 			});
-			expect(wiki.filterTiddlers("TestIncoming +[backlinks:blockid[ToThisBlock]]").join(",")).toBe("TestOutgoing");
-			// Non-matching block ID should return empty
-			expect(wiki.filterTiddlers("TestIncoming +[backlinks:blockid[WrongAnchor]]").join(",")).toBe("");
+			expect(wiki.filterTiddlers("TestIncoming +[backlinks:anchor[ToThisBlock]]").join(",")).toBe("TestOutgoing");
+			// Non-matching anchor should return empty
+			expect(wiki.filterTiddlers("TestIncoming +[backlinks:anchor[WrongAnchor]]").join(",")).toBe("");
 		});
 
-		it("should track block ID links for the blockids filter", function() {
+		it("should track anchor links for the anchors filter", function() {
 			wiki.addTiddler({
 				title: "TestIncoming",
 				text: "First. ^anchor1\n\nSecond. ^anchor2",
@@ -81,7 +81,7 @@ describe("Backlinks tests", function() {
 				title: "TestOutgoing",
 				text: "Link to [[TestIncoming^anchor1]] and [[TestIncoming^anchor2]]",
 			});
-			var anchors = wiki.getTiddlerBlockIdLinks("TestOutgoing","TestIncoming");
+			var anchors = wiki.getTiddlerAnchorLinks("TestOutgoing","TestIncoming");
 			expect(anchors.sort().join(",")).toBe("anchor1,anchor2");
 		});
 	});

@@ -88,8 +88,6 @@ var WikiParser = function(type,text,options) {
 	} else {
 		topBranch.push.apply(topBranch,this.parseBlocks());
 	}
-	// Post-process: absorb blockid nodes into parent block ID attributes
-	this.tree = this.postProcessBlockIds(this.tree);
 	// Build rules' name map
 	this.usingRuleMap = {};
 	$tw.utils.each(this.pragmaRules, function (ruleInfo) { self.usingRuleMap[ruleInfo.rule.name] = Object.getPrototypeOf(ruleInfo.rule); });
@@ -241,51 +239,53 @@ WikiParser.prototype.parseBlock = function(terminatorRegExpString) {
 	if(this.pos >= this.sourceLength) {
 		return [];
 	}
+	var start = this.pos,
+		result;
 	// Look for a block rule that applies at the current position
 	var nextMatch = this.findNextMatch(this.blockRules,this.pos);
 	if(nextMatch && nextMatch.matchIndex === this.pos) {
-		var start = this.pos;
-		var subTree = nextMatch.rule.parse();
+		result = nextMatch.rule.parse();
 		// Set the start and end positions of the first and last blocks if they're not already set
-		if(subTree.length > 0) {
-			if(subTree[0].start === undefined) subTree[0].start = start;
-			if(subTree[subTree.length - 1].end === undefined) subTree[subTree.length - 1].end = this.pos;
+		if(result.length > 0) {
+			if(result[0].start === undefined) result[0].start = start;
+			if(result[result.length - 1].end === undefined) result[result.length - 1].end = this.pos;
 		}
-		$tw.utils.each(subTree, function (node) { node.rule = nextMatch.rule.name; });
-		return subTree;
-	}
-	// Treat it as a paragraph if we didn't find a block rule
-	var start = this.pos;
-	var children = this.parseInlineRun(terminatorRegExp);
-	var end = this.pos;
-	return [{type: "element", tag: "p", children: children, start: start, end: end, rule: "parseblock" }];
-};
-
-/*
-Post-process the parse tree to absorb blockid nodes into their parent block's block ID attribute.
-A blockid node at the end of a block's children array is removed and its id is set as the
-parent's "blockId" attribute. This means blockid nodes never appear in the final widget tree.
-*/
-WikiParser.prototype.postProcessBlockIds = function(tree) {
-	for(var i = 0; i < tree.length; i++) {
-		var node = tree[i];
-		// Recurse into children first
-		if(node.children && node.children.length > 0) {
-			this.postProcessBlockIds(node.children);
-			// Check if the last child is a blockid
-			var lastChild = node.children[node.children.length - 1];
-			if(lastChild.type === "blockid" && lastChild.attributes && lastChild.attributes.id) {
-				// Absorb the blockid's id into the parent node's block ID attribute
-				if(!node.attributes) {
-					node.attributes = {};
-				}
-				node.attributes.blockId = {type: "string", value: lastChild.attributes.id.value};
-				// Remove the blockid node from children
-				node.children.pop();
+		$tw.utils.each(result, function(node) { node.rule = nextMatch.rule.name; });
+		// For heading elements, check their inline content for a trailing ^id.
+		// (List items are handled inside the list rule; other blocks use anchorblock.)
+		if(result.length === 1 && result[0].type === "element" && /^h[1-6]$/.test(result[0].tag)) {
+			var headingAnchorId = $tw.utils.extractInlineAnchor(result[0].children);
+			if(headingAnchorId) {
+				return [{
+					type: "anchor",
+					attributes: {id: {type: "string", value: headingAnchorId}},
+					children: result,
+					start: start,
+					end: this.pos,
+					rule: "anchor",
+					isBlock: true
+				}];
 			}
 		}
+	} else {
+		// Treat it as a paragraph if we didn't find a block rule
+		var children = this.parseInlineRun(terminatorRegExp);
+		var paraAnchorId = $tw.utils.extractInlineAnchor(children);
+		var pNode = {type: "element", tag: "p", children: children, start: start, end: this.pos, rule: "parseblock"};
+		if(paraAnchorId) {
+			return [{
+				type: "anchor",
+				attributes: {id: {type: "string", value: paraAnchorId}},
+				children: [pNode],
+				start: start,
+				end: this.pos,
+				rule: "anchor",
+				isBlock: true
+			}];
+		}
+		return [pNode];
 	}
-	return tree;
+	return result;
 };
 
 /*

@@ -38,6 +38,11 @@ exports.serialize = function (tree,serialize) {
 		var result = [];
 		if(node.type === "element" && isListNode(node)) {
 			node.children.forEach(function (child) {
+				// Unwrap anchor containers around list items: * item ^id becomes
+				// anchor{li} in the parse tree. We extract the li and its anchor id.
+				var unwrapped = $tw.utils.unwrapAnchor(child);
+				var anchorId = unwrapped.anchorId;
+				child = unwrapped.inner;
 				if(itemTags.includes(child.tag)) {
 					var currentMarker = findMarker(node.tag, child.tag);
 					// Handle class attributes
@@ -47,12 +52,17 @@ exports.serialize = function (tree,serialize) {
 					 * We collect same level text nodes into this list, and concat then submit them before enter deeper list.
 					 */
 					var content = [];
+					// anchorSuffix is declared BEFORE $tw.utils.each so it is
+					// accessible inside the callback (avoids var-hoisting undefined bug).
+					var anchorSuffix = anchorId ? " ^" + anchorId : "";
 					$tw.utils.each(child.children,function (subNode) {
 						if(isListNode(subNode)) {
-							// Recursive call for nested lists
-							if(content.length > 0) {
-								result.push(markerPrefix + currentMarker + classAttr + " " + content.join("").trim());
+							// Recursive call for nested lists.
+							// Flush content with its anchor suffix before entering the nested list.
+							if(content.length > 0 || anchorSuffix) {
+								result.push(markerPrefix + currentMarker + classAttr + " " + content.join("").trim() + anchorSuffix);
 								content = [];
+								anchorSuffix = ""; // consumed
 							}
 							result.push(serializeList(subNode, markerPrefix + currentMarker).trim());
 						} else {
@@ -61,8 +71,9 @@ exports.serialize = function (tree,serialize) {
 						return ""; // Default return for unhandled node types
 					});
 					// prepend `#` mark to a new line, if it has content (and has or hasn't nested list), or if it has no content and also no nested list
+
 					if(content.length > 0 || child.children.length === 0) {
-						result.push(markerPrefix + currentMarker + classAttr + " " + content.join("").trim());
+						result.push(markerPrefix + currentMarker + classAttr + " " + content.join("").trim() + anchorSuffix);
 						content = [];
 					}
 				}

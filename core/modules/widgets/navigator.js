@@ -136,7 +136,7 @@ Add a new record to the top of the history stack
 title: a title string or an array of title strings
 fromPageRect: page coordinates of the origin of the navigation
 options: optional object containing:
-  blockId: optional block ID in this tiddler
+  anchor: optional anchor in this tiddler
 */
 NavigatorWidget.prototype.addToHistory = function(title,fromPageRect,options) {
 	this.story.addToHistory(title,fromPageRect,options);
@@ -150,7 +150,7 @@ NavigatorWidget.prototype.handleNavigateEvent = function(event) {
 	if(event.navigateTo) {
 		this.addToStory(event.navigateTo,event.navigateFromTitle);
 		if(!event.navigateSuppressNavigation) {
-			this.addToHistory(event.navigateTo,event.navigateFromClientRect,{blockId: event.blockId});
+			this.addToHistory(event.navigateTo,event.navigateFromClientRect,{anchor: event.anchor});
 		}
 	}
 	return false;

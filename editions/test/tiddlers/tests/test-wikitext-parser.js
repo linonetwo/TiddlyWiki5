@@ -469,10 +469,10 @@ describe("WikiText parser tests", function() {
 		expect(parse(wikitext)).toEqual(expectedParseTree);
 	});
 
-	it("should parse section marks (absorbed into parent block ID attribute)", function () {
-		expect(parse("There is a block id that is invisible, but you can find it using developer tool's inspect element feature. ^BlockLevelLinksID1")).toEqual(
+	it("should parse section marks (wrapped in anchor container)", function () {
+		expect(parse("There is an anchor that is invisible, but you can find it using developer tool's inspect element feature. ^BlockLevelLinksID1")).toEqual(
 
-			[{"type":"element","tag":"p","rule":"parseblock","children":[{"type":"text","text":"There is a block id that is invisible, but you can find it using developer tool's inspect element feature.","start":0,"end":106}],"start":0,"end":126,"attributes":{"blockId":{"type":"string","value":"BlockLevelLinksID1"}}}]
+			[{"type":"anchor","rule":"anchor","attributes":{"id":{"type":"string","value":"BlockLevelLinksID1"}},"children":[{"type":"element","tag":"p","rule":"parseblock","children":[{"type":"text","text":"There is an anchor that is invisible, but you can find it using developer tool's inspect element feature.","start":0,"end":105}],"start":0,"end":125}],"start":0,"end":125,"isBlock":true}]
 
 		);
 	});
@@ -481,37 +481,41 @@ describe("WikiText parser tests", function() {
 	it("should parse link to anchors", function () {
 		expect(parse("[[Link to BlockLevelLinksID1|Block Level Links in WikiText^BlockLevelLinksID1]]")).toEqual(
 
-			[{"type":"element","tag":"p","rule":"parseblock","children":[{"type":"link","attributes":{"to":{"type":"string","value":"Block Level Links in WikiText","start":29,"end":58},"blockId":{"type":"string","value":"BlockLevelLinksID1","start":59,"end":77}},"children":[{"type":"text","text":"Link to BlockLevelLinksID1","start":2,"end":28}],"start":0,"end":79,"rule":"prettylink"}],"start":0,"end":79}]
+			[{"type":"element","tag":"p","rule":"parseblock","children":[{"type":"link","attributes":{"to":{"type":"string","value":"Block Level Links in WikiText","start":29,"end":58},"anchor":{"type":"string","value":"BlockLevelLinksID1","start":59,"end":77}},"children":[{"type":"text","text":"Link to BlockLevelLinksID1","start":2,"end":28}],"start":0,"end":79,"rule":"prettylink"}],"start":0,"end":79}]
 
 		);
 	});
 
-	it("should parse code block with block ID in fence", function () {
+	it("should parse code block with anchor on opening fence", function () {
 		var result = parse("```css ^codeId\ncode block\n```");
 		expect(result.length).toBe(1);
-		expect(result[0].type).toBe("codeblock");
-		expect(result[0].attributes.code.value).toBe("code block");
-		expect(result[0].attributes.language.value).toBe("css");
-		expect(result[0].attributes.blockId.value).toBe("codeId");
+		expect(result[0].type).toBe("anchor");
+		expect(result[0].attributes.id.value).toBe("codeId");
+		var codeblock = result[0].children[0];
+		expect(codeblock.type).toBe("codeblock");
+		expect(codeblock.attributes.code.value).toBe("code block");
+		expect(codeblock.attributes.language.value).toBe("css");
+		// _anchorId is set so the codeblock serializer knows where to embed it
+		expect(codeblock._anchorId).toBe("codeId");
 	});
 
-	it("should parse link without block ID", function () {
+	it("should parse link without anchor", function () {
 		expect(parse("[[Simple Link]]")).toEqual(
 
-			[{"type":"element","tag":"p","rule":"parseblock","children":[{"type":"link","attributes":{"to":{"type":"string","value":"Simple Link","start":2,"end":13},"blockId":{"type":"string","value":"","start":13,"end":13}},"children":[{"type":"text","text":"Simple Link","start":2,"end":13}],"start":0,"end":15,"rule":"prettylink"}],"start":0,"end":15}]
+			[{"type":"element","tag":"p","rule":"parseblock","children":[{"type":"link","attributes":{"to":{"type":"string","value":"Simple Link","start":2,"end":13},"anchor":{"type":"string","value":"","start":13,"end":13}},"children":[{"type":"text","text":"Simple Link","start":2,"end":13}],"start":0,"end":15,"rule":"prettylink"}],"start":0,"end":15}]
 
 		);
 	});
 
-	it("should parse link with alias and block ID", function () {
+	it("should parse link with alias and anchor", function () {
 		expect(parse("[[Click here|TiddlerTitle^mark123]]")).toEqual(
 
-			[{"type":"element","tag":"p","rule":"parseblock","children":[{"type":"link","attributes":{"to":{"type":"string","value":"TiddlerTitle","start":13,"end":25},"blockId":{"type":"string","value":"mark123","start":26,"end":33}},"children":[{"type":"text","text":"Click here","start":2,"end":12}],"start":0,"end":35,"rule":"prettylink"}],"start":0,"end":35}]
+			[{"type":"element","tag":"p","rule":"parseblock","children":[{"type":"link","attributes":{"to":{"type":"string","value":"TiddlerTitle","start":13,"end":25},"anchor":{"type":"string","value":"mark123","start":26,"end":33}},"children":[{"type":"text","text":"Click here","start":2,"end":12}],"start":0,"end":35,"rule":"prettylink"}],"start":0,"end":35}]
 
 		);
 	});
 
-	it("should parse transclusion with block ID", function () {
+	it("should parse transclusion with anchor", function () {
 		var result = parse("{{SomeTitle^myAnchor}}");
 		expect(result.length).toBe(1);
 		var tiddlerNode = result[0];
@@ -519,10 +523,10 @@ describe("WikiText parser tests", function() {
 		var transclude = tiddlerNode.children[0];
 		expect(transclude.type).toBe("transclude");
 		expect(transclude.attributes.$tiddler.value).toBe("SomeTitle");
-		expect(transclude.attributes.$blockId.value).toBe("myAnchor");
+		expect(transclude.attributes.$anchor.value).toBe("myAnchor");
 	});
 
-	it("should parse transclusion with block ID range", function () {
+	it("should parse transclusion with anchor range", function () {
 		var result = parse("{{SomeTitle^startId..^endId}}");
 		expect(result.length).toBe(1);
 		var tiddlerNode = result[0];
@@ -530,21 +534,102 @@ describe("WikiText parser tests", function() {
 		var transclude = tiddlerNode.children[0];
 		expect(transclude.type).toBe("transclude");
 		expect(transclude.attributes.$tiddler.value).toBe("SomeTitle");
-		expect(transclude.attributes.$blockId.value).toBe("startId");
-		expect(transclude.attributes.$blockIdEnd.value).toBe("endId");
+		expect(transclude.attributes.$anchor.value).toBe("startId");
+		expect(transclude.attributes.$anchorEnd.value).toBe("endId");
 	});
 
-	it("should parse text reference with block ID range", function () {
+	it("should parse text reference with anchor range", function () {
 		var result = $tw.utils.parseTextReference("MyTitle^blockA..^blockZ");
 		expect(result.title).toBe("MyTitle");
-		expect(result.blockId).toBe("blockA");
-		expect(result.blockIdEnd).toBe("blockZ");
+		expect(result.anchor).toBe("blockA");
+		expect(result.anchorEnd).toBe("blockZ");
 	});
 
-	it("should parse text reference with single block ID", function () {
+	it("should parse text reference with single anchor", function () {
 		var result = $tw.utils.parseTextReference("MyTitle^singleBlock");
 		expect(result.title).toBe("MyTitle");
-		expect(result.blockId).toBe("singleBlock");
-		expect(result.blockIdEnd).toBeUndefined();
+		expect(result.anchor).toBe("singleBlock");
+		expect(result.anchorEnd).toBeUndefined();
+	});
+
+	it("should parse heading with anchor", function () {
+		var result = parse("!! My Heading ^headingId");
+		expect(result.length).toBe(1);
+		expect(result[0].type).toBe("anchor");
+		expect(result[0].attributes.id.value).toBe("headingId");
+		var heading = result[0].children[0];
+		expect(heading.type).toBe("element");
+		expect(heading.tag).toBe("h2");
+	});
+
+	it("should parse list items with anchors", function () {
+		var result = parse("* item A ^listA\n* item B ^listB\n* item C");
+		expect(result.length).toBe(1);
+		expect(result[0].type).toBe("element");
+		expect(result[0].tag).toBe("ul");
+		// First li is wrapped in anchor
+		expect(result[0].children[0].type).toBe("anchor");
+		expect(result[0].children[0].attributes.id.value).toBe("listA");
+		// Second li is wrapped in anchor
+		expect(result[0].children[1].type).toBe("anchor");
+		expect(result[0].children[1].attributes.id.value).toBe("listB");
+		// Third li has no anchor
+		expect(result[0].children[2].type).toBe("element");
+		expect(result[0].children[2].tag).toBe("li");
+	});
+
+	it("should parse typedblock with anchor on opening fence", function () {
+		var result = parse("$$$text/plain ^typedId\nhello world\n$$$");
+		expect(result.length).toBe(1);
+		expect(result[0].type).toBe("anchor");
+		expect(result[0].attributes.id.value).toBe("typedId");
+		var inner = result[0].children[0];
+		expect(inner.type).toBe("void");
+		expect(inner._anchorId).toBe("typedId");
+	});
+
+	it("should parse quoteblock with anchor on opening fence", function () {
+		var result = parse("<<< ^quoteId\nQuote body.\n<<< ");
+		expect(result.length).toBe(1);
+		expect(result[0].type).toBe("anchor");
+		expect(result[0].attributes.id.value).toBe("quoteId");
+		var blockquote = result[0].children[0];
+		expect(blockquote.type).toBe("element");
+		expect(blockquote.tag).toBe("blockquote");
+		expect(blockquote._anchorId).toBe("quoteId");
+	});
+
+	it("should parse quoteblock with citation and anchor on opening fence", function () {
+		var result = parse("<<< Some citation ^quoteId\nQuote body.\n<<<");
+		expect(result.length).toBe(1);
+		expect(result[0].type).toBe("anchor");
+		expect(result[0].attributes.id.value).toBe("quoteId");
+		// The cite text should still appear as a child element
+		var blockquote = result[0].children[0];
+		var hasOpenCite = blockquote.children.some(function(c) {
+			return c.type === "element" && c.tag === "cite";
+		});
+		expect(hasOpenCite).toBe(true);
+	});
+
+	it("should parse transcludeblock with anchor", function () {
+		var result = parse("{{SomeTitle}} ^transId\n");
+		expect(result.length).toBe(1);
+		expect(result[0].type).toBe("anchor");
+		expect(result[0].attributes.id.value).toBe("transId");
+	});
+
+	it("should parse filteredtranscludeblock with anchor", function () {
+		var result = parse("{{{[tag[docs]]}}} ^filterId\n");
+		expect(result.length).toBe(1);
+		expect(result[0].type).toBe("anchor");
+		expect(result[0].attributes.id.value).toBe("filterId");
+	});
+
+	it("should parse code block without anchor", function () {
+		var result = parse("```\nplain code\n```");
+		expect(result.length).toBe(1);
+		expect(result[0].type).toBe("codeblock");
+		expect(result[0].attributes.code.value).toBe("plain code");
 	});
 });

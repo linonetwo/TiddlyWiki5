@@ -5,38 +5,38 @@ tags: WikiText
 title: Block Level Links in WikiText
 type: text/vnd.tiddlywiki
 
-! Adding Block IDs
+! Adding Anchors
 
-<<wikitext-example-without-html src:"! Adding block ID for heading ^🤗→AddingIDforTitle">>
+<<wikitext-example-without-html src:"! Adding anchor for heading ^🤗→AddingIDforTitle">>
 
-The basic syntax for block IDs is:
+The basic syntax for anchors is:
 
-<<wikitext-example src:"A paragraph with an invisible block ID. ^BlockLevelLinksID1">>
+<<wikitext-example src:"A paragraph with an invisible anchor. ^BlockLevelLinksID1">>
 
 # Add a space between the end of your text and the `^`.
 # There is no space between `^` and the id.
 # ID can contain any Unicode char other than `^` and space ` `.
 
-The block ID becomes an attribute of the enclosing block element. The DOM will have:
+The anchor becomes an attribute of the enclosing block element. The DOM will have:
 
 ```html
-<p data-tw-block-id="BlockLevelLinksID1" id="Block Level Links in WikiText^^BlockLevelLinksID1">...</p>
+<p data-tw-anchor="BlockLevelLinksID1" id="Block Level Links in WikiText^^BlockLevelLinksID1">...</p>
 ```
 
-!! Adding block ID to code blocks
+!! Adding anchor to code blocks
 
-Code blocks use a special syntax — add `^blockId` after the language on the opening fence:
+Code blocks use a special syntax — add `^anchor` after the closing fence:
 
-<<wikitext-example src:"```css ^codeAnchor
+<<wikitext-example src:"```css
 .main {
   display: none;
 }
-```
+``` ^codeAnchor
 ">>
 
-! Link to Block IDs ^linkSection
+! Link to Anchors ^linkSection
 
-Add `^blockId` after the title in a link to navigate to and highlight that block:
+Add `^anchor` after the title in a link to navigate to and highlight that block:
 
 <<wikitext-example-without-html src:"[[Link to paragraph|Block Level Links in WikiText^BlockLevelLinksID1]]">>
 
@@ -44,26 +44,26 @@ Add `^blockId` after the title in a link to navigate to and highlight that block
 
 <<wikitext-example-without-html src:"[[Link to code block|Block Level Links in WikiText^codeAnchor]]">>
 
-<<wikitext-example-without-html  src:"[[Link to Non-existing block ID|Block Level Links in WikiText^😂❎]]">>
+<<wikitext-example-without-html  src:"[[Link to Non-existing anchor|Block Level Links in WikiText^😂❎]]">>
 
 ! Single Block Transclusion
 
-You can transclude a single block from another tiddler using `{{Title^blockId}}`:
+You can transclude a single block from another tiddler using `{{Title^anchor}}`:
 
 <<wikitext-example-without-html src:"{{Block Level Links in WikiText^BlockLevelLinksID1}}">>
 
-This will render only the block with that block ID, not the entire tiddler.
+This will render only the block with that anchor, not the entire tiddler.
 
 ! Block-Level Backlinks
 
-Use the `backlinks:blockid` filter suffix to find tiddlers linking to a specific block ID:
+Use the `backlinks:anchor` filter suffix to find tiddlers linking to a specific anchor:
 
 ```
-[{!!title}backlinks:blockid[BlockLevelLinksID1]]
+[{!!title}backlinks:anchor[BlockLevelLinksID1]]
 ```
 
-Use the `blockids` filter to find which block IDs a source tiddler links to in a target:
+Use the `anchors` filter to find which anchors a source tiddler links to in a target:
 
 ```
-[<sourceTiddler>blockids[TargetTitle]]
+[<sourceTiddler>anchors[TargetTitle]]
 ```

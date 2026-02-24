@@ -48,11 +48,11 @@ ZoominListView.prototype.navigateTo = function(historyInfo) {
 	}
 	var listItemWidget = this.listWidget.children[listElementIndex],
 		targetElement = listItemWidget.findFirstDomNode();
-	// If block ID is provided, find the marked element via DOM query
-	if(targetElement && historyInfo.blockId) {
-		var blockIdElement = targetElement.parentNode.querySelector("[data-tw-block-id=\"" + historyInfo.blockId + "\"]");
-		if(blockIdElement) {
-			targetElement = blockIdElement;
+	// If anchor is provided, find the marked element via DOM query
+	if(targetElement && historyInfo.anchor) {
+		var anchorElement = targetElement.parentNode.querySelector("[data-tw-anchor=\"" + historyInfo.anchor + "\"]");
+		if(anchorElement) {
+			targetElement = anchorElement;
 		}
 	}
 	// Abandon if the list entry isn't a DOM element (it might be a text node)

@@ -20,13 +20,13 @@ PopStoryView.prototype.navigateTo = function(historyInfo) {
 	}
 	var listItemWidget = this.listWidget.children[listElementIndex],
 		targetElement = listItemWidget.findFirstDomNode();
-	// If block ID is provided, find the marked element via DOM query
-	var foundBlockId = false;
-	if(targetElement && historyInfo.blockId) {
-		var blockIdElement = targetElement.parentNode.querySelector("[data-tw-block-id=\"" + historyInfo.blockId + "\"]");
-		if(blockIdElement) {
-			targetElement = blockIdElement;
-			foundBlockId = true;
+	// If anchor is provided, find the marked element via DOM query
+	var foundAnchor = false;
+	if(targetElement && historyInfo.anchor) {
+		var anchorElement = targetElement.parentNode.querySelector("[data-tw-anchor=\"" + historyInfo.anchor + "\"]");
+		if(anchorElement) {
+			targetElement = anchorElement;
+			foundAnchor = true;
 		}
 	}
 	// Abandon if the list entry isn't a DOM element (it might be a text node)
@@ -34,7 +34,7 @@ PopStoryView.prototype.navigateTo = function(historyInfo) {
 		return;
 	}
 	// Scroll the node into view
-	this.listWidget.dispatchEvent({type: "tm-scroll", target: targetElement, highlight: foundBlockId});
+	this.listWidget.dispatchEvent({type: "tm-scroll", target: targetElement, highlight: foundAnchor});
 };
 
 PopStoryView.prototype.insert = function(widget) {

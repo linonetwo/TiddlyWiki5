@@ -19,8 +19,8 @@ exports.types = {block: true};
 
 exports.init = function(parser) {
 	this.parser = parser;
-	// Regexp to match
-	this.matchRegExp = /\{\{([^\{\}\|]*)(?:\|\|([^\|\{\}]+))?(?:\|([^\{\}]+))?\}\}(?:\r?\n|$)/mg;
+	// Regexp to match — optionally capture ^anchor after }}
+	this.matchRegExp = /\{\{([^\{\}\|]*)(?:\|\|([^\|\{\}]+))?(?:\|([^\{\}]+))?\}\}(?:\s+\^(\S+))?(?:\r?\n|$)/mg;
 };
 
 exports.parse = function() {
@@ -29,7 +29,8 @@ exports.parse = function() {
 	// Get the match details
 	var template = $tw.utils.trim(this.match[2]),
 		textRef = $tw.utils.trim(this.match[1]),
-		params = this.match[3] ? this.match[3].split("|") : [];
+		params = this.match[3] ? this.match[3].split("|") : [],
+		anchor = this.match[4] || "";
 	// Prepare the transclude widget
 	var transcludeNode = {
 		type: "transclude",
@@ -45,14 +46,14 @@ exports.parse = function() {
 		};
 	});
 	// Prepare the tiddler widget
-	var tr, targetTitle, targetField, targetIndex, targetBlockId, targetBlockIdEnd, tiddlerNode;
+	var tr, targetTitle, targetField, targetIndex, targetAnchor, targetAnchorEnd, tiddlerNode;
 	if(textRef) {
 		tr = $tw.utils.parseTextReference(textRef);
 		targetTitle = tr.title;
 		targetField = tr.field;
 		targetIndex = tr.index;
-		targetBlockId = tr.blockId;
-		targetBlockIdEnd = tr.blockIdEnd;
+		targetAnchor = tr.anchor;
+		targetAnchorEnd = tr.anchorEnd;
 		tiddlerNode = {
 			type: "tiddler",
 			attributes: {
@@ -65,8 +66,10 @@ exports.parse = function() {
 	if(template) {
 		transcludeNode.attributes["$tiddler"] = {name: "$tiddler", type: "string", value: template};
 		if(textRef) {
+			if(anchor) tiddlerNode.anchorId = anchor;
 			return [tiddlerNode];
 		} else {
+			if(anchor) transcludeNode.anchorId = anchor;
 			return [transcludeNode];
 		}
 	} else {
@@ -78,14 +81,16 @@ exports.parse = function() {
 			if(targetIndex) {
 				transcludeNode.attributes["$index"] = {name: "$index", type: "string", value: targetIndex};
 			}
-			if(targetBlockId) {
-				transcludeNode.attributes["$blockId"] = {name: "$blockId", type: "string", value: targetBlockId};
+			if(targetAnchor) {
+				transcludeNode.attributes["$anchor"] = {name: "$anchor", type: "string", value: targetAnchor};
 			}
-			if(targetBlockIdEnd) {
-				transcludeNode.attributes["$blockIdEnd"] = {name: "$blockIdEnd", type: "string", value: targetBlockIdEnd};
+			if(targetAnchorEnd) {
+				transcludeNode.attributes["$anchorEnd"] = {name: "$anchorEnd", type: "string", value: targetAnchorEnd};
 			}
+			if(anchor) tiddlerNode.anchorId = anchor;
 			return [tiddlerNode];
 		} else {
+			if(anchor) transcludeNode.anchorId = anchor;
 			return [transcludeNode];
 		}
 	}

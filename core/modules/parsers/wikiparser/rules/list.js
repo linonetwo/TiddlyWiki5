@@ -136,9 +136,17 @@ exports.parse = function() {
 		var classEnd = this.parser.pos;
 		this.parser.skipWhitespace({treatNewlinesAsNonWhitespace: true});
 		var tree = this.parser.parseInlineRun(/(\r?\n)/mg);
+		// Detect and strip trailing " ^id" anchor syntax from the item's inline
+		// content. We mark the <li> node with a temporary anchorId property and
+		// defer the actual wrapping until after the full list is built, so that
+		// nested-list appending (which works via the parent <li>) is unaffected.
+		var listItemAnchorId = $tw.utils.extractInlineAnchor(tree);
 		lastListItem.children.push.apply(lastListItem.children,tree);
 		lastListItem.end = this.parser.pos;
 		listStack[listStack.length-1].end = this.parser.pos;
+		if(listItemAnchorId) {
+			lastListItem.anchorId = listItemAnchorId;
+		}
 		if(classes.length > 0) {
 			$tw.utils.addClassToParseTreeNode(lastListItem,classes.join(" "));
 			lastListItem.attributes.class.start = classStart;
@@ -147,6 +155,28 @@ exports.parse = function() {
 		// Consume any whitespace following the list item
 		this.parser.skipWhitespace();
 	}
+	// Wrap any list items that were marked with an anchorId during inline parsing.
+	// Done after the full list is built so that nested-list structure is intact.
+	function wrapItemAnchors(node) {
+		if(!node.children) return;
+		for(var i = 0; i < node.children.length; i++) {
+			var child = node.children[i];
+			wrapItemAnchors(child);
+			if(child.anchorId) {
+				var id = child.anchorId;
+				delete child.anchorId;
+				node.children[i] = {
+					type: "anchor",
+					attributes: {id: {type: "string", value: id}},
+					children: [child],
+					start: child.start,
+					end: child.end,
+					isBlock: true
+				};
+			}
+		}
+	}
+	wrapItemAnchors(listStack[0]);
 	// Return the root element of the list
 	return [listStack[0]];
 };

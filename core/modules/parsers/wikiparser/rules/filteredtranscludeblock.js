@@ -22,8 +22,8 @@ exports.types = {block: true};
 
 exports.init = function(parser) {
 	this.parser = parser;
-	// Regexp to match
-	this.matchRegExp = /\{\{\{([^\|]+?)(?:\|([^\|\{\}]+))?(?:\|\|([^\|\{\}]+))?\}\}([^\}]*)\}(?:\.(\S+))?(?:\r?\n|$)/mg;
+	// Regexp to match — optionally capture ^anchor after the closing }}
+	this.matchRegExp = /\{\{\{([^\|]+?)(?:\|([^\|\{\}]+))?(?:\|\|([^\|\{\}]+))?\}\}([^\}]*)\}(?:\.(\S+))?(?:\s+\^(\S+))?(?:\r?\n|$)/mg;
 };
 
 exports.parse = function() {
@@ -44,7 +44,8 @@ exports.parse = function() {
 		tooltip = this.match[2],
 		template = $tw.utils.trim(this.match[3]),
 		style = this.match[4],
-		classes = this.match[5];
+		classes = this.match[5],
+		anchor = this.match[6] || "";
 	// Return the list widget
 	var node = {
 		type: "list",
@@ -64,6 +65,9 @@ exports.parse = function() {
 	}
 	if(classes) {
 		node.attributes.itemClass = {type: "string", value: classes.split(".").join(" "), start: classesStart, end: classesEnd};
+	}
+	if(anchor) {
+		node.anchorId = anchor;
 	}
 	return [node];
 };

@@ -1,19 +1,19 @@
 /*\
-title: $:/core/modules/parsers/wikiparser/rules/blockid.js
+title: $:/core/modules/parsers/wikiparser/rules/anchor.js
 type: application/javascript
 module-type: wikirule
 
-Inline rule for block IDs using ^id syntax at end of line.
+Inline rule for anchors using ^id syntax at end of line.
 
-The ^id is parsed as a temporary "blockid" node. A post-processing step in the
-wikiparser constructor absorbs it into the parent block element's "blockId" attribute.
-This means the blockid node never appears in the final widget tree.
+The ^id is parsed as a temporary "anchor" marker node. The wikiparser's parseBlock()
+method detects this marker and wraps the enclosing block in an <$anchor> container widget.
+The anchor marker itself is removed from the block's children.
 
 \*/
 
 "use strict";
 
-exports.name = "blockid";
+exports.name = "anchor";
 exports.types = {inline: true};
 
 /*
@@ -35,9 +35,9 @@ exports.parse = function() {
 	var id = this.match[1] || "";
 	var idStart = start + 2; // skip space and ^
 	var idEnd = idStart + id.length;
-	// Return a temporary blockid node (will be absorbed by postProcessBlockIds)
+	// Return a temporary anchor-marker node (will be wrapped by wrapAnchors in parseBlock)
 	return [{
-		type: "blockid",
+		type: "anchor-marker",
 		attributes: {
 			id: {type: "string", value: id, start: idStart, end: idEnd}
 		},

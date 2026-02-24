@@ -93,7 +93,7 @@ Story.prototype.addToHistory = function(navigateTo,fromPageRect,options) {
 	// Add a new record to the top of the history stack
 	var historyList = this.wiki.getTiddlerData(this.historyTitle,[]);
 	$tw.utils.each(titles,function(title) {
-		historyList.push({title: title, fromPageRect: fromPageRect, blockId: options.blockId});
+		historyList.push({title: title, fromPageRect: fromPageRect, anchor: options.anchor});
 	});
 	this.wiki.setTiddlerData(this.historyTitle,historyList,{"current-tiddler": titles[titles.length-1]});
 };

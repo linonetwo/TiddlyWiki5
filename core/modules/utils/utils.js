@@ -724,22 +724,22 @@ Returns an object with the following fields, all optional:
 * index: JSON property index
 */
 exports.parseTextReference = function(textRef) {
-	// Check for ^blockId suffix before processing !! and ## separators
-	// ^blockId is only valid for wikitext text content and is mutually exclusive with !!field and ##index
-	// Supports range syntax: Title^start..^end (both block IDs required for range)
-	var blockId, blockIdEnd, caretPos = textRef.indexOf("^");
+	// Check for ^anchor suffix before processing !! and ## separators
+	// ^anchor is only valid for wikitext text content and is mutually exclusive with !!field and ##index
+	// Supports range syntax: Title^start..^end (both anchors required for range)
+	var anchor, anchorEnd, caretPos = textRef.indexOf("^");
 	if(caretPos !== -1) {
-		// Only treat as block ID if there's no !! or ## before the ^
+		// Only treat as anchor if there's no !! or ## before the ^
 		var beforeCaret = textRef.substring(0,caretPos);
 		if(beforeCaret.indexOf("!!") === -1 && beforeCaret.indexOf("##") === -1) {
-			var blockIdPart = textRef.substring(caretPos + 1);
-			// Check for range syntax: blockIdStart..^blockIdEnd
-			var rangeMatch = /^(\S+?)\.\.\^(\S+)$/.exec(blockIdPart);
+			var anchorPart = textRef.substring(caretPos + 1);
+			// Check for range syntax: anchorStart..^anchorEnd
+			var rangeMatch = /^(\S+?)\.\.\^(\S+)$/.exec(anchorPart);
 			if(rangeMatch) {
-				blockId = rangeMatch[1];
-				blockIdEnd = rangeMatch[2];
+				anchor = rangeMatch[1];
+				anchorEnd = rangeMatch[2];
 			} else {
-				blockId = blockIdPart;
+				anchor = anchorPart;
 			}
 			textRef = beforeCaret;
 		}
@@ -769,11 +769,11 @@ exports.parseTextReference = function(textRef) {
 		// If we couldn't parse it
 		result.title = textRef;
 	}
-	if(blockId) {
-		result.blockId = blockId;
+	if(anchor) {
+		result.anchor = anchor;
 	}
-	if(blockIdEnd) {
-		result.blockIdEnd = blockIdEnd;
+	if(anchorEnd) {
+		result.anchorEnd = anchorEnd;
 	}
 	return result;
 };

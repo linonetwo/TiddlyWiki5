@@ -44,14 +44,14 @@ exports.parse = function() {
 		};
 	});
 	// Prepare the tiddler widget
-	var tr, targetTitle, targetField, targetIndex, targetBlockId, targetBlockIdEnd, tiddlerNode;
+	var tr, targetTitle, targetField, targetIndex, targetAnchor, targetAnchorEnd, tiddlerNode;
 	if(textRef) {
 		tr = $tw.utils.parseTextReference(textRef);
 		targetTitle = tr.title;
 		targetField = tr.field;
 		targetIndex = tr.index;
-		targetBlockId = tr.blockId;
-		targetBlockIdEnd = tr.blockIdEnd;
+		targetAnchor = tr.anchor;
+		targetAnchorEnd = tr.anchorEnd;
 		tiddlerNode = {
 			type: "tiddler",
 			attributes: {
@@ -76,11 +76,11 @@ exports.parse = function() {
 			if(targetIndex) {
 				transcludeNode.attributes["$index"] = {name: "$index", type: "string", value: targetIndex};
 			}
-			if(targetBlockId) {
-				transcludeNode.attributes["$blockId"] = {name: "$blockId", type: "string", value: targetBlockId};
+			if(targetAnchor) {
+				transcludeNode.attributes["$anchor"] = {name: "$anchor", type: "string", value: targetAnchor};
 			}
-			if(targetBlockIdEnd) {
-				transcludeNode.attributes["$blockIdEnd"] = {name: "$blockIdEnd", type: "string", value: targetBlockIdEnd};
+			if(targetAnchorEnd) {
+				transcludeNode.attributes["$anchorEnd"] = {name: "$anchorEnd", type: "string", value: targetAnchorEnd};
 			}
 			return [tiddlerNode];
 		} else {

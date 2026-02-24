@@ -73,9 +73,7 @@ ElementWidget.prototype.render = function(parent,nextSibling) {
 	this.makeChildWidgets();
 	// Create the DOM node and render children
 	var domNode = this.document.createElementNS(this.namespace,this.tag);
-	this.assignAttributes(domNode,{excludeEventAttributes: true, excludeBlockIdAttribute: true});
-	// Apply block ID attribute if present
-	this.applyBlockId(domNode);
+	this.assignAttributes(domNode,{excludeEventAttributes: true});
 	// Allow hooks to manipulate the DOM node. Eg: Add debug info
 	$tw.hooks.invokeHook("th-dom-rendering-element", domNode, this);
 	parent.insertBefore(domNode,nextSibling);
@@ -92,9 +90,7 @@ ElementWidget.prototype.refresh = function(changedTiddlers) {
 	if(hasChangedAttributes) {
 		if(!this.isReplaced) {
 			// Update our attributes
-			this.assignAttributes(this.domNodes[0],{excludeEventAttributes: true, excludeBlockIdAttribute: true});
-			// Reapply block ID
-			this.applyBlockId(this.domNodes[0]);
+			this.assignAttributes(this.domNodes[0],{excludeEventAttributes: true});
 		} else {
 			// If we were replaced then completely refresh ourselves
 			return this.refreshSelf();

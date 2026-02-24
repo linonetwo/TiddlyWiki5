@@ -101,17 +101,49 @@ exports.findParseTreeNode = function(nodeArray,search) {
 };
 
 /*
-Recursively search for a parse tree node with a matching block ID attribute.
-Returns the matching node or null.
+Scan inline parse-tree nodes for a trailing " ^id" anchor syntax.
+If found, trims the anchor text from the last text node and returns the
+anchor id string. Returns null if no anchor is found.
+Modifies the nodes array in-place.
+
+Used by parseBlock (paragraphs + headings) and list.js (list items) so that
+anchor detection requires no inline rule and produces no temporary node types.
 */
-exports.findNodeWithBlockId = function(tree,blockId) {
+exports.extractInlineAnchor = function extractInlineAnchor(nodes) {
+	if(!nodes || nodes.length === 0) return null;
+	for(var i = nodes.length - 1; i >= 0; i--) {
+		var node = nodes[i];
+		if(node.type === "text") {
+			if(!node.text) return null; // guard against empty/undefined text
+			var m = node.text.match(/^(.*?)[ \t]\^(\S+)[ \t]*$/);
+			if(m) {
+				node.text = m[1];
+				if(!node.text) nodes.splice(i, 1);
+				return m[2]; // anchor id
+			}
+			return null; // last text node has no anchor
+		}
+		if(node.children && node.children.length > 0) {
+			var id = extractInlineAnchor(node.children);
+			if(id !== null) return id;
+			return null;
+		}
+	}
+	return null;
+};
+
+/*
+Recursively search for an anchor container node with a matching id attribute.
+Returns the matching anchor node or null.
+*/
+exports.findNodeWithAnchor = function(tree,anchor) {
 	for(var i = 0; i < tree.length; i++) {
 		var node = tree[i];
-		if(node.attributes && node.attributes.blockId && node.attributes.blockId.value === blockId) {
+		if(node.type === "anchor" && node.attributes && node.attributes.id && node.attributes.id.value === anchor) {
 			return node;
 		}
 		if(node.children) {
-			var found = exports.findNodeWithBlockId(node.children,blockId);
+			var found = exports.findNodeWithAnchor(node.children,anchor);
 			if(found) {
 				return found;
 			}
@@ -121,22 +153,22 @@ exports.findNodeWithBlockId = function(tree,blockId) {
 };
 
 /*
-Extract a single block (or range of blocks) from a parse tree by block ID(s).
-If blockIdEnd is provided, extracts all top-level nodes from blockId to blockIdEnd (inclusive).
-Returns an array of parse tree nodes, or null if block ID not found.
+Extract a single anchor container (or range of anchor containers) from a parse tree.
+If anchorEnd is provided, extracts all top-level nodes from anchor to anchorEnd (inclusive).
+Returns an array of parse tree nodes, or null if anchor not found.
 */
-exports.extractBlockIdNodes = function(tree,blockId,blockIdEnd) {
-	if(!blockIdEnd) {
-		// Single block extraction
-		var node = exports.findNodeWithBlockId(tree,blockId);
+exports.extractAnchorNodes = function(tree,anchor,anchorEnd) {
+	if(!anchorEnd) {
+		// Single anchor extraction
+		var node = exports.findNodeWithAnchor(tree,anchor);
 		if(node) {
 			return [node];
 		}
 		return null;
 	}
-	// Range extraction: find both block IDs in the flat top-level list
-	// First, try to find both block IDs at the same level of nesting
-	var result = exports.extractBlockIdRange(tree,blockId,blockIdEnd);
+	// Range extraction: find both anchors in the flat top-level list
+	// First, try to find both anchors at the same level of nesting
+	var result = exports.extractAnchorRange(tree,anchor,anchorEnd);
 	if(result) {
 		return result;
 	}
@@ -144,20 +176,20 @@ exports.extractBlockIdNodes = function(tree,blockId,blockIdEnd) {
 };
 
 /*
-Extract a range of nodes between two block IDs at the same level of a tree.
+Extract a range of nodes between two anchor containers at the same level of a tree.
 Returns the matching nodes array, or null if not found at this level.
 Searches recursively into children if not found at the current level.
 */
-exports.extractBlockIdRange = function(tree,blockIdStart,blockIdEnd) {
+exports.extractAnchorRange = function(tree,anchorStart,anchorEnd) {
 	var startIndex = -1, endIndex = -1;
 	// Search at this level
 	for(var i = 0; i < tree.length; i++) {
 		var node = tree[i];
-		if(node.attributes && node.attributes.blockId) {
-			if(node.attributes.blockId.value === blockIdStart) {
+		if(node.type === "anchor" && node.attributes && node.attributes.id) {
+			if(node.attributes.id.value === anchorStart) {
 				startIndex = i;
 			}
-			if(node.attributes.blockId.value === blockIdEnd) {
+			if(node.attributes.id.value === anchorEnd) {
 				endIndex = i;
 			}
 		}
@@ -169,7 +201,7 @@ exports.extractBlockIdRange = function(tree,blockIdStart,blockIdEnd) {
 	// Not found at this level - search in children
 	for(var j = 0; j < tree.length; j++) {
 		if(tree[j].children) {
-			var found = exports.extractBlockIdRange(tree[j].children,blockIdStart,blockIdEnd);
+			var found = exports.extractAnchorRange(tree[j].children,anchorStart,anchorEnd);
 			if(found) {
 				return found;
 			}

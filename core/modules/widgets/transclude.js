@@ -148,8 +148,8 @@ TranscludeWidget.prototype.collectAttributes = function() {
 		this.transcludeField = this.getAttribute("$field");
 		this.transcludeIndex = this.getAttribute("$index");
 		this.transcludeMode = this.getAttribute("$mode");
-		this.transcludeBlockId = this.getAttribute("$blockId");
-		this.transcludeBlockIdEnd = this.getAttribute("$blockIdEnd");
+		this.transcludeAnchor = this.getAttribute("$anchor");
+		this.transcludeAnchorEnd = this.getAttribute("$anchorEnd");
 		this.recursionMarker = this.getAttribute("$recursionMarker","yes");
 	}
 };
@@ -360,12 +360,12 @@ TranscludeWidget.prototype.parseTransclusionTarget = function(parseAsInline) {
 				defaultType: this.transcludeType
 			});
 	}
-	// If a block ID is specified, extract only the matching block(s) from the parse tree
-	if(this.transcludeBlockId && parser) {
-		var blockIdNodes = $tw.utils.extractBlockIdNodes(parser.tree,this.transcludeBlockId,this.transcludeBlockIdEnd);
-		if(blockIdNodes) {
+	// If an anchor is specified, extract only the matching block(s) from the parse tree
+	if(this.transcludeAnchor && parser) {
+		var anchorNodes = $tw.utils.extractAnchorNodes(parser.tree,this.transcludeAnchor,this.transcludeAnchorEnd);
+		if(anchorNodes) {
 			parser = {
-				tree: blockIdNodes,
+				tree: anchorNodes,
 				source: parser.source,
 				type: parser.type
 			};
