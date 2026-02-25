@@ -29,12 +29,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "${{ env.NODE_VERSION }}"
-      - name: Install dependencies
-        run: npm install
       - name: Generate declaration files
-        run: npx tsc
+        run: npx --yes typescript@5.8.3 tsc
       - name: Check type tests pass
-        run: npx tsc --noEmit -p types/tests/tsconfig.json
+        run: npx --yes typescript@5.8.3 tsc --noEmit -p types/tests/tsconfig.json
   build-prerelease:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'

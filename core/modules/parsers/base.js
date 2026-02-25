@@ -62,23 +62,23 @@
  * @param {boolean} [options.configTrimWhiteSpace=false] - If true, trim whitespace
  */
 function Parser(type, text, options) {
-  /**
+	/**
    * Result parse tree.
    * @type {ParseTreeNode[]}
    */
-  this.tree = [];
+	this.tree = [];
 
-  /**
+	/**
    * Original source text (unmodified).
    * @type {string}
    */
-  this.source = text;
+	this.source = text;
 
-  /**
+	/**
    * Source MIME type.
    * @type {string}
    */
-  this.type = type;
+	this.type = type;
 }
 
 exports.Parser = Parser;
