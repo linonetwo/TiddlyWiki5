@@ -1,0 +1,14 @@
+title: $:/changenotes/5.4.0/#7534
+description: Support markdown frontmatter metadata with save-time migration from .meta files
+release: 5.4.0
+tags: $:/tags/ChangeNote
+change-type: feature
+change-category: plugin
+github-links: https://github.com/TiddlyWiki/TiddlyWiki5/issues/7534
+github-contributors: linonetwo
+
+Adds support for reading and writing markdown frontmatter metadata, and introduces a pluggable `tiddlerserializer` mechanism.
+
+For markdown tiddlers, metadata can now be embedded in a single `.md` file using YAML-style frontmatter. Existing `.md.meta` files are migrated on next save: when a markdown tiddler is saved using frontmatter, the legacy `.meta` file is removed.
+
+This change also relocates markdown frontmatter implementation modules under `$:/plugins/tiddlywiki/markdown/serializer/` and adds regression tests for serializer registration, save behavior, and migration cleanup.
