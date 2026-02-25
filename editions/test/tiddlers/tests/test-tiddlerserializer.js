@@ -37,7 +37,7 @@ describe("tiddlerserializer tests", function() {
 			return "---\ntitle: Serializer Test\n---\n\nHello";
 		};
 		var fileInfo = $tw.utils.generateTiddlerFileInfo(tiddler,{
-			directory: "/tmp"
+			directory: os.tmpdir()
 		});
 		expect(fileInfo.type).toBe("text/x-markdown");
 		expect(fileInfo.hasMetaFile).toBe(false);
