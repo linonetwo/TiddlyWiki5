@@ -30,9 +30,9 @@ jobs:
         with:
           node-version: "${{ env.NODE_VERSION }}"
       - name: Generate declaration files
-        run: npx --yes typescript@5.8.3 tsc
+        run: npx --yes -p typescript@5.8.3 tsc
       - name: Check type tests pass
-        run: npx --yes typescript@5.8.3 tsc --noEmit -p types/tests/tsconfig.json
+        run: npx --yes -p typescript@5.8.3 tsc --noEmit -p types/tests/tsconfig.json
   build-prerelease:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
