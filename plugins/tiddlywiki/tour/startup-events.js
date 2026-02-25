@@ -17,6 +17,8 @@ exports.synchronous = true;
 var CURRENT_TOUR_TITLE = "$:/config/CurrentTour";
 var CURRENT_STEP_TITLE = "$:/state/tour/step";
 var SHOW_TOUR_TITLE = "$:/config/ShowTour";
+var LAYOUT_TITLE = "$:/layout";
+var TUTORIAL_CENTER_LAYOUT_TITLE = "$:/plugins/tiddlywiki/tour/layouts/tutorial-center";
 
 function makeProgressTitle(tourTitle,suffix) {
 	if(!tourTitle) {
@@ -60,7 +62,7 @@ function getCompletedSteps(info) {
 	if(!info.completedStepsTitle) {
 		return [];
 	}
-	if($tw.wiki.getTiddlerText(info.completedStepsTitle + "!!completed","no") === "yes") {
+	if($tw.wiki.getTextReference(info.completedStepsTitle + "!!completed","no") === "yes") {
 		return getOrderedSteps(info);
 	}
 	return $tw.wiki.getTiddlerList(info.completedStepsTitle);
@@ -90,7 +92,7 @@ function getValidCompletedSteps(info,completedSteps) {
 	var steps = getOrderedSteps(info),
 		result = [];
 	$tw.utils.each(steps,function(stepTitle) {
-		if(completedSteps.indexOf(stepTitle) !== -1) {
+		if(completedSteps.includes(stepTitle)) {
 			result.push(stepTitle);
 		}
 	});
@@ -123,7 +125,7 @@ function progressStep(tourTitle,stepTitle) {
 		return;
 	}
 	completedSteps = getCompletedSteps(info);
-	if(completedSteps.indexOf(stepTitle) !== -1) {
+	if(completedSteps.includes(stepTitle)) {
 		return;
 	}
 	completedSteps.push(stepTitle);
@@ -140,7 +142,7 @@ function deprogressStep(tourTitle,stepTitle) {
 		return;
 	}
 	completedSteps = getCompletedSteps(info);
-	if(completedSteps.indexOf(stepTitle) === -1) {
+	if(!completedSteps.includes(stepTitle)) {
 		return;
 	}
 	completedSteps = $tw.utils.removeArrayEntries(completedSteps,[stepTitle]);
@@ -169,7 +171,7 @@ function persistProgressFromCurrentStep() {
 	}
 	completedSteps = getCompletedSteps(info);
 	for(index = 0; index < stepIndex; index++) {
-		if(completedSteps.indexOf(steps[index]) === -1) {
+		if(!completedSteps.includes(steps[index])) {
 			completedSteps.push(steps[index]);
 			changed = true;
 		}
@@ -205,7 +207,7 @@ function resumeTourFromSavedProgress() {
 	}
 	completedSteps = getCompletedSteps(info);
 	for(index = 0; index < steps.length; index++) {
-		if(completedSteps.indexOf(steps[index]) !== -1) {
+		if(completedSteps.includes(steps[index])) {
 			highestCompletedIndex = index;
 		}
 	}
@@ -223,25 +225,32 @@ function resumeTourFromSavedProgress() {
 }
 
 function buildPayload(event,tourTitle,stepTitle,completion,totalSteps) {
-	var payload = {
+	return {
 		tourTitle: tourTitle,
 		stepTitle: stepTitle,
 		completion: completion,
 		totalSteps: totalSteps,
 		event: event
 	};
-	return payload;
+}
+
+function isTourActiveContext() {
+	return $tw.wiki.getTiddlerText(SHOW_TOUR_TITLE,"hide") === "show" || $tw.wiki.getTiddlerText(LAYOUT_TITLE,"") === TUTORIAL_CENTER_LAYOUT_TITLE;
+}
+
+function runHeavySyncIfRelevant() {
+	if(!isTourActiveContext()) {
+		return;
+	}
+	persistProgressFromCurrentStep();
+	resumeTourFromSavedProgress();
 }
 
 exports.startup = function() {
-	persistProgressFromCurrentStep();
-	resumeTourFromSavedProgress();
+	runHeavySyncIfRelevant();
 	$tw.wiki.addEventListener("change",function(changes) {
-		if(changes[CURRENT_TOUR_TITLE] || changes[CURRENT_STEP_TITLE]) {
-			persistProgressFromCurrentStep();
-		}
-		if(changes[CURRENT_TOUR_TITLE] || changes[CURRENT_STEP_TITLE] || changes[SHOW_TOUR_TITLE]) {
-			resumeTourFromSavedProgress();
+		if(changes[CURRENT_TOUR_TITLE] || changes[CURRENT_STEP_TITLE] || changes[SHOW_TOUR_TITLE] || changes[LAYOUT_TITLE]) {
+			runHeavySyncIfRelevant();
 		}
 	});
 
@@ -289,7 +298,7 @@ exports.startup = function() {
 			stepTitle = paramObject.step || $tw.wiki.getTiddlerText(CURRENT_STEP_TITLE,""),
 			info = getTourInfo(tourTitle),
 			completedSteps = getCompletedSteps(info);
-		if(completedSteps.indexOf(stepTitle) === -1) {
+		if(!completedSteps.includes(stepTitle)) {
 			progressStep(tourTitle,stepTitle);
 		} else {
 			deprogressStep(tourTitle,stepTitle);

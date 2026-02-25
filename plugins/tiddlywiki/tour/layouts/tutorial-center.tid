@@ -67,7 +67,7 @@ languageTitle={{{ [{$:/language}get[name]] }}}
 								<$button class="tc-btn-invisible tc-tour-center-reset-icon" tooltip="Reset this walkthrough progress">
 									<$action-setfield $tiddler=<<actualCompletionTitle>> text="0"/>
 									<$list filter="[<completedStepsTitle>!is[blank]]" variable="ignore2">
-										<$action-setfield $tiddler=<<completedStepsTitle>> list=""/>
+										<$action-setfield $tiddler=<<completedStepsTitle>> list="" completed="no"/>
 									</$list>
 									{{$:/core/images/refresh-button}}
 								</$button>

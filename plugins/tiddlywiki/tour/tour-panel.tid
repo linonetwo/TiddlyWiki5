@@ -73,7 +73,7 @@ tags: $:/tags/PageTemplate
 <$let
 	currentTour={{$:/config/CurrentTour}}
 	tourTag={{{ [<currentTour>get[tour-tag]] }}}
-	totalSteps={{{ [all[shadows+tiddlers]tag<tourTag>count[]] }}}
+	totalSteps={{{ [all[shadows+tiddlers]tag<tourTag>count[]max[1]] }}}
 	completion={{{ [<currentTour>get[actualCompletion]get[text]else[0]] }}}
 	percentage={{{ [<completion>divide<totalSteps>multiply[100]] }}}
 >
