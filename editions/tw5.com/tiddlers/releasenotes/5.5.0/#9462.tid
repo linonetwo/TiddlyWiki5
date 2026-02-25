@@ -13,4 +13,3 @@ github-contributors: linonetwo
 * Add "Convert Markdown to WikiText on import" option
 ** Add import option list to allow register checkboxes on the import options panel
 * Two new editor toolbar buttons for formatting WikiText and converting Markdown to WikiText
-* Update the Convert Markdown icon to a clearer one-direction visual (Markdown → WikiText)
