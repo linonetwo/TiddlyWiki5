@@ -3,7 +3,7 @@ description: Add JSDoc parser AST type annotations and TS type-check pipeline
 tags: $:/tags/ChangeNote
 release: 5.5.0
 change-type: enhancement
-change-category: developer experience
+change-category: developer
 github-links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/8533
 github-contributors: linonetwo
 
