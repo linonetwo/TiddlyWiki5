@@ -152,7 +152,7 @@ test("Range transclusion renders all blocks between two anchors", async ({ page 
 	const tiddlerBody = page.locator('[data-tiddler-title="Anchor/Transclusion"] .tc-tiddler-body');
 	await expect(tiddlerBody, "Transclusion tiddler body is visible").toBeVisible({ timeout });
 
-	// Range transclusion: {{Anchor/Marks^BlockLevelLinksID1..^AddingIDforTitle}}
+	// Range transclusion: {{Anchor/Marks^BlockLevelLinksID1^AddingIDforTitle}}
 	// Should render: paragraph (BlockLevelLinksID1) + heading (AddingIDforTitle)
 
 	// The heading at the range end must be present

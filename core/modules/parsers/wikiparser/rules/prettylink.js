@@ -21,7 +21,9 @@ exports.types = {inline: true};
 exports.init = function(parser) {
 	this.parser = parser;
 	// Regexp to match `[[Alias|Title^anchor]]`, the `Alias|` and `^anchor` are optional.
-	this.matchRegExp = /\[\[(.*?)(?:\|(.*?)?)?(?:\^([^|\s^]+)?)?\]\]/mg;
+	// Note: no inner `?` after the capture groups — `[[Title|]]` (empty alias) or `[[Title^]]`
+	// (empty anchor) are not valid syntax and should not match.
+	this.matchRegExp = /\[\[(.*?)(?:\|(.*?))?(?:\^([^|\s^]+))?\]\]/mg;
 };
 
 exports.parse = function() {
