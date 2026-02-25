@@ -11,6 +11,13 @@ Tests for pluggable tiddler serializer modules.
 "use strict";
 
 describe("tiddlerserializer tests", function() {
+	if(!$tw.node) {
+		it("should only run in node.js", function() {
+			expect(true).toBe(true);
+		});
+		return;
+	}
+
 	var fs = require("fs"),
 		os = require("os"),
 		path = require("path");
