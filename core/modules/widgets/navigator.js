@@ -146,7 +146,7 @@ Handle a tm-navigate event
 NavigatorWidget.prototype.handleNavigateEvent = function(event) {
 	// Resolve alias before passing to hooks
 	if(event.navigateTo) {
-		var resolved = this.wiki.resolveAlias(event.navigateTo);
+		const resolved = this.wiki.resolveAlias(event.navigateTo);
 		if(resolved) {
 			event.navigateTo = resolved;
 		}

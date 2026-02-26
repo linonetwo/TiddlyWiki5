@@ -1536,13 +1536,13 @@ $tw.Wiki.prototype.defineTiddlerModules = function() {
 		}
 		// Register module aliases from the alias field
 		if(tiddler.hasField("alias")) {
-			var aliases = $tw.utils.parseStringArray(tiddler.fields.alias);
+			const aliases = $tw.utils.parseStringArray(tiddler.fields.alias);
 			if(aliases) {
-				for(var i = 0; i < aliases.length; i++) {
-					if($tw.utils.hop($tw.modules.aliases,aliases[i]) && $tw.modules.aliases[aliases[i]] !== tiddler.fields.title) {
-						console.log("Warning: Module alias '" + aliases[i] + "' redefined from '" + $tw.modules.aliases[aliases[i]] + "' to '" + tiddler.fields.title + "'");
+				for(const alias of aliases) {
+					if($tw.utils.hop($tw.modules.aliases,alias) && $tw.modules.aliases[alias] !== tiddler.fields.title) {
+						console.log(`Warning: Module alias '${alias}' redefined from '${$tw.modules.aliases[alias]}' to '${tiddler.fields.title}'`);
 					}
-					$tw.modules.aliases[aliases[i]] = tiddler.fields.title;
+					$tw.modules.aliases[alias] = tiddler.fields.title;
 				}
 			}
 		}
@@ -1567,13 +1567,13 @@ $tw.Wiki.prototype.defineShadowModules = function() {
 		}
 		// Register module aliases from the alias field (for shadow tiddlers not overridden)
 		if(!self.tiddlerExists(title) && tiddler.hasField("alias")) {
-			var aliases = $tw.utils.parseStringArray(tiddler.fields.alias);
+			const aliases = $tw.utils.parseStringArray(tiddler.fields.alias);
 			if(aliases) {
-				for(var i = 0; i < aliases.length; i++) {
-					if($tw.utils.hop($tw.modules.aliases,aliases[i]) && $tw.modules.aliases[aliases[i]] !== tiddler.fields.title) {
-						console.log("Warning: Module alias '" + aliases[i] + "' redefined from '" + $tw.modules.aliases[aliases[i]] + "' to '" + tiddler.fields.title + "'");
+				for(const alias of aliases) {
+					if($tw.utils.hop($tw.modules.aliases,alias) && $tw.modules.aliases[alias] !== tiddler.fields.title) {
+						console.log(`Warning: Module alias '${alias}' redefined from '${$tw.modules.aliases[alias]}' to '${tiddler.fields.title}'`);
 					}
-					$tw.modules.aliases[aliases[i]] = tiddler.fields.title;
+					$tw.modules.aliases[alias] = tiddler.fields.title;
 				}
 			}
 		}

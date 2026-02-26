@@ -528,17 +528,16 @@ exports.getTiddlerBacklinks = function(targetTitle) {
 	}
 	backlinks = backlinks.slice(0);
 	// Also include backlinks via aliases declared on the target tiddler
-	var targetTiddler = this.getTiddler(targetTitle);
+	const targetTiddler = this.getTiddler(targetTitle);
 	if(targetTiddler && targetTiddler.fields.alias) {
-		var aliases = $tw.utils.isArray(targetTiddler.fields.alias) ? targetTiddler.fields.alias : $tw.utils.parseStringArray(targetTiddler.fields.alias);
-		$tw.utils.each(aliases,function(alias) {
-			var aliasBacklinks = backIndexer.subIndexers.link.lookup(alias);
-			$tw.utils.each(aliasBacklinks,function(bl) {
+		const aliases = $tw.utils.isArray(targetTiddler.fields.alias) ? targetTiddler.fields.alias : $tw.utils.parseStringArray(targetTiddler.fields.alias);
+		for(const alias of aliases) {
+			for(const bl of backIndexer.subIndexers.link.lookup(alias)) {
 				if(backlinks.indexOf(bl) === -1) {
 					backlinks.push(bl);
 				}
-			});
-		});
+			}
+		}
 	}
 	return backlinks;
 };
@@ -621,17 +620,16 @@ exports.getTiddlerBacktranscludes = function(targetTitle) {
 	}
 	backtranscludes = backtranscludes.slice(0);
 	// Also include backtranscludes via aliases declared on the target tiddler
-	var targetTiddler = this.getTiddler(targetTitle);
+	const targetTiddler = this.getTiddler(targetTitle);
 	if(targetTiddler && targetTiddler.fields.alias) {
-		var aliases = $tw.utils.isArray(targetTiddler.fields.alias) ? targetTiddler.fields.alias : $tw.utils.parseStringArray(targetTiddler.fields.alias);
-		$tw.utils.each(aliases,function(alias) {
-			var aliasBacktranscludes = backIndexer.subIndexers.transclude.lookup(alias);
-			$tw.utils.each(aliasBacktranscludes,function(bt) {
+		const aliases = $tw.utils.isArray(targetTiddler.fields.alias) ? targetTiddler.fields.alias : $tw.utils.parseStringArray(targetTiddler.fields.alias);
+		for(const alias of aliases) {
+			for(const bt of backIndexer.subIndexers.transclude.lookup(alias)) {
 				if(backtranscludes.indexOf(bt) === -1) {
 					backtranscludes.push(bt);
 				}
-			});
-		});
+			}
+		}
 	}
 	return backtranscludes;
 };
@@ -1120,7 +1118,7 @@ exports.getTextReferenceParserInfo = function(title,field,index,options) {
 		tiddler = this.getTiddler(title);
 		// If not found, try resolving as an alias
 		if(!tiddler) {
-			var resolvedAliasTitle = this.resolveAlias(title);
+			const resolvedAliasTitle = this.resolveAlias(title);
 			if(resolvedAliasTitle && resolvedAliasTitle !== title) {
 				tiddler = this.getTiddler(resolvedAliasTitle);
 				title = resolvedAliasTitle;
@@ -1528,7 +1526,7 @@ exports.resolveAlias = function(title) {
 	}
 	// Look up the alias using the AliasIndexer
 	if(this.eachTiddlerPlusShadows.byAlias) {
-		var titles = this.eachTiddlerPlusShadows.byAlias(title);
+		const titles = this.eachTiddlerPlusShadows.byAlias(title);
 		if(titles && titles.length > 0) {
 			return titles[0];
 		}

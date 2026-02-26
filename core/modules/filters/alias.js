@@ -20,35 +20,37 @@ field value and will not correctly handle multi-value alias fields.
 Export our filter function
 */
 exports.alias = function(source,operator,options) {
-	var results = [],
-		aliasName = operator.operand;
+	const aliasName = operator.operand;
 	if(operator.prefix === "!") {
 		// Negated: return source tiddlers that do NOT have this alias
-		source(function(tiddler,title) {
-			var aliases = tiddler && tiddler.fields.alias
+		const results = [];
+		source((tiddler,title) => {
+			const aliases = tiddler && tiddler.fields.alias
 				? ($tw.utils.isArray(tiddler.fields.alias) ? tiddler.fields.alias : $tw.utils.parseStringArray(tiddler.fields.alias))
 				: [];
 			if(!aliases || aliases.indexOf(aliasName) === -1) {
 				results.push(title);
 			}
 		});
+		return results;
 	} else if(aliasName) {
 		// Use the AliasIndexer byAlias method when available (includes tiddlers and shadows)
 		if(options.wiki.eachTiddlerPlusShadows.byAlias) {
-			results = options.wiki.eachTiddlerPlusShadows.byAlias(aliasName);
-		} else {
-			// Fallback: scan all tiddlers manually
-			options.wiki.eachTiddlerPlusShadows(function(tiddler,title) {
-				if(tiddler && tiddler.fields.alias) {
-					var aliases = $tw.utils.isArray(tiddler.fields.alias)
-						? tiddler.fields.alias
-						: $tw.utils.parseStringArray(tiddler.fields.alias);
-					if(aliases && aliases.indexOf(aliasName) !== -1) {
-						results.push(title);
-					}
-				}
-			});
+			return options.wiki.eachTiddlerPlusShadows.byAlias(aliasName);
 		}
+		// Fallback: scan all tiddlers manually
+		const results = [];
+		options.wiki.eachTiddlerPlusShadows((tiddler,title) => {
+			if(tiddler && tiddler.fields.alias) {
+				const aliases = $tw.utils.isArray(tiddler.fields.alias)
+					? tiddler.fields.alias
+					: $tw.utils.parseStringArray(tiddler.fields.alias);
+				if(aliases && aliases.indexOf(aliasName) !== -1) {
+					results.push(title);
+				}
+			}
+		});
+		return results;
 	}
-	return results;
+	return [];
 };

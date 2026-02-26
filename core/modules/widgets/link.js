@@ -170,7 +170,7 @@ LinkWidget.prototype.handleClickEvent = function(event) {
 	// Send the click on its way as a navigate event
 	var bounds = this.domNodes[0].getBoundingClientRect();
 	// Navigate to the alias target if resolved, otherwise the original target
-	var navigateTarget = this.isAlias ? this.aliasTarget : this.to;
+	const navigateTarget = this.isAlias ? this.aliasTarget : this.to;
 	this.dispatchEvent({
 		type: "tm-navigate",
 		navigateTo: navigateTarget,
@@ -216,7 +216,7 @@ LinkWidget.prototype.execute = function() {
 	// Resolve alias: if the target doesn't exist as a tiddler, try to resolve it as an alias
 	this.aliasTarget = this.wiki.resolveAlias(this.to);
 	// Determine the link characteristics
-	var resolvedTarget = this.aliasTarget || this.to;
+	const resolvedTarget = this.aliasTarget || this.to;
 	this.isMissing = !this.wiki.tiddlerExists(resolvedTarget);
 	this.isShadow = this.wiki.isShadowTiddler(resolvedTarget);
 	this.isAlias = (this.aliasTarget !== null && this.aliasTarget !== this.to);
