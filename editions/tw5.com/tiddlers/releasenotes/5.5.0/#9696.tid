@@ -17,4 +17,4 @@ The [[RevealWidget]] popup now stays within its container by default. The existi
 * Shifts along both axes so the popup fits entirely within the container
 * For absolutely-positioned popups the boundary is the visible viewport
 
-The legacy `clamp` values `right`, `bottom` and `both` are unchanged. Use `clamp="none"` to reproduce the pre-5.5.0 behaviour of exact fixed-direction placement without any adjustment.
+The existing `clamp` values `right`, `bottom` and `both` are unchanged — they shift the popup to the container edge without flipping direction, useful when a fixed direction is desired. Use `clamp="none"` to reproduce the pre-5.5.0 behaviour of exact fixed-direction placement without any adjustment.

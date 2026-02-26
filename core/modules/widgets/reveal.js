@@ -203,9 +203,9 @@ RevealWidget.prototype.render = function(parent,nextSibling) {
 RevealWidget.prototype.positionPopup = function(domNode) {
 	domNode.style.position = "absolute";
 	domNode.style.zIndex = "1000";
-	var popupWidth = domNode.offsetWidth,
-		popupHeight = domNode.offsetHeight,
-		computedCoordinates = computePopupCoordinates(this.popup,this.position,popupWidth,popupHeight),
+	const popupWidth = domNode.offsetWidth,
+		popupHeight = domNode.offsetHeight;
+	let computedCoordinates = computePopupCoordinates(this.popup,this.position,popupWidth,popupHeight),
 		left = computedCoordinates.left,
 		top = computedCoordinates.top;
 	if(this.clampToParent === "auto") {
@@ -213,20 +213,21 @@ RevealWidget.prototype.positionPopup = function(domNode) {
 		computedCoordinates = chooseBestPopupCoordinates(domNode,this.popup,computedCoordinates.position,popupWidth,popupHeight);
 		left = computedCoordinates.left;
 		top = computedCoordinates.top;
-		var shiftedCoordinates = shiftPopupIntoContainer(domNode,this.popup,left,top,popupWidth,popupHeight);
+		const shiftedCoordinates = shiftPopupIntoContainer(domNode,this.popup,left,top,popupWidth,popupHeight);
 		left = shiftedCoordinates.left;
 		top = shiftedCoordinates.top;
 	} else if(this.clampToParent !== "none") {
-		// Legacy hard-clamp mode: shift coordinates without flipping direction.
+		// Hard-clamp mode: shift coordinates without flipping direction.
+		let parentWidth,parentHeight;
 		if(this.popup.absolute) {
-			var viewport = getViewportMetrics(),
-				parentWidth = viewport.innerWidth,
-				parentHeight = viewport.innerHeight;
+			const {innerWidth,innerHeight} = getViewportMetrics();
+			parentWidth = innerWidth;
+			parentHeight = innerHeight;
 		} else {
-			var parentWidth = domNode.offsetParent.offsetWidth,
-				parentHeight = domNode.offsetParent.offsetHeight;
+			parentWidth = domNode.offsetParent.offsetWidth;
+			parentHeight = domNode.offsetParent.offsetHeight;
 		}
-		var right = left + domNode.offsetWidth,
+		const right = left + domNode.offsetWidth,
 			bottom = top + domNode.offsetHeight;
 		if((this.clampToParent === "both" || this.clampToParent === "right") && right > parentWidth) {
 			left = parentWidth - domNode.offsetWidth;
@@ -242,7 +243,7 @@ RevealWidget.prototype.positionPopup = function(domNode) {
 	}
 	if(this.popup.absolute) {
 		// Traverse the offsetParent chain and correct the offset to make it relative to the parent node.
-		for(var offsetParentDomNode = domNode.offsetParent; offsetParentDomNode; offsetParentDomNode = offsetParentDomNode.offsetParent) {
+		for(let offsetParentDomNode = domNode.offsetParent; offsetParentDomNode; offsetParentDomNode = offsetParentDomNode.offsetParent) {
 			left -= offsetParentDomNode.offsetLeft;
 			top -= offsetParentDomNode.offsetTop;
 		}
@@ -270,8 +271,9 @@ RevealWidget.prototype.execute = function() {
 	this.openAnimation = this.animate === "no" ? undefined : "open";
 	this.closeAnimation = this.animate === "no" ? undefined : "close";
 	this.updatePopupPosition = this.getAttribute("updatePopupPosition","no") === "yes";
-	// clamp="auto" (default) flips direction and shifts to fit the container.
-	// clamp="none" disables all adjustment. clamp="right"/"bottom"/"both" hard-clamp without flipping (legacy).
+	// clamp="auto" (default) flips direction then shifts to fit the container.
+	// clamp="none" disables all adjustment.
+	// clamp="right"/"bottom"/"both" hard-clamp without flipping.
 	this.clampToParent = this.getAttribute("clamp","auto");
 	// Compute the title of the state tiddler and read it
 	this.stateTiddlerTitle = this.state;
