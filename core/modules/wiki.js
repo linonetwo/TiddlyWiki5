@@ -623,7 +623,6 @@ exports.getTiddlerBacktranscludes = function(targetTitle) {
 	// Also include backtranscludes via aliases declared on the target tiddler
 	var targetTiddler = this.getTiddler(targetTitle);
 	if(targetTiddler && targetTiddler.fields.alias) {
-		var self = this;
 		var aliases = $tw.utils.isArray(targetTiddler.fields.alias) ? targetTiddler.fields.alias : $tw.utils.parseStringArray(targetTiddler.fields.alias);
 		$tw.utils.each(aliases,function(alias) {
 			var aliasBacktranscludes = backIndexer.subIndexers.transclude.lookup(alias);
@@ -1089,6 +1088,13 @@ exports.parseTextReference = function(title,field,index,options) {
 	var parserInfo;
 	if(!options.subTiddler) {
 		if(field === "text" || (!field && !index)) {
+			// Resolve alias if the tiddler doesn't exist under this title
+			if(!this.getTiddler(title)) {
+				var resolvedAliasTitle = this.resolveAlias(title);
+				if(resolvedAliasTitle && resolvedAliasTitle !== title) {
+					title = resolvedAliasTitle;
+				}
+			}
 			this.getTiddlerText(title); // Force the tiddler to be lazily loaded
 			return this.parseTiddler(title,options);
 		}
