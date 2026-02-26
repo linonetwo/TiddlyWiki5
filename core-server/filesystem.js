@@ -549,7 +549,7 @@ exports.cleanupTiddlerFiles = function(options,callback) {
 	if(adaptorInfo.filepath && bootInfo.filepath && adaptorInfo.filepath !== bootInfo.filepath) {
 		$tw.utils.deleteTiddlerFile(adaptorInfo,function(err) {
 			if(err) {
-				if((err.code == "EPERM" || err.code == "EACCES") && err.syscall == "unlink") {
+				if((err.code === "EPERM" || err.code === "EACCES") && err.syscall === "unlink") {
 					// Error deleting the previous file on disk, should fail gracefully
 					$tw.syncer.displayError("Server desynchronized. Error cleaning up previous file for tiddler: \""+title+"\"",err);
 					return callback(null,bootInfo);
@@ -564,10 +564,10 @@ exports.cleanupTiddlerFiles = function(options,callback) {
 		if(fs.existsSync(oldMetaPath)) {
 			fs.unlink(oldMetaPath,function(err) {
 				if(err) {
-					if(err.code == "ENOENT") {
+					if(err.code === "ENOENT") {
 						return callback(null,bootInfo);
 					}
-					if((err.code == "EPERM" || err.code == "EACCES") && err.syscall == "unlink") {
+					if((err.code === "EPERM" || err.code === "EACCES") && err.syscall === "unlink") {
 						$tw.syncer.displayError("Server desynchronized. Error cleaning up previous metafile for tiddler: \"" + title + "\"",err);
 						return callback(null,bootInfo);
 					}
