@@ -75,6 +75,9 @@ LinkWidget.prototype.renderLink = function(parent,nextSibling) {
 		if(this.isShadow) {
 			classes.push("tc-tiddlylink-shadow");
 		}
+		if(this.isAlias) {
+			classes.push("tc-tiddlylink-alias");
+		}
 		if(this.isMissing && !this.isShadow) {
 			classes.push("tc-tiddlylink-missing");
 		} else {
@@ -166,9 +169,11 @@ LinkWidget.prototype.renderLink = function(parent,nextSibling) {
 LinkWidget.prototype.handleClickEvent = function(event) {
 	// Send the click on its way as a navigate event
 	var bounds = this.domNodes[0].getBoundingClientRect();
+	// Navigate to the alias target if resolved, otherwise the original target
+	var navigateTarget = this.isAlias ? this.aliasTarget : this.to;
 	this.dispatchEvent({
 		type: "tm-navigate",
-		navigateTo: this.to,
+		navigateTo: navigateTarget,
 		navigateFromTitle: this.getVariable("storyTiddler"),
 		navigateFromNode: this,
 		navigateFromClientRect: { top: bounds.top, left: bounds.left, width: bounds.width, right: bounds.right, bottom: bounds.bottom, height: bounds.height
@@ -208,9 +213,13 @@ LinkWidget.prototype.execute = function() {
 	this.startActions = this.getAttribute("startactions");
 	this.endActions = this.getAttribute("endactions");
 	this.linkTag = this.getAttribute("tag","a");
+	// Resolve alias: if the target doesn't exist as a tiddler, try to resolve it as an alias
+	this.aliasTarget = this.wiki.resolveAlias(this.to);
 	// Determine the link characteristics
-	this.isMissing = !this.wiki.tiddlerExists(this.to);
-	this.isShadow = this.wiki.isShadowTiddler(this.to);
+	var resolvedTarget = this.aliasTarget || this.to;
+	this.isMissing = !this.wiki.tiddlerExists(resolvedTarget);
+	this.isShadow = this.wiki.isShadowTiddler(resolvedTarget);
+	this.isAlias = (this.aliasTarget !== null && this.aliasTarget !== this.to);
 	this.hideMissingLinks = (this.getVariable("tv-show-missing-links") || "yes") === "no";
 	// Make the child widgets
 	var templateTree;
@@ -228,7 +237,7 @@ Selectively refreshes the widget if needed. Returns true if the widget or any of
 */
 LinkWidget.prototype.refresh = function(changedTiddlers) {
 	var changedAttributes = this.computeAttributes();
-	if($tw.utils.count(changedAttributes) > 0 || changedTiddlers[this.to]) {
+	if($tw.utils.count(changedAttributes) > 0 || changedTiddlers[this.to] || (this.aliasTarget && changedTiddlers[this.aliasTarget])) {
 		this.refreshSelf();
 		return true;
 	}

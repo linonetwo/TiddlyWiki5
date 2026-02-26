@@ -526,7 +526,21 @@ exports.getTiddlerBacklinks = function(targetTitle) {
 		});
 		return backlinks;
 	}
-	return backlinks.slice(0);
+	backlinks = backlinks.slice(0);
+	// Also include backlinks via aliases declared on the target tiddler
+	var targetTiddler = this.getTiddler(targetTitle);
+	if(targetTiddler && targetTiddler.fields.alias) {
+		var aliases = $tw.utils.isArray(targetTiddler.fields.alias) ? targetTiddler.fields.alias : $tw.utils.parseStringArray(targetTiddler.fields.alias);
+		$tw.utils.each(aliases,function(alias) {
+			var aliasBacklinks = backIndexer.subIndexers.link.lookup(alias);
+			$tw.utils.each(aliasBacklinks,function(bl) {
+				if(backlinks.indexOf(bl) === -1) {
+					backlinks.push(bl);
+				}
+			});
+		});
+	}
+	return backlinks;
 };
 
 
@@ -605,7 +619,22 @@ exports.getTiddlerBacktranscludes = function(targetTitle) {
 	if(!backtranscludes) {
 		return [];
 	}
-	return backtranscludes.slice(0);
+	backtranscludes = backtranscludes.slice(0);
+	// Also include backtranscludes via aliases declared on the target tiddler
+	var targetTiddler = this.getTiddler(targetTitle);
+	if(targetTiddler && targetTiddler.fields.alias) {
+		var self = this;
+		var aliases = $tw.utils.isArray(targetTiddler.fields.alias) ? targetTiddler.fields.alias : $tw.utils.parseStringArray(targetTiddler.fields.alias);
+		$tw.utils.each(aliases,function(alias) {
+			var aliasBacktranscludes = backIndexer.subIndexers.transclude.lookup(alias);
+			$tw.utils.each(aliasBacktranscludes,function(bt) {
+				if(backtranscludes.indexOf(bt) === -1) {
+					backtranscludes.push(bt);
+				}
+			});
+		});
+	}
+	return backtranscludes;
 };
 
 /*
@@ -618,7 +647,8 @@ exports.getMissingTitles = function() {
 	this.forEachTiddler(function(title,tiddler) {
 		var links = self.getTiddlerLinks(title);
 		$tw.utils.each(links,function(link) {
-			if((!self.tiddlerExists(link) && !self.isShadowTiddler(link)) && missing.indexOf(link) === -1) {
+			// resolveAlias returns truthy (the title or resolved alias) if the tiddler exists or has an alias
+			if(!self.resolveAlias(link) && missing.indexOf(link) === -1) {
 				missing.push(link);
 			}
 		});
@@ -1082,6 +1112,14 @@ exports.getTextReferenceParserInfo = function(title,field,index,options) {
 		tiddler = this.getSubTiddler(title,options.subTiddler);
 	} else {
 		tiddler = this.getTiddler(title);
+		// If not found, try resolving as an alias
+		if(!tiddler) {
+			var resolvedAliasTitle = this.resolveAlias(title);
+			if(resolvedAliasTitle && resolvedAliasTitle !== title) {
+				tiddler = this.getTiddler(resolvedAliasTitle);
+				title = resolvedAliasTitle;
+			}
+		}
 	}
 	if(field === "text" || (!field && !index)) {
 		if(tiddler && tiddler.fields) {
@@ -1470,6 +1508,26 @@ exports.getTiddlerText = function(title,defaultText) {
 		// Indicate that the text is being loaded
 		return null;
 	}
+};
+
+/*
+Resolve an alias to a real tiddler title. Returns the resolved title if an alias matches,
+or null if no alias is found. Titles that match an existing tiddler or shadow tiddler take
+priority over aliases (ie aliases are only resolved when no tiddler with that title exists).
+*/
+exports.resolveAlias = function(title) {
+	// If a tiddler or shadow already exists with this title, no alias resolution needed
+	if(this.tiddlerExists(title) || this.isShadowTiddler(title)) {
+		return title;
+	}
+	// Look up the alias using the AliasIndexer
+	if(this.eachTiddlerPlusShadows.byAlias) {
+		var titles = this.eachTiddlerPlusShadows.byAlias(title);
+		if(titles && titles.length > 0) {
+			return titles[0];
+		}
+	}
+	return null;
 };
 
 /*
