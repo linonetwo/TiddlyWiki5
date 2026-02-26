@@ -6,9 +6,11 @@ tags: $:/tags/Image
   <g transform="translate(0, 0) scale(0.55)" fill="currentColor">
     <path d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm4 12.5v-4l2 2 2-2v4h2v-7h-2l-2 2-2-2H5v7h2zm11-3v-4h-2v4h-2l3 3 3-3h-2z"/>
   </g>
-  <g transform="translate(9.5, 11) scale(0.55)" fill="currentColor">
-    <path d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z m4 5.5 v2 h2 v5 h2 v-5 h2 v-2 h-6 z m8 0 v2 h2 v-2 h-2 z m0 3 v4 h2 v-4 h-2 z"/>
+  <g transform="translate(8.6, 11.0) scale(0.58)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.5" y="4" width="19" height="16" rx="1" stroke-width="1.6"/>
+    <path d="M4.7 8.5h7 M8.2 8.5v7" stroke-width="2.2"/>
+    <path d="M11.9 8.5l2 7 1.7-4 1.7 4 2-7" stroke-width="2.1"/>
   </g>
-  <path d="M 12.5 6 Q 16 6 16 11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-  <path d="M 14 9 L 16 11.5 L 18 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 12.2 5.8 Q 16.8 5.8 16.8 12.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 16.8 12.2 L 19.8 9.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
 </svg>
