@@ -90,7 +90,7 @@ describe("Reveal popup positioning tests", function() {
 		expect(domNode.style.top).toBe("220px");
 	});
 
-	// autoPosition=no: raw coordinates placed without adjustment.
+	// clamp="none": raw coordinates placed without adjustment.
 	it("should keep legacy fixed-direction behavior when clamp is none", function() {
 		var domNode = createDomNode(120,80),
 			widgetState = createRevealWidgetState({

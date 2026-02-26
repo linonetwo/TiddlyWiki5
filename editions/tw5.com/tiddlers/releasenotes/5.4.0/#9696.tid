@@ -1,0 +1,17 @@
+title: $:/changenotes/5.4.0/#9696
+description: Auto-position popup via clamp="auto" attribute
+release: 5.4.0
+tags: $:/tags/ChangeNote
+change-type: improvement
+change-category: usability
+github-links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/9696
+github-contributors: linonetwo
+
+The [[RevealWidget]] popup now stays within its container by default. The existing `clamp` attribute gains a new value `"auto"` which becomes the default:
+
+* Prefers the requested `position` direction
+* Flips to the opposite direction (e.g. `below` → `above`) when the preferred side would overflow the container
+* Shifts along both axes so the popup fits entirely within the container
+* For absolutely-positioned popups the boundary is the visible viewport
+
+The legacy `clamp` values `right`, `bottom` and `both` are unchanged. Use `clamp="none"` to reproduce the pre-5.4.0 behaviour of exact fixed-direction placement without any adjustment.
