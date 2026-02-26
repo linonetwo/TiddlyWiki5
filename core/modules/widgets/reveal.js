@@ -33,15 +33,16 @@ var POPUP_POSITION_OPPOSITES = {
 	belowright: "aboveright"
 };
 
-var POPUP_AUTO_POSITION_PADDING = 5;
+const POPUP_AUTO_POSITION_PADDING = 5;
 
 function getViewportMetrics() {
-	var win = typeof window !== "undefined" ? window : (typeof global !== "undefined" ? global.window : undefined);
+	const win = typeof window !== "undefined" ? window
+		: (typeof global !== "undefined" ? global.window : undefined);
 	return {
-		innerWidth: win && typeof win.innerWidth === "number" ? win.innerWidth : 1024,
-		innerHeight: win && typeof win.innerHeight === "number" ? win.innerHeight : 768,
-		pageXOffset: win && typeof win.pageXOffset === "number" ? win.pageXOffset : 0,
-		pageYOffset: win && typeof win.pageYOffset === "number" ? win.pageYOffset : 0
+		innerWidth: (win && typeof win.innerWidth === "number") ? win.innerWidth : 1024,
+		innerHeight: (win && typeof win.innerHeight === "number") ? win.innerHeight : 768,
+		pageXOffset: (win && typeof win.pageXOffset === "number") ? win.pageXOffset : 0,
+		pageYOffset: (win && typeof win.pageYOffset === "number") ? win.pageYOffset : 0
 	};
 }
 
@@ -50,17 +51,17 @@ function getViewportMetrics() {
 // so the bound is simply [0, offsetParent.offsetWidth] x [0, offsetParent.offsetHeight].
 // For absolute popups, coordinates are page-absolute, so we use the viewport rect.
 function getContainerBounds(domNode,popup) {
-	var padding = POPUP_AUTO_POSITION_PADDING;
+	const padding = POPUP_AUTO_POSITION_PADDING;
 	if(popup.absolute) {
-		var vp = getViewportMetrics();
+		const {pageXOffset,pageYOffset,innerWidth,innerHeight} = getViewportMetrics();
 		return {
-			minX: vp.pageXOffset + padding,
-			minY: vp.pageYOffset + padding,
-			maxX: vp.pageXOffset + vp.innerWidth - padding,
-			maxY: vp.pageYOffset + vp.innerHeight - padding
+			minX: pageXOffset + padding,
+			minY: pageYOffset + padding,
+			maxX: pageXOffset + innerWidth - padding,
+			maxY: pageYOffset + innerHeight - padding
 		};
 	}
-	var offsetParent = domNode.offsetParent;
+	const offsetParent = domNode.offsetParent;
 	if(!offsetParent) {
 		return {minX: padding, minY: padding, maxX: 9999, maxY: 9999};
 	}
@@ -73,7 +74,7 @@ function getContainerBounds(domNode,popup) {
 }
 
 function computePopupCoordinates(popup,position,popupWidth,popupHeight) {
-	var left,top;
+	let left,top;
 	switch(position) {
 		case "left":
 			left = popup.left - popupWidth;
@@ -109,17 +110,13 @@ function computePopupCoordinates(popup,position,popupWidth,popupHeight) {
 			position = "below";
 			break;
 	}
-	return {
-		position: position,
-		left: left,
-		top: top
-	};
+	return {position,left,top};
 }
 
 // Compute overflow of a popup rect (in container coordinates) against the container bounds.
 // Returns {total, top, left, right, bottom} where each is pixels of overflow (0 = no overflow).
 function getContainerOverflow(bounds,left,top,popupWidth,popupHeight) {
-	var overflowLeft = Math.max(0,bounds.minX - left),
+	const overflowLeft = Math.max(0,bounds.minX - left),
 		overflowTop = Math.max(0,bounds.minY - top),
 		overflowRight = Math.max(0,(left + popupWidth) - bounds.maxX),
 		overflowBottom = Math.max(0,(top + popupHeight) - bounds.maxY);
@@ -133,7 +130,7 @@ function getContainerOverflow(bounds,left,top,popupWidth,popupHeight) {
 }
 
 function getAutoPositionCandidates(position) {
-	var preferred = position || "below",
+	const preferred = position || "below",
 		opposite = POPUP_POSITION_OPPOSITES[preferred] || "above",
 		candidates = [preferred];
 	if(opposite !== preferred) {
@@ -144,16 +141,14 @@ function getAutoPositionCandidates(position) {
 
 // Choose the best direction (preferred vs opposite) by comparing overflow inside the container.
 function chooseBestPopupCoordinates(domNode,popup,position,popupWidth,popupHeight) {
-	var bounds = getContainerBounds(domNode,popup),
-		candidates = getAutoPositionCandidates(position),
-		best,
-		i;
-	for(i=0; i<candidates.length; i++) {
-		var candidate = computePopupCoordinates(popup,candidates[i],popupWidth,popupHeight),
-			overflow = getContainerOverflow(bounds,candidate.left,candidate.top,popupWidth,popupHeight),
-			score = overflow.total;
+	const bounds = getContainerBounds(domNode,popup),
+		candidates = getAutoPositionCandidates(position);
+	let best = null;
+	for(const candidatePosition of candidates) {
+		const candidate = computePopupCoordinates(popup,candidatePosition,popupWidth,popupHeight),
+			{total: score} = getContainerOverflow(bounds,candidate.left,candidate.top,popupWidth,popupHeight);
 		if(!best || score < best.score) {
-			best = {candidate: candidate, score: score};
+			best = {candidate,score};
 		}
 	}
 	return best ? best.candidate : computePopupCoordinates(popup,position,popupWidth,popupHeight);
@@ -161,9 +156,8 @@ function chooseBestPopupCoordinates(domNode,popup,position,popupWidth,popupHeigh
 
 // After choosing the best direction, shift the popup to fit inside the container.
 function shiftPopupIntoContainer(domNode,popup,left,top,popupWidth,popupHeight) {
-	var bounds = getContainerBounds(domNode,popup),
-		deltaX = 0,
-		deltaY = 0;
+	const bounds = getContainerBounds(domNode,popup);
+	let deltaX = 0,deltaY = 0;
 	if(left < bounds.minX) {
 		deltaX = bounds.minX - left;
 	} else if(left + popupWidth > bounds.maxX) {
@@ -174,7 +168,7 @@ function shiftPopupIntoContainer(domNode,popup,left,top,popupWidth,popupHeight) 
 	} else if(top + popupHeight > bounds.maxY) {
 		deltaY = bounds.maxY - (top + popupHeight);
 	}
-	return {left: left + deltaX, top: top + deltaY};
+	return {left: left + deltaX,top: top + deltaY};
 }
 
 /*
