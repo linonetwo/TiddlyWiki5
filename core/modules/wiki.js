@@ -526,20 +526,7 @@ exports.getTiddlerBacklinks = function(targetTitle) {
 		});
 		return backlinks;
 	}
-	backlinks = backlinks.slice(0);
-	// Also include backlinks via aliases declared on the target tiddler
-	const targetTiddler = this.getTiddler(targetTitle);
-	if(targetTiddler && targetTiddler.fields.alias) {
-		const aliases = $tw.utils.isArray(targetTiddler.fields.alias) ? targetTiddler.fields.alias : $tw.utils.parseStringArray(targetTiddler.fields.alias);
-		for(const alias of aliases) {
-			for(const bl of backIndexer.subIndexers.link.lookup(alias)) {
-				if(backlinks.indexOf(bl) === -1) {
-					backlinks.push(bl);
-				}
-			}
-		}
-	}
-	return backlinks;
+	return backlinks.slice(0);
 };
 
 
@@ -618,20 +605,7 @@ exports.getTiddlerBacktranscludes = function(targetTitle) {
 	if(!backtranscludes) {
 		return [];
 	}
-	backtranscludes = backtranscludes.slice(0);
-	// Also include backtranscludes via aliases declared on the target tiddler
-	const targetTiddler = this.getTiddler(targetTitle);
-	if(targetTiddler && targetTiddler.fields.alias) {
-		const aliases = $tw.utils.isArray(targetTiddler.fields.alias) ? targetTiddler.fields.alias : $tw.utils.parseStringArray(targetTiddler.fields.alias);
-		for(const alias of aliases) {
-			for(const bt of backIndexer.subIndexers.transclude.lookup(alias)) {
-				if(backtranscludes.indexOf(bt) === -1) {
-					backtranscludes.push(bt);
-				}
-			}
-		}
-	}
-	return backtranscludes;
+	return backtranscludes.slice(0);
 };
 
 /*
@@ -644,8 +618,7 @@ exports.getMissingTitles = function() {
 	this.forEachTiddler(function(title,tiddler) {
 		var links = self.getTiddlerLinks(title);
 		$tw.utils.each(links,function(link) {
-			// resolveAlias returns truthy (the title or resolved alias) if the tiddler exists or has an alias
-			if(!self.resolveAlias(link) && missing.indexOf(link) === -1) {
+			if((!self.tiddlerExists(link) && !self.isShadowTiddler(link)) && missing.indexOf(link) === -1) {
 				missing.push(link);
 			}
 		});
@@ -1086,13 +1059,6 @@ exports.parseTextReference = function(title,field,index,options) {
 	var parserInfo;
 	if(!options.subTiddler) {
 		if(field === "text" || (!field && !index)) {
-			// Resolve alias if the tiddler doesn't exist under this title
-			if(!this.getTiddler(title)) {
-				var resolvedAliasTitle = this.resolveAlias(title);
-				if(resolvedAliasTitle && resolvedAliasTitle !== title) {
-					title = resolvedAliasTitle;
-				}
-			}
 			this.getTiddlerText(title); // Force the tiddler to be lazily loaded
 			return this.parseTiddler(title,options);
 		}
@@ -1116,14 +1082,6 @@ exports.getTextReferenceParserInfo = function(title,field,index,options) {
 		tiddler = this.getSubTiddler(title,options.subTiddler);
 	} else {
 		tiddler = this.getTiddler(title);
-		// If not found, try resolving as an alias
-		if(!tiddler) {
-			const resolvedAliasTitle = this.resolveAlias(title);
-			if(resolvedAliasTitle && resolvedAliasTitle !== title) {
-				tiddler = this.getTiddler(resolvedAliasTitle);
-				title = resolvedAliasTitle;
-			}
-		}
 	}
 	if(field === "text" || (!field && !index)) {
 		if(tiddler && tiddler.fields) {
@@ -1512,26 +1470,6 @@ exports.getTiddlerText = function(title,defaultText) {
 		// Indicate that the text is being loaded
 		return null;
 	}
-};
-
-/*
-Resolve an alias to a real tiddler title. Returns the resolved title if an alias matches,
-or null if no alias is found. Titles that match an existing tiddler or shadow tiddler take
-priority over aliases (ie aliases are only resolved when no tiddler with that title exists).
-*/
-exports.resolveAlias = function(title) {
-	// If a tiddler or shadow already exists with this title, no alias resolution needed
-	if(this.tiddlerExists(title) || this.isShadowTiddler(title)) {
-		return title;
-	}
-	// Look up the alias using the AliasIndexer
-	if(this.eachTiddlerPlusShadows.byAlias) {
-		const titles = this.eachTiddlerPlusShadows.byAlias(title);
-		if(titles && titles.length > 0) {
-			return titles[0];
-		}
-	}
-	return null;
 };
 
 /*

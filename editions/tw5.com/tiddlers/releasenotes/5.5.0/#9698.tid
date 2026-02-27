@@ -1,14 +1,37 @@
-change-category: core
-change-type: new feature
+change-category: hackability
+change-type: feature
 created: 20260226000000000
-description: Add alias field support for require, navigation, links, transclude and backlinks
+description: Add module-alias field for require() alias resolution in JavaScript modules
 github-contributors: linonetwo
 github-links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/9698
-modified: 20260226000000000
+modified: 20260227000000000
 release: 5.5.0
 tags: $:/tags/ChangeNote
 title: $:/changenotes/5.5.0/#9698
 type: text/vnd.tiddlywiki
+
+Adds a new `module-alias` tiddler field that allows JavaScript library tiddlers to declare one or more short names for use with `require()`.
+
+Plugin developers can now write:
+
+```
+module-alias: prosemirror-model
+```
+
+on a library tiddler at `$:/plugins/myplugin/lib/prosemirror-model.js`, and any JavaScript module inside that plugin can then call:
+
+```javascript
+const {Node} = require("prosemirror-model");
+```
+
+instead of the full tiddler path. This resolves the problem described in [[issue #8999|https://github.com/TiddlyWiki/TiddlyWiki5/issues/8999]].
+
+Notes:
+
+* The field value uses the same string-array format as `tags` (space-separated; use `[[double brackets]]` for names containing spaces)
+* Real module titles always take priority over aliases
+* Duplicate alias warnings are logged to the console
+
 
 Adds a new `alias` tiddler field (string array format, same as `tags`/`list`) that allows a tiddler to declare one or more alternative names.
 

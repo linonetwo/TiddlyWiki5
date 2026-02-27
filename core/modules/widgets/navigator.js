@@ -144,13 +144,6 @@ NavigatorWidget.prototype.addToHistory = function(title,fromPageRect) {
 Handle a tm-navigate event
 */
 NavigatorWidget.prototype.handleNavigateEvent = function(event) {
-	// Resolve alias before passing to hooks
-	if(event.navigateTo) {
-		const resolved = this.wiki.resolveAlias(event.navigateTo);
-		if(resolved) {
-			event.navigateTo = resolved;
-		}
-	}
 	event = $tw.hooks.invokeHook("th-navigating",event);
 	if(event.navigateTo) {
 		this.addToStory(event.navigateTo,event.navigateFromTitle);

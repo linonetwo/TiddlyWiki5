@@ -1136,8 +1136,8 @@ $tw.modules.define("$:/boot/tiddlerfields/list","tiddlerfield",{
 	parse: $tw.utils.parseStringArray,
 	stringify: $tw.utils.stringifyList
 });
-$tw.modules.define("$:/boot/tiddlerfields/alias","tiddlerfield",{
-	name: "alias",
+$tw.modules.define("$:/boot/tiddlerfields/module-alias","tiddlerfield",{
+	name: "module-alias",
 	parse: $tw.utils.parseStringArray,
 	stringify: $tw.utils.stringifyList
 });
@@ -1534,9 +1534,9 @@ $tw.Wiki.prototype.defineTiddlerModules = function() {
 					break;
 			}
 		}
-		// Register module aliases from the alias field
-		if(tiddler.hasField("alias")) {
-			const aliases = $tw.utils.parseStringArray(tiddler.fields.alias);
+		// Register module aliases from the module-alias field
+		if(tiddler.hasField("module-alias")) {
+			const aliases = $tw.utils.parseStringArray(tiddler.fields["module-alias"]);
 			if(aliases) {
 				for(const alias of aliases) {
 					if($tw.utils.hop($tw.modules.aliases,alias) && $tw.modules.aliases[alias] !== tiddler.fields.title) {
@@ -1565,9 +1565,9 @@ $tw.Wiki.prototype.defineShadowModules = function() {
 			// Define the module
 			$tw.modules.define(tiddler.fields.title,tiddler.fields["module-type"],tiddler.fields.text);
 		}
-		// Register module aliases from the alias field (for shadow tiddlers not overridden)
-		if(!self.tiddlerExists(title) && tiddler.hasField("alias")) {
-			const aliases = $tw.utils.parseStringArray(tiddler.fields.alias);
+		// Register module aliases from the module-alias field (for shadow tiddlers not overridden)
+		if(!self.tiddlerExists(title) && tiddler.hasField("module-alias")) {
+			const aliases = $tw.utils.parseStringArray(tiddler.fields["module-alias"]);
 			if(aliases) {
 				for(const alias of aliases) {
 					if($tw.utils.hop($tw.modules.aliases,alias) && $tw.modules.aliases[alias] !== tiddler.fields.title) {
