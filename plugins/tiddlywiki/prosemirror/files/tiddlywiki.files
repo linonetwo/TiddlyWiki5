@@ -1,0 +1,178 @@
+{
+"tiddlers": [
+{
+"file": "prosemirror-model.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-model",
+"module-type": "library",
+"module-alias": "prosemirror-model"
+}
+},{
+"file": "prosemirror-state.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-state",
+"module-type": "library",
+"module-alias": "prosemirror-state"
+}
+},{
+"file": "prosemirror-view.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-view",
+"module-type": "library",
+"module-alias": "prosemirror-view"
+}
+},{
+"file": "prosemirror.css",
+"fields": {
+"type": "text/css",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror.css",
+"tags": "[[$:/tags/Stylesheet]]"
+}
+},{
+"file": "prosemirror-flat-list.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-flat-list",
+"module-type": "library",
+"module-alias": "prosemirror-flat-list"
+}
+},{
+"file": "prosemirror-flat-list.css",
+"fields": {
+"type": "text/css",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-flat-list.css",
+"tags": "[[$:/tags/Stylesheet]]"
+}
+},{
+"file": "prosemirror-schema-basic.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-schema-basic",
+"module-type": "library",
+"module-alias": "prosemirror-schema-basic"
+}
+},{
+"file": "orderedmap.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/orderedmap",
+"module-type": "library",
+"module-alias": "orderedmap"
+}
+},{
+"file": "prosemirror-transform.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-transform",
+"module-type": "library",
+"module-alias": "prosemirror-transform"
+}
+},{
+"file": "prosemirror-keymap.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-keymap",
+"module-type": "library",
+"module-alias": "prosemirror-keymap"
+}
+},{
+"file": "prosemirror-history.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-history",
+"module-type": "library",
+"module-alias": "prosemirror-history"
+}
+},{
+"file": "prosemirror-commands.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-commands",
+"module-type": "library",
+"module-alias": "prosemirror-commands"
+}
+},{
+"file": "prosemirror-dropcursor.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-dropcursor",
+"module-type": "library",
+"module-alias": "prosemirror-dropcursor"
+}
+},{
+"file": "prosemirror-gapcursor.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-gapcursor",
+"module-type": "library",
+"module-alias": "prosemirror-gapcursor"
+}
+},{
+"file": "prosemirror-menu.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-menu",
+"module-type": "library",
+"module-alias": "prosemirror-menu"
+}
+},{
+"file": "menu.css",
+"fields": {
+"type": "text/css",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/menu.css",
+"tags": "[[$:/tags/Stylesheet]]"
+}
+},{
+"file": "prosemirror-inputrules.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-inputrules",
+"module-type": "library",
+"module-alias": "prosemirror-inputrules"
+}
+},{
+"file": "w3c-keyname.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/w3c-keyname",
+"module-type": "library",
+"module-alias": "w3c-keyname"
+}
+},{
+"file": "crelt.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/crelt",
+"module-type": "library",
+"module-alias": "crelt"
+}
+},{
+"file": "rope-sequence.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/rope-sequence",
+"module-type": "library",
+"module-alias": "rope-sequence"
+}
+},{
+"file": "prosemirror-safari-ime-span.cjs",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-safari-ime-span",
+"module-type": "library",
+"module-alias": "prosemirror-safari-ime-span"
+}
+},{
+"file": "prosemirror-slash-menu.js",
+"fields": {
+"type": "application/javascript",
+"title": "$:/plugins/tiddlywiki/prosemirror/lib/prosemirror-slash-menu",
+"module-type": "library",
+"module-alias": "prosemirror-slash-menu"
+}
+}
+]
+}

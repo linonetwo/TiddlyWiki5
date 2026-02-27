@@ -99,4 +99,63 @@ describe("module-alias field tests", () => {
 		});
 	});
 
+	// ─── prosemirror plugin integration: library titles + module-alias ───────
+	// Verifies that the prosemirror plugin's tiddlywiki.files declares each JS
+	// library tiddler with a proper $:/plugins/... title AND a module-alias that
+	// matches what require() calls in the plugin source use.
+
+	describe("prosemirror plugin library tiddlers (module-alias integration)", () => {
+		// The known short names used by require() in the prosemirror plugin source
+		const KNOWN_ALIASES = [
+			"prosemirror-model",
+			"prosemirror-state",
+			"prosemirror-view",
+			"prosemirror-transform",
+			"prosemirror-keymap",
+			"prosemirror-history",
+			"prosemirror-commands",
+			"prosemirror-dropcursor",
+			"prosemirror-gapcursor",
+			"prosemirror-menu",
+			"prosemirror-inputrules",
+			"prosemirror-schema-basic",
+			"prosemirror-flat-list",
+			"orderedmap",
+			"rope-sequence",
+			"crelt",
+			"w3c-keyname"
+		];
+		const PLUGIN_PREFIX = "$:/plugins/tiddlywiki/prosemirror/lib/";
+
+		// After the test wiki boots, the prosemirror plugin tiddlers should be
+		// registered as shadow modules. Check $tw.modules.aliases to verify.
+		it("all known prosemirror require() short names should be registered as module aliases", () => {
+			for(const alias of KNOWN_ALIASES) {
+				const resolved = $tw.modules.aliases[alias];
+				expect(resolved).withContext(`module-alias '${alias}' should be registered`).toBeDefined();
+				if(resolved) {
+					expect(resolved).withContext(`alias '${alias}' should resolve to a $:/plugins/... title`).toContain(PLUGIN_PREFIX);
+				}
+			}
+		});
+
+		it("the real title for prosemirror-model should use plugin prefix", () => {
+			const resolvedTitle = $tw.modules.aliases["prosemirror-model"];
+			expect(resolvedTitle).toBe(`${PLUGIN_PREFIX}prosemirror-model`);
+		});
+
+		it("require('prosemirror-model') via execute() should return a module with exports", () => {
+			// The prosemirror plugin must be loaded — if it isn't (e.g. the test
+			// edition doesn't include it) this test is skipped gracefully.
+			if(!$tw.modules.aliases["prosemirror-model"]) {
+				pending("prosemirror plugin not loaded in this test edition");
+				return;
+			}
+			const exports = $tw.modules.execute("prosemirror-model");
+			expect(exports).toBeDefined();
+			// prosemirror-model always exports a Schema constructor
+			expect(exports.Schema).toBeDefined();
+		});
+	});
+
 });
