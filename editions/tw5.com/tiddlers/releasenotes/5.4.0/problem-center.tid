@@ -1,0 +1,19 @@
+title: $:/changenotes/5.4.0/problem-center
+description: Add centralized runtime problem registry and Problems sidebar tab
+release: 5.4.0
+tags: $:/tags/ChangeNote
+change-type: enhancement
+change-category: core
+
+a new centralized runtime problem registry has been added for browser diagnostics.
+
+Highlights:
+
+* new API entrypoint `$tw.reportProblem(...)`
+* browser registry object `$tw.problemRegistry`
+* snapshot diff helper `$tw.diffProblemSnapshots(...)`
+* new sidebar tab [[$:/core/ui/SideBar/Problems]]
+* bridge from `logger.alert()` into structured problems
+* hook pipe-mode missing-return diagnostics integrated into registry
+
+The feature makes it easier for users and automation tools to detect newly introduced runtime problems.

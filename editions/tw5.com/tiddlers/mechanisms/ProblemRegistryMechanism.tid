@@ -1,0 +1,66 @@
+title: ProblemRegistryMechanism
+tags: Mechanisms Features
+type: text/vnd.tiddlywiki
+
+The ProblemRegistryMechanism provides a centralized way to collect runtime diagnostics and display them in a sidebar tab called <<.sidebar-tab Problems>>.
+
+It is designed to complement, not replace, the [[AlertMechanism]]. Alerts remain lightweight user notifications, while the problem registry keeps structured diagnostic records for debugging and automation.
+
+! Problem Sources
+
+Problems can be reported from JavaScript via:
+
+```js
+$tw.reportProblem({
+  owner: "my-plugin/module",
+  resource: "SomeTiddlerTitle",
+  severity: "warning", // error | warning | info | hint
+  code: "my-code",
+  message: "Something happened",
+  details: { extra: true },
+  tags: ["my-plugin"]
+});
+```
+
+Some core pathways also bridge into this mechanism, such as `logger.alert()` and hook pipe-mode missing-return diagnostics.
+
+! Registry API
+
+The browser runtime exposes `$tw.problemRegistry` with utility methods such as:
+
+* `report(problem)`
+* `setProblems(owner,resource,problems)`
+* `list(filter)`
+* `getSummary()`
+* `clearProblem(problemKey)`
+* `clearAll()`
+* `takeSnapshot()`
+* `diffSnapshots(before,after)`
+
+The helper `$tw.diffProblemSnapshots(before,after)` is also provided.
+
+! UI Projection
+
+Problems are projected to temporary tiddlers with the tag [[$:/tags/Problem]] and rendered by [[$:/core/ui/SideBar/Problems]].
+
+Supporting temporary titles include:
+
+* `$:/temp/problems/problem-*`
+* `$:/temp/problems/summary`
+
+Each projected problem tiddler stores fields such as `severity`, `owner`, `resource`, `code`, `count`, and `problem-key`.
+
+! Sidebar Actions
+
+The Problems sidebar tab supports:
+
+* clearing all problems with `tm-clear-problems`
+* clearing one problem with `tm-clear-problem`
+
+These messages are handled by the startup registry wiring.
+
+! Typical Workflow
+
+# Perform an action in the wiki (or in plugin code)
+# Inspect the <<.sidebar-tab Problems>> tab
+# Use snapshot diffing (`takeSnapshot()` + `diffSnapshots()`) to check if new diagnostics were introduced

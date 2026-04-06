@@ -9,6 +9,11 @@ Missing/Caption: Missing
 More/Caption: More
 Open/Caption: Open
 Orphans/Caption: Orphans
+Problems/Caption: Problems
+Problems/ClearAll: clear all
+Problems/Empty: No problems detected
+Problems/ResourceLabel: Resource
+Problems/SummaryPrefix: Total
 Recent/Caption: Recent
 Shadows/Caption: Shadows
 System/Caption: System

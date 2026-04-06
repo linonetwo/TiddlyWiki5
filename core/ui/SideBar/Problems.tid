@@ -1,0 +1,27 @@
+title: $:/core/ui/SideBar/Problems
+tags: $:/tags/SideBar
+caption: {{$:/language/SideBar/Problems/Caption}}
+
+\whitespace trim
+
+<div class="tc-sidebar-tab-open tc-sidebar-tab-problems">
+<div class="tc-sidebar-tab-open-item">
+<$button message="tm-clear-problems" class="tc-btn-invisible tc-btn-mini"><$text text={{$:/language/SideBar/Problems/ClearAll}}/></$button>
+<span class="tc-tiny-gap-left tc-muted"><$text text={{$:/language/SideBar/Problems/SummaryPrefix}}/> <$text text={{$:/temp/problems/summary!!total}}/></span>
+</div>
+<$list filter="[all[shadows+tiddlers]tag[$:/tags/Problem]!is[draft]sort[modified]reverse[]]" emptyMessage={{$:/language/SideBar/Problems/Empty}}>
+<div class="tc-sidebar-tab-open-item">
+<$button message="tm-clear-problem" param=<<currentTiddler>> class="tc-btn-invisible tc-btn-mini tc-small-gap-right" tooltip={{$:/language/Buttons/Close/Hint}} aria-label={{$:/language/Buttons/Close/Caption}}>{{$:/core/images/close-button}}</$button>
+<span class="tc-muted"><$view field="severity"/></span>
+<span class="tc-tiny-gap-left"><$view field="owner"/></span>
+<br>
+<span><$text text={{!!text}}/></span>
+<br>
+<$let problemResource={{!!resource}}>
+<span class="tc-muted"><$text text={{$:/language/SideBar/Problems/ResourceLabel}}/>: </span>
+<$list filter="[<problemResource>is[tiddler]]" variable="resourceTitle"><$link to=<<resourceTitle>><$text text=<<resourceTitle>>/></$link></$list>
+<$list filter="[<problemResource>!is[tiddler]]"><$text text=<<problemResource>>/></$list>
+</$let>
+</div>
+</$list>
+</div>

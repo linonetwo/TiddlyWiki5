@@ -72,7 +72,17 @@ Alert a message
 Logger.prototype.alert = function(/* args */) {
 	if(this.enable) {
 		// Prepare the text of the alert
-		var text = Array.prototype.join.call(arguments," ");
+		const text = Array.prototype.join.call(arguments," ");
+		if($tw.reportProblem) {
+			$tw.reportProblem({
+				owner: this.componentName ? `logger/${this.componentName}` : "logger",
+				resource: "$:/temp/problems/global",
+				severity: "warning",
+				code: "logger-alert",
+				message: text,
+				tags: ["logger","alert"]
+			});
+		}
 		// Create alert tiddlers in the browser
 		if($tw.browser) {
 			// Check if there is an existing alert with the same text and the same component
