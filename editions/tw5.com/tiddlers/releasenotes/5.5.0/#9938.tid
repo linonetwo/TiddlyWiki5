@@ -8,3 +8,5 @@ github-links: https://github.com/TiddlyWiki/TiddlyWiki5/pull/9938
 github-contributors: linonetwo
 
 Editor preview types can now specify a `condition` filter to control their visibility. The EditWidget provides the selected editor as `tv-editor-type` for use in these filters. Preview types without a condition remain available to all editors.
+
+Editor type mappings ignore leading and trailing whitespace, so a trailing newline in a configuration tiddler does not prevent the editor and its toolbar from loading.
