@@ -57,6 +57,21 @@ describe("Editor preview conditions", function() {
 		expect(widget.children[0].getVariable("tv-editor-type")).toBe("custom");
 	});
 
+	it("trims editor mapping text before choosing a widget and exposing its context", function() {
+		const wiki = makeWiki();
+		wiki.addTiddler({title: "$:/config/EditorTypeMappings/text/vnd.tiddlywiki",text: " custom\n"});
+		const widget = makeEditWidget(wiki);
+		expect(widget.editorType).toBe("custom");
+		expect(widget.children[0].getVariable("tv-editor-type")).toBe("custom");
+	});
+
+	it("uses the default editor when a mapping contains only whitespace", function() {
+		const wiki = makeWiki();
+		wiki.addTiddler({title: "$:/config/EditorTypeMappings/text/vnd.tiddlywiki",text: " \n"});
+		const widget = makeEditWidget(wiki);
+		expect(widget.children[0].getVariable("tv-editor-type")).toBe("text");
+	});
+
 	it("keeps unconditional previews available to the default editor", function() {
 		const html = render(makeWiki(),"text");
 		expect(html).toContain("Always caption");
