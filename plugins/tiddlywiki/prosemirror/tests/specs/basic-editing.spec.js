@@ -184,6 +184,7 @@ test.describe("ProseMirror Editor - Integration", () => {
 		const importFrame = page.locator('.tc-tiddler-frame[data-tiddler-title="$:/Import"]');
 		await pastePlainText(editor, "Pasted text");
 		await expect(importFrame).toHaveCount(0);
-		await expect(editor).toContainText("Pasted text");
+		await expect(editor).toHaveText("Pasted text");
+		await expect.poll(() => page.evaluate(() => $tw.wiki.getTiddlerText("$:/plugins/tiddlywiki/prosemirror/example"))).toBe("Pasted text");
 	});
 });

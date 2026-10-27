@@ -13,6 +13,27 @@ describe("ProseMirror source safety", () => {
 	const to = require("$:/plugins/tiddlywiki/prosemirror/ast/to-prosemirror.js").to;
 	const schema = require("$:/plugins/tiddlywiki/prosemirror/core/schema.js").buildSchema();
 	const type = "text/vnd.tiddlywiki";
+	const Fragment = require("prosemirror-model").Fragment;
+
+	["pragma_block", "opaque_block", "opaque_inline", "typed_block"].forEach((name) => {
+		it("includes the current source of " + name + " in plain text", () => {
+			const node = schema.nodes[name].create({
+				rawText: "Current source\nSecond line",
+				twSourceText: "Previous source"
+			});
+			const fragment = Fragment.from(node);
+			expect(fragment.textBetween(0,fragment.size)).toBe("Current source\nSecond line");
+		});
+	});
+
+	it("includes inline source between surrounding selected text", () => {
+		const paragraph = schema.nodes.paragraph.create(null,[
+			schema.text("Before "),
+			schema.nodes.opaque_inline.create({ rawText: "<<now>>" }),
+			schema.text(" after")
+		]);
+		expect(paragraph.textBetween(0,paragraph.content.size)).toBe("Before <<now>> after");
+	});
 
 	function checkSource(input) {
 		const doc = schema.nodeFromJSON(shared.parseWikiTextToDoc($tw.wiki,type,input));

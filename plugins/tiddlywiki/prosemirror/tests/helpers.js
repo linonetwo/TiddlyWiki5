@@ -71,11 +71,16 @@ function selectAllEditorContent(editor) {
 
 async function pastePlainText(editor, text) {
 	await editor.evaluate((el, t) => {
-		const dt = new DataTransfer();
-		dt.setData("text/plain", t);
-		const evt = new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true });
+		const evt = new ClipboardEvent("paste", { bubbles: true, cancelable: true });
+		// Firefox protects data in script-created DataTransfer objects. Supply
+		// the clipboard read interface directly and let ProseMirror handle the
+		// event once, just as it handles a user paste.
+		Object.defineProperty(evt, "clipboardData", { value: {
+			getData(type) { return type === "text/plain" ? t : ""; },
+			types: ["text/plain"],
+			files: []
+		} });
 		el.dispatchEvent(evt);
-		try { el.ownerDocument.execCommand("insertText", false, t); } catch(e) { /* ignore */ }
 	}, text);
 }
 

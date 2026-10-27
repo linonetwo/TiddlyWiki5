@@ -61,6 +61,10 @@ WikiText constructs that cannot be safely represented as editable ProseMirror st
 
 Use the slash menu to insert a 3 by 3 table with a header row. Typed blocks for WikiText, Markdown, HTML, SVG, CSS, JavaScript and JSON can also be inserted from the slash menu and edited through their block controls.
 
+!! Copy and paste
+
+Copy and cut include source-backed nodes in the clipboard's plain text. Inline constructs keep their source spelling; pragmas and unsupported blocks keep their source; typed blocks contribute their body text. Pasting into a plain-text editor therefore includes that content. The clipboard also carries structured HTML so pasting back into the visual editor retains those node types and their attributes.
+
 !! Current scope
 
 This is an experimental editor. Source preservation is preferred over pretending that unsupported WikiText is fully editable. When exact visual semantics are unavailable, the editor keeps the original source in an isolated node instead of discarding it.

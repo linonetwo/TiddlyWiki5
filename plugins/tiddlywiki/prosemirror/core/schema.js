@@ -15,6 +15,13 @@ const { schema: basicSchema } = require("prosemirror-schema-basic");
 const { createListSpec } = require("prosemirror-flat-list");
 const getSourceAttrSpec = require("$:/plugins/tiddlywiki/prosemirror/ast/source-preservation.js").getSourceAttrSpec;
 
+// Source atoms keep their body in attrs rather than text children. ProseMirror
+// uses leafText for plain-text clipboard output (including cut), so include
+// the current source body alongside ordinary selected text.
+function sourceLeafText(node) {
+	return node.attrs.rawText;
+}
+
 // prosemirror-tables — conditional require (not available in Node tests)
 let pmTables;
 try {
@@ -129,6 +136,7 @@ function buildSchema() {
 		pragma_block: {
 			attrs: { rawText: { default: "" }, firstLine: { default: "" } },
 			group: "block", atom: true, selectable: true, draggable: true,
+			leafText: sourceLeafText,
 			toDOM(node) {
 				return ["div", {
 					class: "pm-pragma-block",
@@ -150,6 +158,7 @@ function buildSchema() {
 		opaque_block: {
 			attrs: { rawText: { default: "" }, firstLine: { default: "" }, parseTreeJson: { default: null }, autoEdit: { default: false } },
 			group: "block", atom: true, selectable: true, draggable: false,
+			leafText: sourceLeafText,
 			toDOM(node) {
 				const attrs = {
 					class: "pm-opaque-block",
@@ -175,6 +184,7 @@ function buildSchema() {
 		opaque_inline: {
 			attrs: { rawText: { default: "" }, firstLine: { default: "" }, parseTreeJson: { default: null } },
 			group: "inline", inline: true, atom: true, selectable: true, draggable: false,
+			leafText: sourceLeafText,
 			toDOM(node) {
 				const attrs = {
 					class: "pm-opaque-inline",
@@ -223,6 +233,7 @@ function buildSchema() {
 		typed_block: {
 			attrs: { rawText: { default: "" }, parseType: { default: "" }, renderType: { default: null }, autoEdit: { default: false } },
 			group: "block", atom: true, selectable: true, draggable: true,
+			leafText: sourceLeafText,
 			toDOM(node) {
 				const attrs = {
 					class: "pm-typed-block",
