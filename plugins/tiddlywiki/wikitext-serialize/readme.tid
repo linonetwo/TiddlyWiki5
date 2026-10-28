@@ -2,6 +2,8 @@ title: $:/plugins/tiddlywiki/wikitext-serialize/readme
 
 This plugin turns a WikiText parse tree back into WikiText: `$tw.utils.serializeWikitextParseTree(tree, options)`. With `options.source`, the text the tree was parsed from, node positions reproduce the original formatting byte for byte; without it every rule rebuilds its syntax from the tree alone.
 
+When a source-backed node has been edited, the serializer rebuilds that node from the current tree. Unchanged neighbouring nodes can still retain their original syntax. Source verification reparses the original text once per serialization and checks the complete node, including attributes and parameters; the tree-only editor path needs no verification parse. Supply `options.wiki` when the tree belongs to another wiki and `options.parseAsInline: true` when its source was parsed inline. Caller-owned trees and options remain unchanged.
+
 !! Building trees: `$tw.utils.wikitextParseTree`
 
 An editor that writes WikiText builds its parse tree with the factory instead of spelling rule names and tags. Every node carries exactly what the serializer needs and no positions. The test `test-wikitext-parsetree-factory.js` shows every function with the text it produces.

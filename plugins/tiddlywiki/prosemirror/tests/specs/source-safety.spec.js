@@ -4,6 +4,29 @@ const { test, expect } = require("@playwright/test");
 const { setupProseMirrorTest } = require("../helpers.js");
 
 test.describe("ProseMirror Editor - Source safety", () => {
+	test("companion serializer edits reach the source and the visual document", async ({ page }) => {
+		const title = "SourceSafeSerializerMutation";
+		const source = "<<now    'YYYY'>>\n\n```js\nkeep this suffix\n```\n\n* keep this suffix";
+		const editor = await setupProseMirrorTest(page,title,{
+			useReadmeTiddler: false, initialText: source
+		});
+		await page.evaluate((title) => {
+			const original = $tw.wiki.getTiddlerText(title);
+			const tree = $tw.wiki.parseText("text/vnd.tiddlywiki",original).tree;
+			tree[1].attributes.code.value = "keep";
+			tree[1].attributes.language.value = "css";
+			tree[2].children[0].children[0].text = "keep";
+			$tw.wiki.setText(title,"text",null,$tw.utils.serializeWikitextParseTree(tree,{source: original}));
+		},title);
+		await expect.poll(() => page.evaluate((title) => $tw.wiki.getTiddlerText(title),title)).toBe("<<now    'YYYY'>>\n\n```css\nkeep\n```\n\n* keep");
+		await expect(editor.locator("pre code")).toHaveText("keep");
+		await expect(editor.locator(".list-content")).toHaveText("keep");
+		const codeBlock = editor.locator(".pm-nodeview-codeblock");
+		await codeBlock.hover();
+		await codeBlock.locator(".pm-nodeview-btn-source").click();
+		await expect(editor.locator("textarea.pm-nodeview-editor")).toHaveValue(/^```css\nkeep\n```\n*$/);
+	});
+
 	test("editing a neighbour preserves table caption, class, alignment and spans", async ({ page }) => {
 		const title = "SourceSafeTable";
 		const table = "|caption|c\n|my-class|k\n|!A|!B|\n|one | two|\n|~|three|";
