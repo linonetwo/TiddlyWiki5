@@ -52,6 +52,22 @@ class CommandMenuView {
 		this.selectedId = null;
 		this.visible = false;
 		this.destroyed = false;
+		this.anchorRect = null;
+		this.anchorScrollX = 0;
+		this.anchorScrollY = 0;
+		this.getAnchorRect = null;
+		this.positionFrame = null;
+		this.onViewportChange = (event) => {
+			// Scrolling the command list must not reposition it or scroll the
+			// selected option back into view while the user browses the list.
+			if(event && event.target && event.target.nodeType && this.root.contains(event.target)) return;
+			const win = this.document.defaultView;
+			if(!this.visible || !win || this.positionFrame !== null) return;
+			this.positionFrame = win.requestAnimationFrame(() => {
+				this.positionFrame = null;
+				this.reposition();
+			});
+		};
 		this.menuId = "tc-editor-command-menu-" + (++nextMenuId);
 		this._buildDOM(options);
 	}
@@ -140,6 +156,7 @@ class CommandMenuView {
 			this.selectedId = this.filteredCommands.length > 0 ? this.filteredCommands[0].id : null;
 		}
 		this.render();
+		this.reposition();
 	}
 
 	_findCommand(id) {
@@ -335,20 +352,69 @@ class CommandMenuView {
 		}
 	}
 
-	show(anchorRect) {
+	show(anchorRect, getAnchorRect) {
 		if(this.destroyed || !anchorRect) {
 			return;
 		}
+		this.anchorRect = anchorRect;
+		const win = this.document.defaultView;
+		this.anchorScrollX = win && win.scrollX || 0;
+		this.anchorScrollY = win && win.scrollY || 0;
+		this.getAnchorRect = getAnchorRect || null;
 		this.visible = true;
 		this.root.style.display = "flex";
 		if(this.searchInput) {
 			this.searchInput.setAttribute("aria-expanded", "true");
 		}
-		this.position(anchorRect);
+		this.reposition();
+		this.listenToViewport(true);
 		if(this.searchInput) {
 			this.searchInput.focus();
 		} else {
 			this.content.focus();
+		}
+	}
+
+	listenToViewport(listen) {
+		const win = this.document.defaultView;
+		if(!win) return;
+		const method = listen ? "addEventListener" : "removeEventListener";
+		win[method]("resize", this.onViewportChange);
+		this.document[method]("scroll", this.onViewportChange, true);
+		if(win.visualViewport) {
+			win.visualViewport[method]("resize", this.onViewportChange);
+			win.visualViewport[method]("scroll", this.onViewportChange);
+		}
+		if(!listen && this.positionFrame !== null) {
+			win.cancelAnimationFrame(this.positionFrame);
+			this.positionFrame = null;
+		}
+	}
+
+	reposition() {
+		if(!this.visible || this.destroyed) return;
+		const win = this.document.defaultView;
+		const scrollX = win && win.scrollX || 0;
+		const scrollY = win && win.scrollY || 0;
+		let rect = this.anchorRect;
+		if(this.getAnchorRect) {
+			try {
+				const current = this.getAnchorRect();
+				if(current) {
+					rect = this.anchorRect = current;
+					this.anchorScrollX = scrollX;
+					this.anchorScrollY = scrollY;
+				}
+			} catch(e) {
+				// An editor may remove the anchor before hiding its menu.
+				// The last known rectangle still permits viewport clamping.
+			}
+		}
+		if(rect) {
+			const dx = this.anchorScrollX - scrollX;
+			const dy = this.anchorScrollY - scrollY;
+			this.position({ left: rect.left + dx, right: rect.right + dx,
+				top: rect.top + dy, bottom: rect.bottom + dy });
 		}
 	}
 
@@ -362,24 +428,34 @@ class CommandMenuView {
 		}
 		const scrollX = win.scrollX || 0;
 		const scrollY = win.scrollY || 0;
+		const viewport = win.visualViewport;
+		const viewportLeft = viewport ? viewport.offsetLeft : 0;
+		const viewportTop = viewport ? viewport.offsetTop : 0;
+		const viewportWidth = viewport ? viewport.width : win.innerWidth;
+		const viewportHeight = viewport ? viewport.height : win.innerHeight;
+		this.root.style.setProperty("--tc-editor-command-menu-viewport-width", viewportWidth + "px");
+		this.root.style.setProperty("--tc-editor-command-menu-viewport-height", viewportHeight + "px");
 		this.root.style.left = (anchorRect.left + scrollX) + "px";
 		this.root.style.top = (anchorRect.bottom + 5 + scrollY) + "px";
 		const menuRect = this.root.getBoundingClientRect();
 		const documentDirection = this.document.documentElement.getAttribute("dir");
 		const rtl = documentDirection === "rtl";
 		const idealLeft = rtl ? anchorRect.right - menuRect.width : anchorRect.left;
-		const maxLeft = Math.max(4, win.innerWidth - menuRect.width - 8);
-		const left = Math.min(Math.max(4, idealLeft), maxLeft);
-		const fitsBelow = anchorRect.bottom + 5 + menuRect.height <= win.innerHeight;
+		const maxLeft = Math.max(viewportLeft + 4, viewportLeft + viewportWidth - menuRect.width - 8);
+		const left = Math.min(Math.max(viewportLeft + 4, idealLeft), maxLeft);
+		const fitsBelow = anchorRect.bottom + 5 + menuRect.height <= viewportTop + viewportHeight;
 		const idealTop = fitsBelow ? anchorRect.bottom + 5 : anchorRect.top - menuRect.height - 5;
-		const maxTop = Math.max(4, win.innerHeight - menuRect.height - 8);
-		const top = Math.min(Math.max(4, idealTop), maxTop);
+		const maxTop = Math.max(viewportTop + 4, viewportTop + viewportHeight - menuRect.height - 8);
+		const top = Math.min(Math.max(viewportTop + 4, idealTop), maxTop);
 		this.root.style.left = (left + scrollX) + "px";
 		this.root.style.top = (top + scrollY) + "px";
 	}
 
 	hide() {
 		this.visible = false;
+		this.listenToViewport(false);
+		this.anchorRect = null;
+		this.getAnchorRect = null;
 		if(this.root) {
 			this.root.style.display = "none";
 		}
@@ -392,6 +468,7 @@ class CommandMenuView {
 		if(this.destroyed) {
 			return;
 		}
+		this.hide();
 		this.destroyed = true;
 		if(this.root && this.root.parentNode) {
 			this.root.parentNode.removeChild(this.root);

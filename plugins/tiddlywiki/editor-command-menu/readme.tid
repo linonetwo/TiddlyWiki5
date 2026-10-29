@@ -29,3 +29,5 @@ Empty context lists mean unrestricted. Draft tiddlers and descriptors without `c
 The tag list of `$:/tags/EditorCommand` supplies explicit ordering. Remaining entries sort by label within their category. Search is case-insensitive and all whitespace-separated search terms must occur in the label, description or keywords.
 
 The menu uses a combobox/listbox interaction when searchable. It supports arrow keys, Home, End, Enter, Escape, pointer selection and IME composition. Icons are restricted to sanitised inline SVG. Every menu instance belongs to the explicitly supplied document and must be destroyed by its owner.
+
+`show(anchorRect, getAnchorRect)` accepts an optional callback that returns the current anchor rectangle after editor reflow. While visible, the menu follows scrolling and viewport changes, including the visual viewport, and constrains its size to the available space. Filtering also updates its position. Viewport listeners and pending positioning callbacks are removed when the menu is hidden or destroyed.

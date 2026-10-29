@@ -424,7 +424,17 @@ class DragHandleController {
 		const handleRect = this.handle.getBoundingClientRect();
 		this.commandMenu.setCommands(commands);
 		this.commandMenu.setFilter("");
-		this.commandMenu.show(handleRect);
+		this.commandMenu.show(handleRect, () => {
+			const blockDOM = this.currentView && this.currentView.nodeDOM(this.currentBlockPos);
+			if(!blockDOM || !blockDOM.getBoundingClientRect) return null;
+			const blockRect = blockDOM.getBoundingClientRect();
+			// The block follows editor reflow even while the handle is pinned
+			// for an open menu. Keep the popup near the same block's gutter.
+			const rtl = helpers.isRTL(this.currentView.dom.ownerDocument);
+			const edge = rtl ? blockRect.right + 6 : blockRect.left - handleRect.width - 6;
+			return { left: edge, right: edge + handleRect.width,
+				top: blockRect.top, bottom: blockRect.top + handleRect.height };
+		});
 		const doc = this.ownerDocument || this.currentView.dom.ownerDocument;
 		doc.removeEventListener("mousedown", this.closeOnOutsideClick);
 		this.safeTimeout(() => {

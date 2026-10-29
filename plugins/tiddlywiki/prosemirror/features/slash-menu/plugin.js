@@ -223,7 +223,10 @@ function createSlashMenuPlugin(options) {
 					} catch(e) {
 						rect = view.dom.getBoundingClientRect();
 					}
-					menu.show(rect);
+					menu.show(rect, function() {
+						const current = SlashMenuKey.getState(editorView.state);
+						return current && current.open ? editorView.coordsAtPos(current.to) : null;
+					});
 					view.dom.ownerDocument.addEventListener("mousedown", closeOnOutsidePointer);
 				} else if(!isOpen && wasOpen) {
 					menu.hide();

@@ -2,8 +2,8 @@
 	position: absolute;
 	display: flex;
 	flex-direction: column;
-	max-height: 320px;
-	width: min(300px, calc(100vw - 16px));
+	max-height: min(320px, calc(var(--tc-editor-command-menu-viewport-height, 100vh) - 16px));
+	width: min(300px, calc(var(--tc-editor-command-menu-viewport-width, 100vw) - 16px));
 	z-index: 1000;
 	overflow: hidden;
 	border: 1px solid transparent;

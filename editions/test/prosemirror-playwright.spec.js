@@ -109,6 +109,43 @@ async function expectReadablePlaceholder(search) {
 }
 
 test.describe("ProseMirror command surfaces", () => {
+	for(const surface of["slash", "block"]) {
+		test(surface + " menu stays usable after viewport shrink and filter changes", async ({ page }) => {
+			await page.setViewportSize({ width: 1280, height: 720 });
+			const title = "MenuViewport/" + surface;
+			const editor = await createEditor(page,title,"Viewport paragraph");
+			if(surface === "slash") {
+				await editor.locator("p").click();
+				await moveToBlockStart(editor);
+				await editor.press("Slash");
+			} else {
+				await editor.locator("p").hover();
+				await page.locator(".tc-prosemirror-drag-handle:visible").click();
+			}
+			const menu = page.locator(".tc-editor-command-menu:visible");
+			const search = menu.locator(".tc-editor-command-menu-search");
+			await expect(search).toBeFocused();
+			await page.setViewportSize({ width: 390, height: 250 });
+			const expectInViewport = async () => {
+				await expect.poll(async () => {
+					const box = await menu.boundingBox();
+					return !!box && box.x >= 0 && box.y >= 0 &&
+						box.x + box.width <= 391 && box.y + box.height <= 251;
+				}).toBe(true);
+			};
+			await expectInViewport();
+			await search.fill("heading 2");
+			await expectInViewport();
+			await search.fill("");
+			await expectInViewport();
+			await search.fill("heading 2");
+			await search.press("Enter");
+			await expect(menu).toBeHidden();
+			await expect(editor.locator("h2")).toHaveText("Viewport paragraph");
+			await expect.poll(() => page.evaluate((title) => $tw.wiki.getTiddlerText(title),title)).toBe("!! Viewport paragraph");
+		});
+	}
+
 	test("slash menu filters in a real input and executes a native command", async ({ page }) => {
 		const editor = await createEditor(page, "SlashCommandTest", "");
 		await editor.click();

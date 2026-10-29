@@ -18,11 +18,13 @@ npx playwright install chromium firefox --with-deps
 # projects makes PR CI extremely slow while mostly retesting editor model logic.
 npx playwright test --project=chromium --workers=2 || exit 1
 
-# Keep cross-browser coverage focused on the full TiddlyWiki browser test page
-# and ProseMirror smoke/installation/clipboard tests. Full Firefox/Edge runs are still available
-# locally with `npx playwright test --project=firefox` or `--project=edge`.
+# Keep cross-browser coverage focused on the full TiddlyWiki browser test page,
+# command menu layout and ProseMirror smoke/installation/clipboard tests.
+# Full Firefox/Edge runs are still available locally with
+# `npx playwright test --project=firefox` or `--project=edge`.
 npx playwright test \
 	editions/test \
+	plugins/tiddlywiki/editor-command-menu/tests/menu-view.spec.js \
 	plugins/tiddlywiki/prosemirror/tests/smoke.spec.js \
 	plugins/tiddlywiki/prosemirror/tests/specs/installation.spec.js \
 	plugins/tiddlywiki/prosemirror/tests/specs/clipboard.spec.js \
