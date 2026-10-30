@@ -109,6 +109,31 @@ async function expectReadablePlaceholder(search) {
 }
 
 test.describe("ProseMirror command surfaces", () => {
+	test("RTL block menu stays in the gutter and duplicates the intended block", async ({ page }) => {
+		await page.setViewportSize({ width: 390, height: 844 });
+		const title = "RTLBlockMenuTest";
+		const editor = await createEditor(page,title,"مرحبا بالعالم\n\nשלום עולם");
+		await page.evaluate(() => document.documentElement.setAttribute("dir","rtl"));
+		const paragraph = editor.locator("p").first();
+		await paragraph.hover();
+		const handle = page.locator(".tc-prosemirror-drag-handle:visible");
+		await expect(handle).toBeVisible();
+		const paragraphBox = await paragraph.boundingBox();
+		const handleBox = await handle.boundingBox();
+		expect(handleBox.x).toBeGreaterThanOrEqual(paragraphBox.x + paragraphBox.width - 2);
+		expect(handleBox.x + handleBox.width).toBeLessThanOrEqual(390);
+		await handle.click();
+		const menu = page.locator(".tc-editor-command-menu:visible");
+		await expect(menu).toBeVisible();
+		const menuBox = await menu.boundingBox();
+		expect(menuBox.x).toBeGreaterThanOrEqual(0);
+		expect(menuBox.x + menuBox.width).toBeLessThanOrEqual(390);
+		await menu.locator("input").fill("duplicate");
+		await menu.locator("input").press("Enter");
+		await expect(editor.locator("p")).toHaveText(["مرحبا بالعالم", "مرحبا بالعالم", "שלום עולם"]);
+		await expect.poll(() => page.evaluate((title) => $tw.wiki.getTiddlerText(title),title)).toBe("مرحبا بالعالم\n\nمرحبا بالعالم\n\nשלום עולם");
+	});
+
 	for(const surface of["slash", "block"]) {
 		test(surface + " menu stays usable after viewport shrink and filter changes", async ({ page }) => {
 			await page.setViewportSize({ width: 1280, height: 720 });
