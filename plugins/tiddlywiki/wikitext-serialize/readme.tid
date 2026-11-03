@@ -2,6 +2,8 @@ title: $:/plugins/tiddlywiki/wikitext-serialize/readme
 
 This plugin turns a WikiText parse tree back into WikiText: `$tw.utils.serializeWikitextParseTree(tree, options)`. With `options.source`, the text the tree was parsed from, node positions reproduce the original formatting byte for byte; without it every rule rebuilds its syntax from the tree alone.
 
+When a source-backed node has been edited, the serializer rebuilds that node from the current tree. Unchanged neighbouring nodes can still retain their original syntax. Source verification reparses the original text once per serialization and checks the complete node, including attributes and parameters; the tree-only editor path needs no verification parse. Supply `options.wiki` when the tree belongs to another wiki and `options.parseAsInline: true` when its source was parsed inline. Caller-owned trees and options remain unchanged.
+
 !! Building trees: `$tw.utils.wikitextParseTree`
 
 An editor that writes WikiText builds its parse tree with the factory instead of spelling rule names and tags. Every node carries exactly what the serializer needs and no positions. The test `test-wikitext-parsetree-factory.js` shows every function with the text it produces.
@@ -70,6 +72,8 @@ write(f.pragma("\\procedure hello() Hi").concat([f.paragraph([f.text("<<hello>>"
 |`kindOf(node)` |text, paragraph, blankLine, heading, list, listItem, definitionList, definitionTerm, definitionDescription, codeBlock, quoteBlock, quoteCite, table, tableSection, tableRow, tableCell, tableCaption, horizontalRule, hardBreak, hardLineBreaksRegion, emphasis, link, externalLink, image, macroCall, transclusion, widget, element, pragma, comment, conditional, typedBlock, opaque or unknown |
 |`emphasisKind(node)`, `headingLevel(node)`, `listKind(node)` |the kind, level or list tag, else null |
 |`regionLines(node)` |the lines of a `"""` region as arrays of inline nodes |
+|`codeBlockParts(node)` |literal `{code, language}` from a fenced block or a codeblock widget; null for dynamic attributes |
+|`codeText(node)` |literal text and decoded entities in a plain code element; null for rich content or attributes |
 |`quoteParts(node)` |`{body, openingCite, closingCite}` |
 |`listItems(node)` |`{node, children, nested, classes}` per item |
 |`tableCellOptions(node)` |the options `tableCell` takes, read back from a cell |
@@ -97,3 +101,5 @@ f.hasImplicitCloseTag(tree[4]); // true
 ```
 
 The plugin is experimental: names may still change.
+
+Code uses backtick syntax when it can represent the complete value. A closing fence inside a block, or a language outside the fence grammar, uses the core `codeblock` widget instead. A body containing every attribute quote form uses a constant `decodebase64` filter. Inline code with conflicting backticks or line breaks uses an entity-escaped `code` element. These forms retain the literal contents and remain editable through the public reading helpers.
