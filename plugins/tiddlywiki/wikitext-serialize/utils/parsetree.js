@@ -36,6 +36,7 @@ exports.serializeWikitextParseTree = function(tree,options) {
 	var Parser = $tw.utils.getParser("text/vnd.tiddlywiki");
 	initSerializers(Parser);
 	var serializers = Parser.prototype.serializers;
+	var matchesSource = options.source && require("$:/plugins/tiddlywiki/wikitext-serialize/utils/source-verifier.js").createSourceVerifier(options.source,tree,options);
 	// A single closure keeps options bound across rules that only know the (tree,serialize) signature
 	var depth = 0;
 	function serialize(tree,index) {
@@ -60,7 +61,7 @@ exports.serializeWikitextParseTree = function(tree,options) {
 				output.push(options.source ? "" : (leading ? "\n\n" : "\n"));
 			} else if(tree.type === "text" && !tree.rule) {
 				var text = tree.text;
-				if(options.source && typeof tree.start === "number" && typeof tree.end === "number") {
+				if(options.source && typeof tree.start === "number" && typeof tree.end === "number" && matchesSource(tree)) {
 					// \whitespace trim eats the edges of text runs but keeps
 					// the original span; the slice restores the eaten bytes
 					var slice = options.source.substring(tree.start,tree.end);
@@ -70,13 +71,18 @@ exports.serializeWikitextParseTree = function(tree,options) {
 				}
 				output.push(text);
 			} else {
-				var serializeOneRule = serializers[tree.rule];
+				// Substring checks cannot detect deletions, reordered parameters
+				// or a new value already present elsewhere in the source. Only an
+				// unchanged parsed node may reuse its old syntax. Other nodes use
+				// the tree-only path; their unchanged siblings retain fidelity.
+				var ruleOptions = matchesSource && !matchesSource(tree) ? $tw.utils.extend({},options,{source: undefined}) : options,
+					serializeOneRule = serializers[tree.rule];
 				if(serializeOneRule) {
-					output.push(serializeOneRule(tree,serialize,options));
+					output.push(serializeOneRule(tree,serialize,ruleOptions));
 				} else if(tree.rule === "parseblock") {
 					// Stitch restores gaps that only exist in the source,
 					// e.g. the line breaks eaten by \whitespace trim
-					var stitched = options.source ? exports.serializeStitched(tree,serialize,{source: options.source}) : null;
+					var stitched = ruleOptions.source ? exports.serializeStitched(tree,serialize,{source: ruleOptions.source}) : null;
 					output.push(stitched !== null ? stitched : serialize(tree.children));
 				} else {
 					// when no rule is found, just serialize the children, for example the void nodes
